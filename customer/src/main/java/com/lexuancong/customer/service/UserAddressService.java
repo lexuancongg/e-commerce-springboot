@@ -8,11 +8,8 @@ import com.lexuancong.customer.viewmodel.address.AddressDetailVm;
 import com.lexuancong.customer.viewmodel.address.AddressPostVm;
 import com.lexuancong.customer.viewmodel.address.AddressVm;
 import com.lexuancong.customer.viewmodel.useraddress.UserAddressVm;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.List;
 import java.util.Objects;

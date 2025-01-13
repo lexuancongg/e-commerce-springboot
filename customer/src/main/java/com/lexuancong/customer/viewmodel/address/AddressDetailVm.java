@@ -7,8 +7,8 @@ public record AddressDetailVm(
         String addressLine,
         Long districtId,
         String districtName,
-        Long stateOrProvinceId,
-        String stateOrProvinceName,
+        Long provinceId,
+        String provinceName,
         Long countryId,
         String countryName
 ) {

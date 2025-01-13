@@ -8,7 +8,7 @@ public record AddressPostVm(
         @NotBlank String phone,
         @NotBlank String addressLine,
         @NotNull Long districtId,
-        @NotNull Long stateOrProvinceId,
+        @NotNull Long provinceId,
         @NotNull Long countryId
 ) {
 }
