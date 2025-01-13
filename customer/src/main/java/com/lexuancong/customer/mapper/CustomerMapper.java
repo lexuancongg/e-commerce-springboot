@@ -1,6 +1,6 @@
 package com.lexuancong.customer.mapper;
 
-import com.lexuancong.customer.viewmodel.CustomerVm;
+import com.lexuancong.customer.viewmodel.customer.CustomerVm;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.stereotype.Component;
 

@@ -15,7 +15,7 @@ public class UserAddress extends AuditEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String userId;
-    private String addressId;
+    private Long addressId;
     private boolean isActive;
 
 }

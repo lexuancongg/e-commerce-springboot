@@ -1,4 +1,4 @@
-package com.lexuancong.customer.viewmodel;
+package com.lexuancong.customer.viewmodel.customer;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
