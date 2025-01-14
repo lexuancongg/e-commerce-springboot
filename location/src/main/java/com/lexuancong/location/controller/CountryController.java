@@ -29,7 +29,7 @@ public class CountryController {
         return ResponseEntity.ok(countryService.getCountriesPaging(pageIndex,pageSize));
     }
 
-    @GetMapping("/backoffice/countries")
+    @GetMapping({"/backoffice/countries","/storefront/countries"})
     public ResponseEntity<List<CountryVm>> getCountries(){
         return ResponseEntity.ok(countryService.getCountries());
     }
@@ -46,6 +46,19 @@ public class CountryController {
                                 .buildAndExpand(countrySaved.id())
                                 .toUri())
                 .body(countrySaved);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateCountry(@PathVariable Long id,
+                                              @RequestBody @Valid final CountryPostVm countryPostVm){
+        countryService.updateCountry(id,countryPostVm);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/backoffice/country/{id}")
+    public ResponseEntity<Void> deleteCountry(@PathVariable Long id){
+        countryService.deleteCountry(id);
+        return ResponseEntity.noContent().build();
     }
 
 

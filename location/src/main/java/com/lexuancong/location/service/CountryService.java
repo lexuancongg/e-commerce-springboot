@@ -54,7 +54,24 @@ public class CountryService {
     }
 
     public CountryVm createCountry(CountryPostVm countryPostVm){
+        if(countryRepository.existsByNameIgnoreCase(countryPostVm.name())){
+            // throw exception
+        }
         return CountryVm.fromModel(countryRepository.save(countryPostVm.toModel()));
+    }
+
+    public void updateCountry(Long id,CountryPostVm countryPostVm){
+       Country country = countryRepository.findById(id).orElseThrow(()->null);
+       country.setName(countryPostVm.name());
+       countryRepository.save(country);
+
+    }
+    public void deleteCountry(Long id){
+        boolean isExistCountry = countryRepository.existsById(id);
+        if(!isExistCountry){
+            // throw exception
+        }
+        countryRepository.deleteById(id);
     }
 
 }

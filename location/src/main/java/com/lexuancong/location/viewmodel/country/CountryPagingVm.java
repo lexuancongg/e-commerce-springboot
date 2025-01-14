@@ -4,7 +4,7 @@ import java.util.List;
 
 public record CountryPagingVm(
         List<CountryVm> countryPayload,
-        int pageNo,
+        int pageIndex,
         int pageSize,
         int totalElements,
         int totalPages,
