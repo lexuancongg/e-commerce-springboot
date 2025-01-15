@@ -1,4 +1,4 @@
-package com.lexuancong.location.config;
+package com.lexuancong.product.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Configuration
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
-public class DatabaseAuditConfig {
+public class EntityAuditConfig {
     @Bean
     public AuditorAware<String> auditorAware() {
         return ()->{
@@ -23,4 +23,5 @@ public class DatabaseAuditConfig {
         };
 
     }
+
 }

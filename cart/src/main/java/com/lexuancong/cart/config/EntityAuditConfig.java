@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Configuration
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
-public class DatabaseAuditConfig {
+public class EntityAuditConfig {
     @Bean
     // thuộc thu viện data-jpa
     public AuditorAware<String> auditorAware(){

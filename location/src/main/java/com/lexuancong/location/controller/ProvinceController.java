@@ -32,9 +32,9 @@ public class ProvinceController {
 
     }
     // show province with country
-    @GetMapping("/backoffice/provinces")
+    @GetMapping({"/backoffice/provinces/{countryId}","/storefront/provinces/{countryId}"})
     public ResponseEntity<List<ProvinceVm>> getProvincesByCountryId(
-            @RequestParam(value = "countryId",required = true) final Long countryId
+            @PathVariable(value = "countryId",required = true) final Long countryId
     ) {
         List<ProvinceVm> provinceVms = provinceService.getProvincesByCountryId(countryId);
         return ResponseEntity.ok(provinceVms);
@@ -61,7 +61,7 @@ public class ProvinceController {
 
     @DeleteMapping("/backoffice/provinces/{id}")
     public ResponseEntity<Void> deleteProvince(@PathVariable Long id){
-        ProvinceService.deleteProvince(id);
+        provinceService.deleteProvince(id);
         return ResponseEntity.noContent().build();
     }
 
