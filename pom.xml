@@ -20,6 +20,9 @@
 	<modules>
 		<module>common</module>
 		<module>cart</module>
+		<module>address</module>
+		<module>product</module>
+		<module>customer</module>
 	</modules>
 
 	<properties>

@@ -8,10 +8,10 @@
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath> <!-- lookup parent from repository -->
     </parent>
-    <artifactId>location</artifactId>
+    <artifactId>address</artifactId>
     <version>${revision}</version>
-    <name>location</name>
-    <description>location</description>
+    <name>address</name>
+    <description>address</description>
 
     <properties>
         <java.version>21</java.version>

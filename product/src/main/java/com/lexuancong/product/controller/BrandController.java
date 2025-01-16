@@ -1,6 +1,5 @@
 package com.lexuancong.product.controller;
 
-import com.lexuancong.product.model.Brand;
 import com.lexuancong.product.service.BrandService;
 import com.lexuancong.product.viewmodel.brand.BrandPostVm;
 import com.lexuancong.product.viewmodel.brand.BrandVm;
@@ -37,6 +36,17 @@ public class BrandController {
                         .buildAndExpand(brandSaved.id()).toUri())
                 .body(brandSaved);
 
+    }
+    @PutMapping("/backoffice/brands/{id}")
+    public ResponseEntity<Void> updateBrand(@PathVariable Long id, @RequestBody @Valid BrandPostVm brandPostVm) {
+        brandService.updateBrand(id,brandPostVm);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/backoffice/brands/{id}")
+    public ResponseEntity<Void> deleteBrand(@PathVariable Long id) {
+        brandService.deleteBrand(id);
+        return ResponseEntity.noContent().build();
     }
 
 
