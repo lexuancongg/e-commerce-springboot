@@ -19,12 +19,12 @@ import java.util.Optional;
 @Transactional
 public class UserAddressService {
     private final UserAddressRepository userAddressRepository;
-    private final LocationService locationService;
+    private final AddressService addressService;
     private final UserAddressMapper userAddressMapper;
 
-    public UserAddressService(UserAddressRepository userAddressRepository, LocationService locationService, UserAddressMapper userAddressMapper) {
+    public UserAddressService(UserAddressRepository userAddressRepository, AddressService locationService, UserAddressMapper userAddressMapper) {
         this.userAddressRepository = userAddressRepository;
-        this.locationService = locationService;
+        this.addressService = locationService;
         this.userAddressMapper = userAddressMapper;
     }
 
@@ -35,7 +35,7 @@ public class UserAddressService {
         List<UserAddress> userAddresses = userAddressRepository.findByUserId(userId);
         boolean isFirstAddress = userAddresses.isEmpty();
         // goi api sang service location de them address
-        AddressVm addressVmOfSavedAddress = locationService.createAddress(addressPostVm);
+        AddressVm addressVmOfSavedAddress = addressService.createAddress(addressPostVm);
         UserAddress userAddress = UserAddress.builder()
                 .userId(userId).addressId(addressVmOfSavedAddress.id()).isActive(isFirstAddress)
                 .build();
@@ -47,7 +47,7 @@ public class UserAddressService {
         UserAddress userAddress = userAddressRepository.findByUserIdAndIsActiveTrue(userId)
                 // ban ra ngoai le here
                 .orElseThrow(()-> null );
-        return  locationService.getAddressById(userAddress.getAddressId());
+        return  addressService.getAddressById(userAddress.getAddressId());
 
     }
 

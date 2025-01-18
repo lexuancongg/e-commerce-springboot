@@ -6,7 +6,7 @@ import com.lexuancong.customer.viewmodel.address.AddressVm;
 import org.springframework.stereotype.Service;
 
 @Service
-public class LocationService {
+public class AddressService {
 
     public AddressVm createAddress(AddressPostVm addressPostVm){
         return null;
