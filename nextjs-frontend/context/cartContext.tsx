@@ -1,4 +1,6 @@
+"use client"
 import React, {createContext, useCallback, useEffect, useMemo, useState} from "react";
+import CartService from "@/services/cartService";
 
 export const CartContext = createContext({
     numberCartItems: 0,
