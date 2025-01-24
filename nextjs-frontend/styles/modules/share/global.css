@@ -1,0 +1,34 @@
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+input,
+textarea,
+label {
+    display: block;
+    outline: none;
+    border: none;
+}
+button {
+    outline: none;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+button:focus {
+    outline: none;
+}
+
+
+.title{
+    font-size: 16px;
+    text-transform: uppercase;
+    text-align: start;
+    height: 60px;
+    line-height: 60px;
+    padding-left: 20px;
+    color: #27272a;
+}
+

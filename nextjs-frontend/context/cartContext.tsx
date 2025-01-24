@@ -1,5 +1,5 @@
 "use client"
-import React, {createContext, useCallback, useEffect, useMemo, useState} from "react";
+import React, {createContext, useCallback, useContext, useEffect, useMemo, useState} from "react";
 import CartService from "@/services/cartService";
 
 export const CartContext = createContext({
@@ -28,4 +28,8 @@ export function CartProvider({children}: React.PropsWithChildren<{}>) {
     );
     return <CartContext value={stateCartContext}>{children}</CartContext>
 
+}
+export const useCartContext = ()=>{
+    const {numberCartItems,fetchNumberCartItems} = useContext(CartContext);
+    return  {numberCartItems,fetchNumberCartItems};
 }
