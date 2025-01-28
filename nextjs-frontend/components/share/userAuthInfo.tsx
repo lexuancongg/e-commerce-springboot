@@ -46,7 +46,7 @@ function UserAuthInfo() {
                         <Dropdown.Toggle variant="dark" id="user-dropdow " className="bg-transparent"
                                          style={{ border: 'none', color: '#b2b2b2' }}
                         >
-                            Signed as: {authenticationInfoVm.userAuthenticationInfo.userName}
+                            {authenticationInfoVm.userAuthenticationInfo.userName || 'xuan cong'}
                         </Dropdown.Toggle>
                         <Dropdown.Menu variant="dark" style={{ backgroundColor: '#222' }}>
                             <Dropdown.Item className="d-block h-full">Profile</Dropdown.Item>

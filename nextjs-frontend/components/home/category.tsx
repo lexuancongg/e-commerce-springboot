@@ -118,64 +118,7 @@ const categoriess: CategoryModel[] = [
             id: 102,
             url: "https://example.com/images/fashion.jpg",
         },
-    },{
-        id: 2,
-        name: "Fashion",
-        slug: "fashion",
-        categoryImage: {
-            id: 102,
-            url: "https://example.com/images/fashion.jpg",
-        },
-    },{
-        id: 2,
-        name: "Fashion",
-        slug: "fashion",
-        categoryImage: {
-            id: 102,
-            url: "https://example.com/images/fashion.jpg",
-        },
-    },{
-        id: 2,
-        name: "Fashion",
-        slug: "fashion",
-        categoryImage: {
-            id: 102,
-            url: "https://example.com/images/fashion.jpg",
-        },
-    },{
-        id: 2,
-        name: "Fashion",
-        slug: "fashion",
-        categoryImage: {
-            id: 102,
-            url: "https://example.com/images/fashion.jpg",
-        },
-    },{
-        id: 2,
-        name: "Fashion",
-        slug: "fashion",
-        categoryImage: {
-            id: 102,
-            url: "https://example.com/images/fashion.jpg",
-        },
-    },{
-        id: 2,
-        name: "Fashion",
-        slug: "fashion",
-        categoryImage: {
-            id: 102,
-            url: "https://example.com/images/fashion.jpg",
-        },
-    },{
-        id: 2,
-        name: "Fashion",
-        slug: "fashion",
-        categoryImage: {
-            id: 102,
-            url: "https://example.com/images/fashion.jpg",
-        },
-    },
-
+    }
 ];
 
 const Category: NextPage = () => {

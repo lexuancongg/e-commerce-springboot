@@ -1,5 +1,5 @@
 "use client"
-import React, {Context, ReactElement, useCallback, useEffect, useMemo, useState} from "react";
+import React, {Context, ReactElement, useCallback, useContext, useEffect, useMemo, useState} from "react";
 import CustomerService from "@/services/customerService";
 
 // khởi tạo context
@@ -46,3 +46,7 @@ export function UserInfoProvider({children}: React.PropsWithChildren): ReactElem
     return <UserInfoContext.Provider value={userInfo}>{children}</UserInfoContext.Provider>;
 
 }
+export const useUserInfoContext = () => {
+    const { email, firstName, lastName, fetchUserInfo } = useContext(UserInfoContext);
+    return { email, firstName, lastName, fetchUserInfo };
+};

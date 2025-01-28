@@ -1,5 +1,5 @@
 
-export type ProductPreview ={
+export type ProductPreviewVm ={
     id:number;
     name:string;
     slug:string;

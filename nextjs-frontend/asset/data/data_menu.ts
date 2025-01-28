@@ -4,16 +4,6 @@ export const data_menu = [
         name: 'Notification',
         links: '#',
         icon: 'bi bi-bell',
-    },
-    {
-        id: 2,
-        name: 'Help & FAQs',
-        links: '#',
-        icon: 'bi bi-question-circle',
-    },
-    {
-        id: 3,
-        name: 'EN',
-        links: '#',
+
     },
 ]
