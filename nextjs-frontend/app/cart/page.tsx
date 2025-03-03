@@ -5,12 +5,9 @@ import CartItem from "@/components/cart/cartItem";
 import Link from "next/link";
 import {Button} from "react-bootstrap";
 import {formatPrice} from "@/utils/formatPrice";
-import {useCartContext} from "@/context/cartContext";
-import {useUserInfoContext} from "@/context/userInfoContext";
 import ConfirmationDialog from "@/components/dialog/confirmDialog";
 import {CartItemPutVm} from "@/models/cart/cartItemPutVm";
 import cartService from "@/services/cartService";
-import {PromotionVerifyResult} from "@/models/promotion/promotion";
 
 
 const Cart = () => {
@@ -28,19 +25,10 @@ const Cart = () => {
 
     const [productIdToRemove, setProductIdToRemove] = useState<number>(0);
 
-    const {email} = useUserInfoContext();
-
-    const {fetchNumberCartItems} = useCartContext();
 
     const [couponCode, setCouponCode] = useState<string>('');
 
-    const [promotionApply, setPromotionApply] = useState<PromotionVerifyResult>({
-        couponCode:'bu',
-        discountType:'bu',
-        isValid:true,
-        productId:1,
-        discountValue:5
-    });
+
 
     const [discountMoney, setDiscountMoney] = useState<number>(0);
     const [subTotalPrice, setSubTotalPrice] = useState<number>(0);
@@ -52,6 +40,8 @@ const Cart = () => {
     }, [])
 
 
+
+    // get data cartItems
     const loadCartItems = useCallback(async () => {
         try {
             const cartItemsPayload = await cartService.getCartItemsFullPayload();
@@ -73,9 +63,10 @@ const Cart = () => {
 
     }
 
+    // handle event checked cartItem
     const handleSelectCartItemChange = (productId: number) => {
         setSelectedProductIds((prevSelectedProductIds) => {
-            // new laij vì set là kiểu tham chiếu
+            // new lại vì set là kiểu tham chiếu
             const newSelectedProductIds = new Set(prevSelectedProductIds);
             if (prevSelectedProductIds.has(productId)) {
                 newSelectedProductIds.delete(productId)
@@ -86,6 +77,9 @@ const Cart = () => {
         })
 
     }
+
+
+    // handle update quantity cartItem
     const handleUpdateCartItemQuantity = async (productId: number, quantity: number) => {
         const cartItemPutVm: CartItemPutVm = {
             quantity: quantity
@@ -93,12 +87,14 @@ const Cart = () => {
         try {
             // call api update tại đây
             await cartService.updateCartItemAboutQuantity(productId, cartItemPutVm);
+            loadCartItems();
 
         } catch (error) {
             throw new Error();
         }
 
     }
+    // handle up quantity
     const handleIncreaseQuantity = async (productId: number) => {
         const cartItem = cartItems.find((item, index) => item.productId == productId);
         if (!cartItem) {
@@ -109,6 +105,8 @@ const Cart = () => {
 
     }
 
+
+    // handle dow quantity 1
     const handleDecreaseQuantity = async (productId: number) => {
         const cartItem = cartItems.find((item, index, obj) => {
             return item.productId == productId;
@@ -117,16 +115,30 @@ const Cart = () => {
         const newQuantity = cartItem.quantity - 1;
         if (newQuantity < 1) {
             // show confirm log delete product
+            handleShowModelConfirmDelete(productId);
         } else {
+            await handleUpdateCartItemQuantity(productId,newQuantity);
 
         }
 
     }
 
+    const handleShowModelConfirmDelete = (productId:number)=>{
+        setProductIdToRemove(productId);
+        setIsShowModelConfirmDelete(true);
+    }
+
+
+
     const handleCartItemQuantityOnBlur = async (
         productId: number, event: React.FocusEvent<HTMLInputElement>
     ) => {
-        const newQuantity = parseInt(event.target.value);
+        const newQuantity = parseInt(event.target.value.trim(),10);
+        if(isNaN(newQuantity)|| newQuantity  <=0){
+            event.preventDefault();
+            return;
+
+        }
         const cartItem = cartItems.find((item, index) => item.productId == productId);
         if (!cartItem || newQuantity === cartItem.quantity) {
             return;
@@ -134,18 +146,32 @@ const Cart = () => {
         await handleUpdateCartItemQuantity(productId, newQuantity);
     }
 
-    const handleCartItemQuantityKeyDown = () => {
+
+    const handleCartItemQuantityKeyDown = (productId:number,event: React.KeyboardEvent<HTMLInputElement>) => {
+        const allowedKeys : string[] = ['Backspace', 'ArrowLeft', 'ArrowRight', 'Delete', 'Tab', 'Enter'];
+        const regExpNumber = /^\d$/;
+        if(!allowedKeys.includes(event.key) && !regExpNumber.test(event.key)){
+            event.preventDefault();
+            return
+        }
+        if(event.key == 'Enter'){
+            const newQuantity =parseInt(event.currentTarget.value.trim(),10);
+            if(isNaN(newQuantity)|| newQuantity  <=0){
+                event.preventDefault();
+                return;
+
+            }
+
+        }
+
 
     }
 
-    const handleOpenDeleteConfirmationModal = () => {
+    const handleShowDeleteConfirmationModal = () => {
 
     }
 
 
-    const removeCouponCode = () => {
-        setPromotionApply(undefined);
-    };
 
     const applyCopounCode = () => {
 
@@ -199,13 +225,12 @@ const Cart = () => {
                                                 item={item}
                                                 isLoading={loadingItems.has(item.productId)}
                                                 isSelected={selectedProductIds.has(item.productId)}
-                                                promotionApply={promotionApply}
                                                 handleSelectCartItemChange={handleSelectCartItemChange}
                                                 handleDecreaseQuantity={handleDecreaseQuantity}
                                                 handleIncreaseQuantity={handleIncreaseQuantity}
                                                 handleCartItemQuantityOnBlur={handleCartItemQuantityOnBlur}
                                                 handleCartItemQuantityKeyDown={handleCartItemQuantityKeyDown}
-                                                handleOpenDeleteConfirmationModal={handleOpenDeleteConfirmationModal}
+                                                handleShowModelConfirmDelete={handleShowModelConfirmDelete}
                                             />
                                         );
                                     })}
@@ -215,34 +240,7 @@ const Cart = () => {
                         </div>
                     </div>
                 </div>
-                {promotionApply && (
-                    <div className="mt-5 mb-5">
-                        <div className="row">
-                            <div className="col">
-                                {promotionApply.couponCode ? (
-                                    <span className="coupon-code-apply" aria-hidden="true"
-                                          onClick={removeCouponCode}>
-                    <i className="bi bi-receipt"></i>
-                                        {promotionApply?.discountType === 'PERCENTAGE' ? (
-                                            <> You got a {promotionApply.discountValue}% discount on one product!</>
-                                        ) : (
-                                            <> You got a {promotionApply.discountValue}$ discount on one product!</>
-                                        )}
-                  </span>
-                                ) : (
-                                    <span
-                                        className="invalid-coupon-code"
-                                        style={{color: 'red', fontWeight: 'bold'}}
-                                        aria-hidden="true"
-                                        onClick={removeCouponCode}
-                                    >
-                    <i className="bi bi-receipt"></i> Coupon code not valid!
-                  </span>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                )}
+
                 <div className="row">
                     <div className="col-lg-6 col-md-6 col-sm-6">
                         <div>
@@ -286,7 +284,7 @@ const Cart = () => {
                         </div>
                         <div>
                             <div>
-                                <input id="select-all" type="checkbox"/>
+                                <input onChange={handleSelectAllCartItemsChange} id="select-all" type="checkbox"/>
                                 <label htmlFor="select-all">Chọn Tất Cả</label>
                             </div>
                             <div>Xóa</div>

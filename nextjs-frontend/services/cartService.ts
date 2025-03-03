@@ -111,8 +111,12 @@ class CartService{
         throw new Error();
     }
 
-    public async updateCartItemAboutQuantity(productId:number , payload:CartItemPutVm){
-
+    public async updateCartItemAboutQuantity(productId:number , cartItemPutVm:CartItemPutVm){
+        const response = await apiClient.put(this.baseUrl,JSON.stringify(cartItemPutVm));
+        if(!response.ok){
+            throw new Error();
+        }
+        return await response.json();
 
     }
 

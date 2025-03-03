@@ -62,7 +62,7 @@ const  Header  = ({children}:React.PropsWithChildren) =>{
                 <nav className="limiter-menu-desktop container">
                     {/* <!-- Logo desktop --> */}
                     <Link href="/" className="header-logo me-3">
-                        <h3 className="text-black">Xuan Cong - store</h3>
+                        <h3 className="text-black">Xuan Cong - Shop</h3>
                     </Link>
 
                     {/* <!-- Search --> */}

@@ -9,7 +9,7 @@ export default function  Layout({children}:React.PropsWithChildren){
     return (
         <>
             <Head>
-                <title>XuanCong -  store</title>
+                <title>XuanCong -  Shop</title>
             </Head>
             <Header>
                 <UserAuthInfo/>

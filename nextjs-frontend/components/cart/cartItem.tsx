@@ -21,7 +21,7 @@ interface CartItemProps {
         productId: number,
         event: React.KeyboardEvent<HTMLInputElement>
     ) => void;
-    handleOpenDeleteConfirmationModal: (productId: number) => void;
+    handleShowModelConfirmDelete: (productId: number) => void;
 }
 
 const calculateProductPrice = (
@@ -49,7 +49,7 @@ const CartItem: FC<CartItemProps> = ({
                                          handleIncreaseQuantity,
                                          handleCartItemQuantityOnBlur,
                                          handleCartItemQuantityKeyDown,
-                                         handleOpenDeleteConfirmationModal,
+                                         handleShowModelConfirmDelete,
                                      }) => {
     return (
         <tr key={item.quantity.toString() + item.productId.toString()}>
@@ -147,7 +147,7 @@ const CartItem: FC<CartItemProps> = ({
                 {' '}
                 <button
                     className="remove_product"
-                    onClick={() => handleOpenDeleteConfirmationModal(item.productId)}
+                    onClick={() => handleShowModelConfirmDelete(item.productId)}
                 >
                     <i className="bi bi-x-lg fs-5"></i>
                 </button>{' '}
