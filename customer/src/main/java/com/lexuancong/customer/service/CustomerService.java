@@ -39,6 +39,7 @@ public class CustomerService {
         }catch (ForbiddenException forbiddenException){
             // throw exception
         }
+        return  null;
     }
 
     public CustomerVm createCustomer(CustomerPostVm customerPostVm){
