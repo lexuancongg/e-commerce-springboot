@@ -9,6 +9,7 @@ import lombok.Setter;
 @Table(name = "product_attribute_group")
 @Getter
 @Setter
+// ví dụ thuộc tính thoong số kỹ thuật thì gồm nhiều thuộc tính khác như ram,...
 public class ProductAttributeGroup extends AuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

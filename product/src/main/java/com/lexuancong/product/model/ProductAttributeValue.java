@@ -9,6 +9,7 @@ import lombok.Setter;
 @Table(name = "product_attribute_value")
 @Getter
 @Setter
+// một sp có nhiều thuộc tính và một thuộc tính cũng có nhieeuf sp => bảng trung gian
 public class ProductAttributeValue {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

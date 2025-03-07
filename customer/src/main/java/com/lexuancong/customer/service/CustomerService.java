@@ -64,6 +64,8 @@ public class CustomerService {
         user.setEnabled(true);
         Response  responseCreateUser = realmResource.users().create(user);
         String userId = CreatedResponseUtil.getCreatedId(responseCreateUser);
+        // khác khi làm vc db, nó không tự động có id
+        user.setId(userId);
         UserResource userResource = realmResource.users().get(userId);
 
         // sau này xử lý role trường hợp admin ta tài khoản cho nhân viên ở đây
