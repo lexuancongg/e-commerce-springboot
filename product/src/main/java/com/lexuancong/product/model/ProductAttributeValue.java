@@ -2,13 +2,15 @@ package com.lexuancong.product.model;
 
 import com.lexuancong.product.model.attribute.ProductAttribute;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "product_attribute_value")
 @Getter
 @Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 // một sp có nhiều thuộc tính và một thuộc tính cũng có nhieeuf sp => bảng trung gian
 public class ProductAttributeValue {
     @Id

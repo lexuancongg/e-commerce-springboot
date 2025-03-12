@@ -6,10 +6,7 @@ import com.lexuancong.product.viewmodel.attributegroup.ProductAttributeGroupVm;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
@@ -22,8 +19,8 @@ public class ProductAttributeGroupController {
     }
 
     @GetMapping({"/backoffice/product-attribute-group"})
-    public ResponseEntity<List<ProductAttributeGroupVm>> getProductAttributeGroup() {
-        List<ProductAttributeGroupVm> productAttributeGroupVms = this.productAttributeGroupService.getProductAttributeGroup();
+    public ResponseEntity<List<ProductAttributeGroupVm>> getProductAttributeGroups() {
+        List<ProductAttributeGroupVm> productAttributeGroupVms = this.productAttributeGroupService.getProductAttributeGroups();
         return new ResponseEntity<>(productAttributeGroupVms, HttpStatus.OK);
     }
 
@@ -35,8 +32,25 @@ public class ProductAttributeGroupController {
             ) {
         ProductAttributeGroupVm productAttributeGroupVm = this.productAttributeGroupService
                 .createProductAttributeGroup(productAttributeGroupPostVm);
+        return ResponseEntity.created(uriComponentsBuilder.replacePath("backoffice/product-attribute-group/{id}")
+                .buildAndExpand(productAttributeGroupVm.id()).toUri()
+        ).body(productAttributeGroupVm);
 
     }
+
+    @PutMapping({"/backoffice/product-attribute-group/{id}"})
+    public ResponseEntity<Void> updateProductAttributeGroup(@PathVariable Long id,
+                                                            @Valid @RequestBody ProductAttributeGroupPostVm productAttributeGroupPostVm){
+        this.productAttributeGroupService.updateProductAttributeGroup(id,productAttributeGroupPostVm);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping({"/backoffice/product-attribute-group/{id}"})
+    public ResponseEntity<Void> deleteProductAttributeGroup(@PathVariable Long id){
+        this.productAttributeGroupService.deleteProductAttributeGroup(id);
+        return ResponseEntity.noContent().build();
+    }
+
 
 
 
