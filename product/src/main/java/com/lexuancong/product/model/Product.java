@@ -21,22 +21,27 @@ public class Product extends AuditEntity{
     private String name;
     private String description;
     private String shortDescription;
+    // thông số kỹ thuật
     private String specifications;
+    // mã quản lý kho
     private String sku;
+    // slug để hiển thị trên url
     private String slug;
+    private String gtin;
     private Double price;
-
     private boolean hasOptions;
     private boolean isOrderEnable;
     private boolean isPublic;
     private boolean isFeature;
+    // xác định cho các biến thể , chỉ có sp chính hiển thị đôc lập trên web
     private boolean isShownSeparately;
+    // xacs định có theo dõi số lượng tồn koong
     private boolean isInventoryTracked;
     private Long inventoryQuantity;
     private String metaTitle;
     private String metaDescription;
     private String metaKeywords;
-    private Long imageId;
+    private Long avatarImageId;
 
     // các thuộc tính khác
 
