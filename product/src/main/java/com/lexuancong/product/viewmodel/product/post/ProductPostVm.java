@@ -3,7 +3,10 @@ package com.lexuancong.product.viewmodel.product.post;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.lexuancong.product.validation.ValidateProductPrice;
+import com.lexuancong.product.viewmodel.product.databinding.ProductPropertiesRequire;
+import com.lexuancong.product.viewmodel.product.databinding.ProductVariationPropertiesRequire;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Null;
 
 import java.util.List;
 
@@ -22,6 +25,13 @@ public record ProductPostVm(
         String gtin,
         @ValidateProductPrice Double price,
         boolean isPublic,
-        boolean isFeature
-) {
+        boolean isFeature,
+        List<Long> productImageIds,
+        Long avatarImageId,
+        Double length,
+        Double width,
+        Double height,
+        Double weight,
+        List<ProductVariationPostVm> variations
+)  implements ProductPropertiesRequire<ProductVariationPostVm> {
 }

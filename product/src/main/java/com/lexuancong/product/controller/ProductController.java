@@ -15,6 +15,8 @@ public class ProductController {
         this.productService = productService;
     }
 
+
+
     // create
     @PostMapping({"/backoffice/products"})
     public ResponseEntity<ProductSummaryVm> createProduct(@Valid @RequestBody ProductPostVm productPostVm) {
