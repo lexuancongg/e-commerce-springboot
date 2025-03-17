@@ -8,8 +8,12 @@ import com.lexuancong.product.viewmodel.product.databinding.ProductVariationProp
 import com.lexuancong.product.viewmodel.product.post.ProductPostVm;
 import com.lexuancong.product.viewmodel.product.post.ProductSummaryVm;
 import com.lexuancong.product.viewmodel.product.post.ProductVariationPostVm;
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +25,7 @@ public class ProductService {
     }
 
 
+    // dành cho create
     private <T extends ProductVariationPropertiesRequire > void validateProduct(ProductPropertiesRequire<T> productVmToSave){
         this.validateProduct(productVmToSave,null);
     }
@@ -43,8 +48,23 @@ public class ProductService {
     }
 
     // check xem các thuộc tinhs của sp có bị trùng lặp khoong
-    private void validateExistingProductProperties(BaseProductPropertiesRequire baseProductPropertiesRequire,Product existingProduct){
+    private void validateExistingProductProperties(BaseProductPropertiesRequire baseProductProperties,Product existingProduct){
+        this.checkPropertyExisted(baseProductProperties.slug().toLowerCase(),this.productRepository::findBySlug,existingProduct);
+        if (StringUtils.isNotEmpty(baseProductProperties.gtin())){
+            this.checkPropertyExisted(baseProductProperties.gtin(),this.productRepository::findByGtin,existingProduct);
+        }
+        this.checkPropertyExisted(baseProductProperties.sku(),this.productRepository::findBySku,existingProduct);
+    }
 
+    // cách thức check các thuộc tính tuương tự nhau (cần tên thuộc tính , đưa method từ jpa) => hàm
+    private void checkPropertyExisted(String propertyValue, Function<String, Optional<Product>> finder ,Product existingProduct){
+        finder.apply(propertyValue).ifPresent(product -> {
+            if(existingProduct == null || !product.getId().equals(existingProduct.getId()) ){
+                // throw exception
+            }
+
+
+        });
     }
 
 

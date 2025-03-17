@@ -17,7 +17,7 @@ import java.util.List;
 public class Product extends AuditEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     private String name;
     private String description;
     private String shortDescription;
