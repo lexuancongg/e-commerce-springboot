@@ -2,6 +2,7 @@ package com.lexuancong.product.viewmodel.product.post;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.lexuancong.product.model.Product;
 import com.lexuancong.product.validation.ValidateProductPrice;
 import com.lexuancong.product.viewmodel.product.databinding.ProductPropertiesRequire;
 import com.lexuancong.product.viewmodel.product.databinding.ProductVariationPropertiesRequire;
@@ -34,4 +35,25 @@ public record ProductPostVm(
         Double weight,
         List<ProductVariationPostVm> variations
 )  implements ProductPropertiesRequire<ProductVariationPostVm> {
+
+
+    public Product toModel(){
+        Product product = new Product();
+        product.setName(name);
+        product.setSlug(slug);
+        product.setAvatarImageId(avatarImageId);
+        product.setDescription(description);
+        product.setSku(slug);
+        product.setShortDescription(shortDescription);
+        product.setSpecifications(specification);
+        product.setGtin(gtin);
+        product.setPrice(price);
+        product.setPublic(isPublic);
+        product.setFeature(isFeature);
+        product.setWeight(weight);
+        product.setHeight(height);
+        product.setWidth(width);
+        return product;
+    }
+
 }
