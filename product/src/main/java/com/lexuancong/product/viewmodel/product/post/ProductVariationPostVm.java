@@ -1,5 +1,6 @@
 package com.lexuancong.product.viewmodel.product.post;
 
+import com.lexuancong.product.model.Product;
 import com.lexuancong.product.viewmodel.product.databinding.ProductVariationPropertiesRequire;
 
 import java.util.List;
@@ -21,5 +22,15 @@ public record ProductVariationPostVm(
     @Override
     public Long id() {
         return null;
+    }
+    public Product product(){
+        Product product = new Product();
+        product.setName(name);
+        product.setSlug(slug);
+        product.setSku(sku);
+        product.setGtin(gtin);
+        product.setPrice(price);
+        product.setAvatarImageId(avatarImageId);
+
     }
 }

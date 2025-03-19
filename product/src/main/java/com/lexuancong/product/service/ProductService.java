@@ -30,11 +30,10 @@ public class ProductService {
         this.validateProduct(productPostVm);
         Product product = productPostVm.toModel();
         this.setBrandForProduct(product, productPostVm.brandId());
+        Product productSaved =  this.productRepository.save(product);
 
-        product =  this.productRepository.save(product);
-
-        List<ProductCategory> productCategoryList = this.setProductCategories(product,productPostVm.categoryIds());
-        List<ProductImage> productImageList = this.setProductImages(product,productPostVm.categoryIds());
+        List<ProductCategory> productCategoryList = this.setProductCategories(productSaved,productPostVm.categoryIds());
+        List<ProductImage> productImageList = this.setProductImages(productSaved,productPostVm.categoryIds());
 
         this.productCategoryRepository.saveAll(productCategoryList);
         this.productImageRepository.saveAll(productImageList);
@@ -45,11 +44,59 @@ public class ProductService {
         }
 
         // xu ly cac bien the
+        List<Product> variationSaved = this.createVariationsFromVm(productPostVm.variations(),productSaved);
+        // xử lý l
 
-
-        
-        
     }
+
+
+
+    private List<Product> createVariationsFromVm(List<? extends ProductVariationPropertiesRequire> variationPostVmList,
+                                                 Product mainProduct) {
+
+        // đầu tiên sử lý hình ảnh
+        List<ProductImage> allProductImages = new ArrayList<>();
+        List<Product> variations = variationPostVmList.stream()
+                .map(variation ->{
+                    Product productVariation  = this.buildProductVariationFormVm(variation, mainProduct);
+                    // quay lại lưu hình ảnh như sản phẩm chính
+                    List<ProductImage> variationImages =
+                            this.setProductImages(productVariation,variation.productImageIds());
+                    allProductImages.addAll(variationImages);
+
+                    return productVariation;
+
+                }  )
+                .toList();
+        List<Product> variationsSaved = this.productRepository.saveAll(variations);
+        this.productImageRepository.saveAll(allProductImages);
+        return variationsSaved;
+
+
+    }
+
+    // input : ds variationVm post , product cha -> để lưu tinh cha con
+    private  List<Product> performCreateVariations(
+            List<? extends ProductVariationPropertiesRequire> variationPropertiesVm,Product mainProduct){
+
+
+    }
+    private Product buildProductVariationFormVm(ProductVariationPropertiesRequire variationPropertiesVm,
+                                                Product mainProduct){
+        return Product.builder()
+                .name(variationPropertiesVm.name())
+                .avatarImageId(variationPropertiesVm.avatarImageId())
+                .slug(variationPropertiesVm.slug().toLowerCase())
+                .sku(variationPropertiesVm.sku())
+                .gtin(variationPropertiesVm.gtin())
+                .price(variationPropertiesVm.price())
+                .isPublic(mainProduct.isPublic())
+                .parent(mainProduct)
+                .build();
+
+    }
+
+    // ds productImage lưu lại khi theem sp
     private List<ProductImage> setProductImages(Product product , List<Long> imageIds){
         List<ProductImage> productImages = new ArrayList<>();
         if(CollectionUtils.isEmpty(imageIds)){
