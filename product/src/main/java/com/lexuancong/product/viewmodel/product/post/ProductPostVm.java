@@ -3,11 +3,11 @@ package com.lexuancong.product.viewmodel.product.post;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.lexuancong.product.model.Product;
+import com.lexuancong.product.model.ProductOptionValue;
 import com.lexuancong.product.validation.ValidateProductPrice;
+import com.lexuancong.product.viewmodel.product.ProductOptionPostValueVm;
 import com.lexuancong.product.viewmodel.product.databinding.ProductPropertiesRequire;
-import com.lexuancong.product.viewmodel.product.databinding.ProductVariationPropertiesRequire;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Null;
 
 import java.util.List;
 
@@ -33,7 +33,8 @@ public record ProductPostVm(
         Double width,
         Double height,
         Double weight,
-        List<ProductVariationPostVm> variations
+        List<ProductVariationPostVm> variations,
+        List<ProductOptionPostValueVm> productOptionValues
 )  implements ProductPropertiesRequire<ProductVariationPostVm> {
 
 

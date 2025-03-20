@@ -2,7 +2,9 @@ package com.lexuancong.product.service;
 
 import com.lexuancong.product.model.*;
 import com.lexuancong.product.repository.*;
+import com.lexuancong.product.viewmodel.product.ProductOptionPostValueVm;
 import com.lexuancong.product.viewmodel.product.databinding.BaseProductPropertiesRequire;
+import com.lexuancong.product.viewmodel.product.databinding.ProductOptionPropertyRequire;
 import com.lexuancong.product.viewmodel.product.databinding.ProductPropertiesRequire;
 import com.lexuancong.product.viewmodel.product.databinding.ProductVariationPropertiesRequire;
 import com.lexuancong.product.viewmodel.product.post.ProductPostVm;
@@ -25,6 +27,8 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final ProductCategoryRepository productCategoryRepository;
     private final ProductImageRepository productImageRepository;
+    private final ProductOptionRepository productOptionRepository;
+    private final ProductOptionValueRepository productOptionValueRepository;
 
     public ProductSummaryVm createProduct(ProductPostVm productPostVm){
         this.validateProduct(productPostVm);
@@ -43,11 +47,48 @@ public class ProductService {
             return ProductSummaryVm.fromModel(product);
         }
 
-        // xu ly cac bien the
+        // xử lý các biến thể
         List<Product> variationSaved = this.createVariationsFromVm(productPostVm.variations(),productSaved);
-        // xử lý l
+        // lưu dữ liệu bảng product optionValue cho  product => cần lấy đuược product otion tương ứng từng id => Map
+
+        List<ProductOption> productOptions = this.getProductOption(productPostVm.productOptionValues());
+        Map<Long,ProductOption> longProductOptionMap =  productOptions.stream()
+                .collect(Collectors.toMap(ProductOption::getId, Function.identity()));
+        List<ProductOptionValue> productOptionValues =
+                this.createProductOptionValue(productPostVm,productSaved,longProductOptionMap);
+
+
+
 
     }
+    private List<ProductOptionValue> createProductOptionValue(ProductPostVm productPostVm ,
+                                                              Product mainProduct ,Map<Long,ProductOption> longProductOptionMap){
+        List<ProductOptionValue> productOptionValues = new ArrayList<>();
+        productPostVm.productOptionValues().forEach(optionValue ->{
+            ProductOption productOption = longProductOptionMap.get(optionValue.productOptionId());
+            ProductOptionValue productOptionValue = ProductOptionValue.builder()
+                    .productOption(productOption)
+                    .product(mainProduct)
+
+                    .build();
+            productOptionValues.add(productOptionValue);
+        });
+        this.productOptionValueRepository.saveAll(productOptionValues);
+        return productOptionValues;
+
+
+    }
+
+    private List<ProductOption> getProductOption(List<? extends ProductOptionPropertyRequire> productOptionValueVms){
+        List<Long> optionIds  = productOptionValueVms.stream()
+                .map(ProductOptionPropertyRequire::productOptionId)
+                .toList();
+        if(CollectionUtils.isEmpty(optionIds)) return Collections.emptyList();
+        List<ProductOption> productOptions = this.productOptionRepository.findAllById(optionIds);
+        return productOptions;
+
+    }
+
 
 
 
@@ -69,6 +110,8 @@ public class ProductService {
                 }  )
                 .toList();
         List<Product> variationsSaved = this.productRepository.saveAll(variations);
+
+        // lưu cho bảng productImage
         this.productImageRepository.saveAll(allProductImages);
         return variationsSaved;
 
@@ -150,7 +193,7 @@ public class ProductService {
     }
 
 
-    // gộp cho cả trường hợp create và update
+    //  cả update và create và update đều validate => gộp chung hàm
     private <T extends ProductVariationPropertiesRequire> void validateProduct(ProductPropertiesRequire<T> productVmToSave, Product existingProduct){
         this.validateLengthMustGreaterThanWidth(productVmToSave);
         this.validateExistingProductProperties(productVmToSave,existingProduct);
