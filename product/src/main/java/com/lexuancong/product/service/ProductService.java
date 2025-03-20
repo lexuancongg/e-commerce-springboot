@@ -29,6 +29,7 @@ public class ProductService {
     private final ProductImageRepository productImageRepository;
     private final ProductOptionRepository productOptionRepository;
     private final ProductOptionValueRepository productOptionValueRepository;
+    private final ProductOptionCombinationRepository productOptionCombinationRepository;
 
     public ProductSummaryVm createProduct(ProductPostVm productPostVm){
         this.validateProduct(productPostVm);
@@ -54,32 +55,53 @@ public class ProductService {
 
 
         List<ProductOption> productOptions = this.getProductOption(productPostVm.productOptionValues());
-        Map<Long,ProductOption> longProductOptionMap =  productOptions.stream()
+        Map<Long,ProductOption> mapOptionById =  productOptions.stream()
                 .collect(Collectors.toMap(ProductOption::getId, Function.identity()));
         List<ProductOptionValue> productOptionValues =
-                this.createProductOptionValue(productPostVm,productSaved,longProductOptionMap);
+                this.createProductOptionValue(productPostVm,productSaved,mapOptionById);
+        return ProductSummaryVm.fromModel(productSaved);
+
 
     }
 
     // cần có product và ProductOption
-    private void createProductOptionCombination(List<Product> variationsSaved,List<ProductOptionValue> productOptionValues,
-                                                List<? extends ProductVariationPropertiesRequire> variationVm,
-                                                Map<Long,ProductOption> longProductOptionMap ){
+    private void createProductOptionCombination(List<Product> variationsSaved,
+                                                List<ProductOptionValue> productOptionValues,
+                                                List<? extends ProductVariationPropertiesRequire> variationVms,
+                                                Map<Long,ProductOption> mapOptionById){
         List<ProductOptionCombination> productOptionCombinations = new ArrayList<>();
         // variationSave rồi nhưng chưa bt nó ứng với productOption Id nào và value gì => dua vao variationVm
         // variantSaved và variantVm có cùng slug => dựa vào slug để lấy
-        Map<String,Product> stringProductMap = variationsSaved.stream()
+        Map<String,Product> mapProductBySlug = variationsSaved.stream()
                 .collect(Collectors.toMap(Product::getSlug,Function.identity()));
+        for(ProductVariationPropertiesRequire variationVm : variationVms){
+            String slugVariant = variationVm.slug().toLowerCase();
+            Product variantSaved = mapProductBySlug.get(slugVariant);
+            if(variantSaved == null){
+                // chứng tỏ lưu lần trước bị lỗi
+                throw new RuntimeException();
+            }
+            // lặp qua từng option
+            variationVm.valueOfOptionByOptionId().forEach((optionId,optionValue)->{
+                ProductOption productOption = mapOptionById.get(optionId);
+                // check xem giá trị của từng option có nằm trong productOptionValues khong
+                boolean  isExitOptionValue = productOptionValues.stream()
+                        .anyMatch(productOptionValue -> productOptionValue.getProductOption()
+                                .getId().equals(optionId) && productOptionValue.getValue().equals(optionValue));
+                if(!isExitOptionValue){
+                    throw new RuntimeException();
+                }
+                ProductOptionCombination productOptionCombination = ProductOptionCombination.builder()
+                        .productOption(productOption)
+                        .product(variantSaved)
+                        .value(optionValue)
+                        .build();
+                productOptionCombinations.add(productOptionCombination);
+            });
 
 
-
-
-
-
-
-
-
-
+        }
+        this.productOptionCombinationRepository.saveAll(productOptionCombinations);
     }
     private List<ProductOptionValue> createProductOptionValue(ProductPostVm productPostVm ,
                                                               Product mainProduct ,Map<Long,ProductOption> longProductOptionMap){
@@ -141,12 +163,7 @@ public class ProductService {
 
     }
 
-    // input : ds variationVm post , product cha -> để lưu tinh cha con
-    private  List<Product> performCreateVariations(
-            List<? extends ProductVariationPropertiesRequire> variationPropertiesVm,Product mainProduct){
 
-
-    }
     private Product buildProductVariationFormVm(ProductVariationPropertiesRequire variationPropertiesVm,
                                                 Product mainProduct){
         return Product.builder()

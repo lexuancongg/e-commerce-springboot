@@ -1,0 +1,58 @@
+{
+  "name": "Laptop Dell XPS 15",
+  "slug": "laptop-dell-xps-15",
+  "brandId": 1,
+  "categoryIds": [2, 3, 5],
+  "shortDescription": "Laptop cao cấp với hiệu suất mạnh mẽ.",
+  "description": "Dell XPS 15 là dòng laptop cao cấp với màn hình 4K, CPU Intel Core i9, RAM 32GB.",
+  "specification": "CPU: Intel Core i9, RAM: 32GB, SSD: 1TB, GPU: NVIDIA RTX 4060",
+  "sku": "XPS15-2024",
+  "gtin": "1234567890123",
+  "price": 2999.99,
+  "isPublic": true,
+  "isFeature": true,
+  "productImageIds": [101, 102, 103],
+  "avatarImageId": 101,
+  "length": 35.7,
+  "width": 23.5,
+  "height": 1.8,
+  "weight": 2.0,
+  "variations": [
+    {
+      "name": "XPS 15 - RAM 16GB",
+      "slug": "xps-15-ram-16gb",
+      "sku": "XPS15-16GB",
+      "gtin": "1234567890124",
+      "price": 2499.99,
+      "avatarImageId": 104,
+      "productImageIds": [104, 105],
+      "valueOfOptionByOptionId": {
+        "201": "16GB RAM",
+        "202": "512GB SSD"
+      }
+    },
+    {
+      "name": "XPS 15 - RAM 32GB",
+      "slug": "xps-15-ram-32gb",
+      "sku": "XPS15-32GB",
+      "gtin": "1234567890125",
+      "price": 2799.99,
+      "avatarImageId": 106,
+      "productImageIds": [106, 107],
+      "valueOfOptionByOptionId": {
+        "201": "32GB RAM",
+        "202": "1TB SSD"
+      }
+    }
+  ],
+  "productOptionValues": [
+    {
+      "productOptionId": 201,
+      "values": ["16GB RAM", "32GB RAM"]
+    },
+    {
+      "productOptionId": 202,
+      "values": ["512GB SSD", "1TB SSD"]
+    }
+  ]
+}

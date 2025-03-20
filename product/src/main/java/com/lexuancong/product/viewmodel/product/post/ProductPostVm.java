@@ -10,8 +10,7 @@ import com.lexuancong.product.viewmodel.product.databinding.ProductPropertiesReq
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collection;
-import java.util.Collections;
+
 import java.util.List;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
