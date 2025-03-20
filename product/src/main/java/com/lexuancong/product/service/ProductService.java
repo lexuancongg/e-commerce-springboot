@@ -43,19 +43,39 @@ public class ProductService {
         this.productImageRepository.saveAll(productImageList);
 
 
-        if(CollectionUtils.isEmpty(productPostVm.variations())){
+        if(CollectionUtils.isEmpty(productPostVm.variations()) || CollectionUtils.isEmpty(productPostVm.productOptionValues())){
             return ProductSummaryVm.fromModel(product);
         }
 
         // xử lý các biến thể
         List<Product> variationSaved = this.createVariationsFromVm(productPostVm.variations(),productSaved);
+
         // lưu dữ liệu bảng product optionValue cho  product => cần lấy đuược product otion tương ứng từng id => Map
+
 
         List<ProductOption> productOptions = this.getProductOption(productPostVm.productOptionValues());
         Map<Long,ProductOption> longProductOptionMap =  productOptions.stream()
                 .collect(Collectors.toMap(ProductOption::getId, Function.identity()));
         List<ProductOptionValue> productOptionValues =
                 this.createProductOptionValue(productPostVm,productSaved,longProductOptionMap);
+
+    }
+
+    // cần có product và ProductOption
+    private void createProductOptionCombination(List<Product> variationsSaved,List<ProductOptionValue> productOptionValues,
+                                                List<? extends ProductVariationPropertiesRequire> variationVm,
+                                                Map<Long,ProductOption> longProductOptionMap ){
+        List<ProductOptionCombination> productOptionCombinations = new ArrayList<>();
+        // variationSave rồi nhưng chưa bt nó ứng với productOption Id nào và value gì => dua vao variationVm
+        // variantSaved và variantVm có cùng slug => dựa vào slug để lấy
+        Map<String,Product> stringProductMap = variationsSaved.stream()
+                .collect(Collectors.toMap(Product::getSlug,Function.identity()));
+
+
+
+
+
+
 
 
 
@@ -66,12 +86,15 @@ public class ProductService {
         List<ProductOptionValue> productOptionValues = new ArrayList<>();
         productPostVm.productOptionValues().forEach(optionValue ->{
             ProductOption productOption = longProductOptionMap.get(optionValue.productOptionId());
-            ProductOptionValue productOptionValue = ProductOptionValue.builder()
-                    .productOption(productOption)
-                    .product(mainProduct)
+            optionValue.values().forEach(value -> {
+                ProductOptionValue productOptionValue = ProductOptionValue.builder()
+                        .productOption(productOption)
+                        .product(mainProduct)
+                        .value(value)
+                        .build();
+                productOptionValues.add(productOptionValue);
+            });
 
-                    .build();
-            productOptionValues.add(productOptionValue);
         });
         this.productOptionValueRepository.saveAll(productOptionValues);
         return productOptionValues;

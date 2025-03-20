@@ -8,7 +8,10 @@ import com.lexuancong.product.validation.ValidateProductPrice;
 import com.lexuancong.product.viewmodel.product.ProductOptionPostValueVm;
 import com.lexuancong.product.viewmodel.product.databinding.ProductPropertiesRequire;
 import jakarta.validation.constraints.NotBlank;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
@@ -54,7 +57,7 @@ public record ProductPostVm(
         product.setWeight(weight);
         product.setHeight(height);
         product.setWidth(width);
-        return product;
+        product.setHasOptions(!CollectionUtils.isEmpty(variations) && !this.productOptionValues.isEmpty());
     }
 
 }
