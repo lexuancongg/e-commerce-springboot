@@ -8,11 +8,11 @@ import com.lexuancong.product.validation.ValidateProductPrice;
 import com.lexuancong.product.viewmodel.product.ProductOptionPostValueVm;
 import com.lexuancong.product.viewmodel.product.databinding.ProductPropertiesRequire;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 import org.springframework.util.CollectionUtils;
 
 
 import java.util.List;
-
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 // dùng để tùy chỉnh quá trình Serialization
 @JsonSerialize
@@ -29,15 +29,20 @@ public record ProductPostVm(
         @ValidateProductPrice Double price,
         boolean isPublic,
         boolean isFeature,
+        boolean isOrderEnable,
         List<Long> productImageIds,
         Long avatarImageId,
         Double length,
         Double width,
         Double height,
+        boolean isInventoryTracked,
         Double weight,
+        Boolean isShownSeparately,
         List<ProductVariationPostVm> variations,
         List<ProductOptionPostValueVm> productOptionValues
 )  implements ProductPropertiesRequire<ProductVariationPostVm> {
+
+
 
 
     public Product toModel(){
@@ -56,7 +61,10 @@ public record ProductPostVm(
         product.setWeight(weight);
         product.setHeight(height);
         product.setWidth(width);
+        product.setInventoryTracked(isInventoryTracked);
+        product.setShownSeparately(isShownSeparately);
         product.setHasOptions(!CollectionUtils.isEmpty(variations) && !this.productOptionValues.isEmpty());
+        return product;
     }
 
 }

@@ -12,6 +12,7 @@ import com.lexuancong.product.viewmodel.product.post.ProductSummaryVm;
 import com.lexuancong.product.viewmodel.product.post.ProductVariationPostVm;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.type.ListType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -52,13 +53,12 @@ public class ProductService {
         List<Product> variationSaved = this.createVariationsFromVm(productPostVm.variations(),productSaved);
 
         // lưu dữ liệu bảng product optionValue cho  product => cần lấy đuược product otion tương ứng từng id => Map
-
-
         List<ProductOption> productOptions = this.getProductOption(productPostVm.productOptionValues());
         Map<Long,ProductOption> mapOptionById =  productOptions.stream()
                 .collect(Collectors.toMap(ProductOption::getId, Function.identity()));
         List<ProductOptionValue> productOptionValues =
                 this.createProductOptionValue(productPostVm,productSaved,mapOptionById);
+        this.createProductOptionCombination(variationSaved,productOptionValues,productPostVm.variations(),mapOptionById);
         return ProductSummaryVm.fromModel(productSaved);
 
 
@@ -143,17 +143,19 @@ public class ProductService {
         // đầu tiên sử lý hình ảnh
         List<ProductImage> allProductImages = new ArrayList<>();
         List<Product> variations = variationPostVmList.stream()
-                .map(variation ->{
-                    Product productVariation  = this.buildProductVariationFormVm(variation, mainProduct);
+                .map(variationVm ->{
+                    Product productVariation  = this.buildProductVariationFormVm(variationVm, mainProduct);
                     // quay lại lưu hình ảnh như sản phẩm chính
                     List<ProductImage> variationImages =
-                            this.setProductImages(productVariation,variation.productImageIds());
+                            this.setProductImages(productVariation,variationVm.productImageIds());
                     allProductImages.addAll(variationImages);
 
                     return productVariation;
 
                 }  )
                 .toList();
+
+        // lưu lại các bieens thể sp
         List<Product> variationsSaved = this.productRepository.saveAll(variations);
 
         // lưu cho bảng productImage
@@ -304,6 +306,77 @@ public class ProductService {
 
             }
         }
+
+
+    }
+
+    public void updateProduct(Long id, ProductPostVm productPostVm){
+        Product product = this.productRepository.findById(id)
+                .orElseThrow(()-> new RuntimeException());
+        this.validateProduct(productPostVm,product);
+        this.setBrandForProduct(product,productPostVm.brandId());
+        // chỉnh sửa lại categoryId
+        List<ProductCategory> productCategoriesOld = product.getProductCategories();
+        List<Long> categoryIdsOld = productCategoriesOld.stream()
+                .map(productCategoryOld ->productCategoryOld.getCategory().getId() )
+                .toList();
+        List<Long> categoryIdsNew = productPostVm.categoryIds();
+        if(!org.apache.commons.collections4.CollectionUtils.isEqualCollection(categoryIdsOld,categoryIdsNew)){
+            this.updateProductCategories(product,categoryIdsNew,productCategoriesOld,categoryIdsOld);
+        }
+        this.updatePropertiesProductFromVm(product,productPostVm);
+        // xử lý productImage
+        List<Long> productImages = product.getProductImages().;
+
+
+
+
+
+
+    }
+    private void updatePropertiesProductFromVm(Product product,ProductPostVm productPostVm){
+        product.setName(productPostVm.name());
+        product.setSlug(productPostVm.slug());
+        product.setAvatarImageId(productPostVm.avatarImageId());
+        product.setDescription(productPostVm.description());
+        product.setShortDescription(productPostVm.shortDescription());
+        product.setSpecifications(productPostVm.specification());
+        product.setSku(productPostVm.sku());
+        product.setDescription(productPostVm.description());
+        product.setGtin(productPostVm.gtin());
+        product.setPrice(productPostVm.price());
+        product.setFeature(productPostVm.isFeature());
+        // lombok tự động đổi tên setter và getter
+        product.setOrderEnable(productPostVm.isOrderEnable());
+        product.setPublic(productPostVm.isPublic());
+        product.setShownSeparately(productPostVm.isShownSeparately());
+        product.setInventoryTracked(productPostVm.isInventoryTracked());
+        product.setWidth(productPostVm.width());
+        product.setHeight(productPostVm.height());
+        product.setLength(productPostVm.length());
+        product.setWeight(productPostVm.weight());
+
+    }
+
+
+    // update trường hợp có id danh mục cũ và id danh mục mới trun nhau nhiều để cải thện hiệu xuất sau
+    private void updateProductCategories(Product product , List<Long> categoryIdsNew,
+                                         List<ProductCategory> productCategoriesOld,
+                                         List<Long> categoryIdsOld){
+        Set<Long> setCategoryIdsOld = new HashSet<>(categoryIdsOld);
+        Set<Long> setCategoryIdsNew = new HashSet<>(categoryIdsNew);
+        // ttìm cái cần thêm
+        List<Long> categoryIdsToAdd = categoryIdsNew.stream().filter(categoryId -> !setCategoryIdsOld.contains(categoryId))
+                .toList();
+        // tìm cái cần xóa
+        List<ProductCategory> productCategoriesToRemove  = productCategoriesOld.stream()
+                .filter(productCategory -> !setCategoryIdsNew.contains(productCategory.getCategory().getId()))
+                .toList();
+
+        List<ProductCategory> productCategoriesNew = this.setProductCategories(product,categoryIdsToAdd);
+        this.productCategoryRepository.deleteAllInBatch(productCategoriesToRemove);
+        this.productCategoryRepository.saveAll(productCategoriesNew);
+
 
 
     }
