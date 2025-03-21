@@ -3,12 +3,10 @@ package com.lexuancong.product.viewmodel.product.post;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.lexuancong.product.model.Product;
-import com.lexuancong.product.model.ProductOptionValue;
 import com.lexuancong.product.validation.ValidateProductPrice;
 import com.lexuancong.product.viewmodel.product.ProductOptionPostValueVm;
 import com.lexuancong.product.viewmodel.product.databinding.ProductPropertiesRequire;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Builder;
 import org.springframework.util.CollectionUtils;
 
 
@@ -30,7 +28,7 @@ public record ProductPostVm(
         boolean isPublic,
         boolean isFeature,
         boolean isOrderEnable,
-        List<Long> productImageIds,
+        List<Long> imageIds,
         Long avatarImageId,
         Double length,
         Double width,

@@ -14,7 +14,7 @@ public record ProductVariationPostVm(
         String gtin,
         Double price,
         Long avatarImageId,
-        List<Long> productImageIds,
+        List<Long> imageIds,
         Map<Long, String> valueOfOptionByOptionId
 
 

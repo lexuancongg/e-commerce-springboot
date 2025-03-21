@@ -15,7 +15,7 @@ public interface BaseProductPropertiesRequire {
 
     Long avatarImageId();
 
-    List<Long> productImageIds();
+    List<Long> imageIds();
 
 
 

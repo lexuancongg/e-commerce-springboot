@@ -25,7 +25,7 @@
       "gtin": "1234567890124",
       "price": 2499.99,
       "avatarImageId": 104,
-      "productImageIds": [104, 105],
+      "imageIds": [104, 105],
       "valueOfOptionByOptionId": {
         "201": "16GB RAM",
         "202": "512GB SSD"
@@ -38,7 +38,7 @@
       "gtin": "1234567890125",
       "price": 2799.99,
       "avatarImageId": 106,
-      "productImageIds": [106, 107],
+      "imageIds": [106, 107],
       "valueOfOptionByOptionId": {
         "201": "32GB RAM",
         "202": "1TB SSD"

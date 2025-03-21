@@ -2,17 +2,14 @@ package com.lexuancong.product.service;
 
 import com.lexuancong.product.model.*;
 import com.lexuancong.product.repository.*;
-import com.lexuancong.product.viewmodel.product.ProductOptionPostValueVm;
 import com.lexuancong.product.viewmodel.product.databinding.BaseProductPropertiesRequire;
 import com.lexuancong.product.viewmodel.product.databinding.ProductOptionPropertyRequire;
 import com.lexuancong.product.viewmodel.product.databinding.ProductPropertiesRequire;
 import com.lexuancong.product.viewmodel.product.databinding.ProductVariationPropertiesRequire;
 import com.lexuancong.product.viewmodel.product.post.ProductPostVm;
 import com.lexuancong.product.viewmodel.product.post.ProductSummaryVm;
-import com.lexuancong.product.viewmodel.product.post.ProductVariationPostVm;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.type.ListType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -39,7 +36,7 @@ public class ProductService {
         Product productSaved =  this.productRepository.save(product);
 
         List<ProductCategory> productCategoryList = this.setProductCategories(productSaved,productPostVm.categoryIds());
-        List<ProductImage> productImageList = this.setProductImages(productSaved,productPostVm.categoryIds());
+        List<ProductImage> productImageList = this.setProductImages(productSaved,productPostVm.imageIds());
 
         this.productCategoryRepository.saveAll(productCategoryList);
         this.productImageRepository.saveAll(productImageList);
@@ -147,7 +144,7 @@ public class ProductService {
                     Product productVariation  = this.buildProductVariationFormVm(variationVm, mainProduct);
                     // quay lại lưu hình ảnh như sản phẩm chính
                     List<ProductImage> variationImages =
-                            this.setProductImages(productVariation,variationVm.productImageIds());
+                            this.setProductImages(productVariation,variationVm.imageIds());
                     allProductImages.addAll(variationImages);
 
                     return productVariation;
@@ -326,14 +323,35 @@ public class ProductService {
         }
         this.updatePropertiesProductFromVm(product,productPostVm);
         // xử lý productImage
-        List<Long> productImages = product.getProductImages().;
+        List<ProductImage> productImages = product.getProductImages();
+        List<Long> imageIdsOld = productImages.stream()
+                .map(ProductImage::getImageId)
+                .toList();
+        List<Long> imageIdsNew = productPostVm.imageIds();
+        if(!org.apache.commons.collections4.CollectionUtils.isEqualCollection(imageIdsOld,imageIdsNew)){
+            this.updateProductImage(product,imageIdsNew,imageIdsOld,productImages);
+        }
+    }
 
-
-
-
-
+    private void updateProductImage(Product product,List<Long> imageIdsNew,
+                                    List<Long> imageIdsOld,List<ProductImage> productImagesOld){
+        Set<Long> setImageIdsOld = new HashSet<>(imageIdsOld);
+        Set<Long> setImageIdsNew = new HashSet<>(imageIdsNew);
+        // tìm cái cần xóa => có trong cũ không có trong mới
+        List<ProductImage> productImagesToRemove = productImagesOld.stream()
+                .filter(productImageOld -> !setImageIdsNew.contains(productImageOld.getImageId()))
+                .toList();
+        // tìm cái có trong cái mới mà cái cũ không cs
+        List<Long> imageIdsToAdd =  imageIdsNew.stream()
+                .filter(imageId -> !setImageIdsOld.contains(imageId))
+                .toList();
+        List<ProductImage> productImages = this.setProductImages(product,imageIdsToAdd);
+        this.productImageRepository.deleteAllInBatch(productImagesToRemove);
+        this.productImageRepository.saveAll(productImages);
 
     }
+
+
     private void updatePropertiesProductFromVm(Product product,ProductPostVm productPostVm){
         product.setName(productPostVm.name());
         product.setSlug(productPostVm.slug());
