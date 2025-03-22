@@ -312,28 +312,77 @@ public class ProductService {
                 .orElseThrow(()-> new RuntimeException());
         this.validateProduct(productPostVm,product);
         this.setBrandForProduct(product,productPostVm.brandId());
-        // chỉnh sửa lại categoryId
-        List<ProductCategory> productCategoriesOld = product.getProductCategories();
-        List<Long> categoryIdsOld = productCategoriesOld.stream()
-                .map(productCategoryOld ->productCategoryOld.getCategory().getId() )
-                .toList();
-        List<Long> categoryIdsNew = productPostVm.categoryIds();
-        if(!org.apache.commons.collections4.CollectionUtils.isEqualCollection(categoryIdsOld,categoryIdsNew)){
-            this.updateProductCategories(product,categoryIdsNew,productCategoriesOld,categoryIdsOld);
-        }
+        // chỉnh sửa lại productCategory
+        this.updateProductCategories(product,productPostVm);
+
         this.updatePropertiesProductFromVm(product,productPostVm);
-        // xử lý productImage
+
+        this.updateProductImage(product,productPostVm );
+        List<Product> variationChillInDb = product.getChild();
+        this.updateValueVariationChillInDb(productPostVm, variationChillInDb);
+        this.productRepository.saveAll(variationChillInDb);
+
+        // tiếp theo sử lý phần valueOfOptionByOptionId
+
+
+    }
+
+    private void updateProductImage(Product product , BaseProductPropertiesRequire productPostVm){
         List<ProductImage> productImages = product.getProductImages();
         List<Long> imageIdsOld = productImages.stream()
                 .map(ProductImage::getImageId)
                 .toList();
         List<Long> imageIdsNew = productPostVm.imageIds();
         if(!org.apache.commons.collections4.CollectionUtils.isEqualCollection(imageIdsOld,imageIdsNew)){
-            this.updateProductImage(product,imageIdsNew,imageIdsOld,productImages);
+            this.perFormUpdateProductImage(product,imageIdsNew,imageIdsOld,productImages);
         }
+
     }
 
-    private void updateProductImage(Product product,List<Long> imageIdsNew,
+    private void updateProductCategories(Product product , ProductPostVm productPostVm){
+        List<ProductCategory> productCategoriesOld = product.getProductCategories();
+        List<Long> categoryIdsOld = productCategoriesOld.stream()
+                .map(productCategoryOld ->productCategoryOld.getCategory().getId() )
+                .toList();
+        List<Long> categoryIdsNew = productPostVm.categoryIds();
+        if(!org.apache.commons.collections4.CollectionUtils.isEqualCollection(categoryIdsOld,categoryIdsNew)){
+            this.perFormUpdateProductCategories(product,categoryIdsNew,productCategoriesOld,categoryIdsOld);
+        }
+
+
+    }
+
+    private  void updateValueVariationChillInDb(ProductPostVm productPostVm,  List<Product> variationChillInDbs ){
+        productPostVm.variations().forEach(variationVm->{
+            for(Product variationChill : variationChillInDbs){
+                if(variationChill.getId().equals(variationVm.id())){
+                    this.perFormUpdateValueForVariation(variationChill,variationVm);
+                    break;
+                }
+            }
+        });
+
+    }
+
+    private void perFormUpdateValueForVariation(Product variation, ProductVariationPropertiesRequire variationPutVm ){
+        variation.setName(variationPutVm.name());
+        variation.setSlug(variationPutVm.slug());
+        variation.setSku(variationPutVm.sku());
+        variation.setGtin(variationPutVm.gtin());
+        variation.setPrice(variationPutVm.price());
+        variation.setAvatarImageId(variationPutVm.avatarImageId());
+        // nếu mà insert vào mỗi for thì hiệu xuất giảm
+        this.updateProductImage(variation,variationPutVm);
+
+
+
+
+
+
+    }
+
+
+    private void perFormUpdateProductImage(Product product,List<Long> imageIdsNew,
                                     List<Long> imageIdsOld,List<ProductImage> productImagesOld){
         Set<Long> setImageIdsOld = new HashSet<>(imageIdsOld);
         Set<Long> setImageIdsNew = new HashSet<>(imageIdsNew);
@@ -378,7 +427,7 @@ public class ProductService {
 
 
     // update trường hợp có id danh mục cũ và id danh mục mới trun nhau nhiều để cải thện hiệu xuất sau
-    private void updateProductCategories(Product product , List<Long> categoryIdsNew,
+    private void perFormUpdateProductCategories(Product product , List<Long> categoryIdsNew,
                                          List<ProductCategory> productCategoriesOld,
                                          List<Long> categoryIdsOld){
         Set<Long> setCategoryIdsOld = new HashSet<>(categoryIdsOld);

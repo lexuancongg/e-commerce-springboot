@@ -8,6 +8,7 @@ import java.util.Map;
 
 // recod tự động sinh getter => không cần overight method
 public record ProductVariationPostVm(
+        Long id,
         String name,
         String slug,
         String sku,
@@ -19,11 +20,8 @@ public record ProductVariationPostVm(
 
 
 ) implements ProductVariationPropertiesRequire {
-    @Override
-    public Long id() {
-        return null;
-    }
-    public Product product(){
+
+    public Product toProduct(){
         Product product = new Product();
         product.setName(name);
         product.setSlug(slug);
@@ -31,6 +29,7 @@ public record ProductVariationPostVm(
         product.setGtin(gtin);
         product.setPrice(price);
         product.setAvatarImageId(avatarImageId);
+        return product;
 
     }
 }

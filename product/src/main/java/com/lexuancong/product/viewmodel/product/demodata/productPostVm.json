@@ -11,7 +11,7 @@
   "price": 2999.99,
   "isPublic": true,
   "isFeature": true,
-  "productImageIds": [101, 102, 103],
+  "imageId": [101, 102, 103],
   "avatarImageId": 101,
   "length": 35.7,
   "width": 23.5,
@@ -19,6 +19,7 @@
   "weight": 2.0,
   "variations": [
     {
+      "id": 5 ,
       "name": "XPS 15 - RAM 16GB",
       "slug": "xps-15-ram-16gb",
       "sku": "XPS15-16GB",
@@ -32,6 +33,7 @@
       }
     },
     {
+      "id": 6,
       "name": "XPS 15 - RAM 32GB",
       "slug": "xps-15-ram-32gb",
       "sku": "XPS15-32GB",
