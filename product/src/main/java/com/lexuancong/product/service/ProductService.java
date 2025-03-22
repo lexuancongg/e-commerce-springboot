@@ -101,10 +101,10 @@ public class ProductService {
         this.productOptionCombinationRepository.saveAll(productOptionCombinations);
     }
     private List<ProductOptionValue> createProductOptionValue(ProductPostVm productPostVm ,
-                                                              Product mainProduct ,Map<Long,ProductOption> longProductOptionMap){
+                                                              Product mainProduct ,Map<Long,ProductOption> productOptionMapById){
         List<ProductOptionValue> productOptionValues = new ArrayList<>();
         productPostVm.productOptionValues().forEach(optionValue ->{
-            ProductOption productOption = longProductOptionMap.get(optionValue.productOptionId());
+            ProductOption productOption = productOptionMapById.get(optionValue.productOptionId());
             optionValue.values().forEach(value -> {
                 ProductOptionValue productOptionValue = ProductOptionValue.builder()
                         .productOption(productOption)
@@ -320,9 +320,51 @@ public class ProductService {
         this.updateProductImage(product,productPostVm );
         List<Product> variationChillInDb = product.getChild();
         this.updateValueVariationChillInDb(productPostVm, variationChillInDb);
-        this.productRepository.saveAll(variationChillInDb);
+        List<Product> variantUpdated = this.productRepository.saveAll(variationChillInDb);
 
-        // tiếp theo sử lý phần valueOfOptionByOptionId
+        // tiếp theo sử lý phần productOptionValues cho ProductOptionValue
+        List<ProductOption> productOptions = this.getProductOption(productPostVm.productOptionValues());
+        Map<Long,ProductOption> productOptionMapById = productOptions.stream()
+                .collect(Collectors.toMap(ProductOption::getId, Function.identity()));
+
+        // cái thêm mới
+        List<? extends ProductVariationPropertiesRequire>  variationVmsNew = productPostVm.variations().stream()
+                .filter(variationVm -> variationVm.id() == null )
+                .toList();
+
+        productPostVm.variations().removeAll(variationVmsNew);
+
+        List<ProductOptionValue> productOptionValues = this.updateProductOptionValue(product,productOptionMapById,productPostVm);
+        // cập nhật lại combination cho các bien the
+        this.updateProductOptionCombination(productPostVm.variations(),variationChillInDb,
+                variantUpdated,productOptionValues,productOptionMapById);
+
+        if(org.apache.commons.collections4.CollectionUtils.isEmpty(variationVmsNew)){
+            return;
+        }
+        //create variation và create combination cho variation mới => variationVm này đã qua được isvalid
+        List<Product> variationSaved = this.createVariationsFromVm(variationVmsNew,product);
+        // create  combination
+
+        this.createProductOptionCombination(variationSaved,productOptionValues,variationVmsNew,productOptionMapById);
+
+
+    }
+    private void updateProductOptionCombination(List<? extends ProductVariationPropertiesRequire> variationVms,
+                                                List<Product> variationChill,
+                                                List<Product> variantUpdated,
+                                                List<ProductOptionValue> productOptionValues,
+                                                Map<Long,ProductOption> productOptionMapById) {
+        List<Long> variationIds = variationChill.stream().map(Product::getId).toList();
+        this.productOptionCombinationRepository.deleteAllByProductIdIn(variationIds);
+        this.createProductOptionCombination(variantUpdated,productOptionValues,variationVms,productOptionMapById);
+
+    }
+    private List<ProductOptionValue> updateProductOptionValue(Product product , Map<Long,ProductOption> productOptionMapById,
+                                          ProductPostVm productPostVm){
+         this.productOptionValueRepository.deleteAllByProductId(product.getId());
+         return this.createProductOptionValue(productPostVm,product,productOptionMapById);
+
 
 
     }
