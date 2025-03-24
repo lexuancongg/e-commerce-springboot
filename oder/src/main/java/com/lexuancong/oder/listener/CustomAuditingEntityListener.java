@@ -1,6 +1,6 @@
-package com.lexuancong.cart.listener;
+package com.lexuancong.oder.listener;
 
-import com.lexuancong.cart.model.AuditEntity;
+import com.lexuancong.oder.model.AuditEntity;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import org.springframework.beans.factory.ObjectFactory;

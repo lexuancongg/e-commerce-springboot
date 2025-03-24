@@ -18,11 +18,13 @@
 	<description>project for work</description>
 
 	<modules>
-		<module>common</module>
+		<module>share</module>
 		<module>cart</module>
 		<module>address</module>
 		<module>product</module>
 		<module>customer</module>
+		<module>image</module>
+		<module>oder</module>
 	</modules>
 
 	<properties>

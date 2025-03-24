@@ -2,14 +2,15 @@ version: "3.9"
 services:
   postgres:
     image: debezium/postgres:16-alpine
+#    tìm file docker file trong thư mục postgres để build
     build: ./docker/postgres
     ports:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     volumes:
-      - ./docker/postgres/postgresql.conf.sample:/usr/share/postgresql/postgresql.conf.sample
-      - ./docker/postgres/postgres_init.sql://docker-entrypoint-initdb.d/postgres_init.sql
+#      - ./docker/postgres/postgresql.conf.sample:/usr/share/postgresql/postgresql.conf.sample
+#      - ./docker/postgres/postgres_init.sql://docker-entrypoint-initdb.d/postgres_init.sql
       - postgres:/var/lib/postgresql/data
-    command: postgres -c 'max_connections=500'
+#    command: postgres -c 'max_connections=500'
     environment:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
