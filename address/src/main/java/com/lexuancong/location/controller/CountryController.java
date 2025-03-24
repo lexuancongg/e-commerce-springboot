@@ -19,7 +19,7 @@ public class CountryController {
     public CountryController(CountryService countryService) {
         this.countryService = countryService;
     }
-    @GetMapping("/backoffice/countries/paging")
+    @GetMapping("/management/countries/paging")
     public ResponseEntity<CountryPagingVm> getCountriesPaging(
             @RequestParam(name ="pageIndex" ,defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER,required = false)
             final int pageIndex,
@@ -29,12 +29,12 @@ public class CountryController {
         return ResponseEntity.ok(countryService.getCountriesPaging(pageIndex,pageSize));
     }
 
-    @GetMapping({"/backoffice/countries","/storefront/countries"})
+    @GetMapping({"/management/countries","/storefront/countries"})
     public ResponseEntity<List<CountryVm>> getCountries(){
         return ResponseEntity.ok(countryService.getCountries());
     }
 
-    @PostMapping("/backoffice/country")
+    @PostMapping("/management/country")
     public ResponseEntity<CountryVm> createCountry(
             @RequestBody @Valid final CountryPostVm countryPostVm,
             final UriComponentsBuilder uriComponentsBuilder
@@ -55,7 +55,7 @@ public class CountryController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/backoffice/country/{id}")
+    @DeleteMapping("/management/country/{id}")
     public ResponseEntity<Void> deleteCountry(@PathVariable Long id){
         countryService.deleteCountry(id);
         return ResponseEntity.noContent().build();

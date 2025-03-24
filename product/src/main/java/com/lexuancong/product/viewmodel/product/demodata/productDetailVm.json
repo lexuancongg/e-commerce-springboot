@@ -1,0 +1,38 @@
+{
+  "id": 1,
+  "name": "Laptop ASUS ROG",
+  "brandName": "ASUS",
+  "categories": ["Laptop", "Gaming"],
+  "attributeGroups": [
+    {
+      "name": "Hiệu năng",
+      "attributeValues": [
+        { "name": "CPU", "value": "Intel Core i9" },
+        { "name": "RAM", "value": "32GB DDR5" },
+        { "name": "Ổ cứng", "value": "1TB NVMe SSD" }
+      ]
+    },
+    {
+      "name": "Màn hình",
+      "attributeValues": [
+        { "name": "Kích thước", "value": "16 inch" },
+        { "name": "Độ phân giải", "value": "2560x1600" },
+        { "name": "Tần số quét", "value": "165Hz" }
+      ]
+    }
+  ],
+  "shortDescription": "Laptop gaming mạnh mẽ với hiệu năng cao.",
+  "description": "ASUS ROG trang bị CPU Intel Core i9, RAM 32GB DDR5 và màn hình 165Hz.",
+  "specification": "CPU Intel Core i9, RAM 32GB DDR5, SSD 1TB NVMe, màn hình 16 inch 165Hz.",
+  "isAllowedToOrder": true,
+  "isPublished": true,
+  "isFeatured": true,
+  "hasOptions": false,
+  "price": 2499.99,
+  "avatarImageUrl": "https://example.com/images/laptop-asus-rog-thumbnail.jpg",
+  "productImageMediaUrls": [
+    "https://example.com/images/laptop-asus-rog-1.jpg",
+    "https://example.com/images/laptop-asus-rog-2.jpg",
+    "https://example.com/images/laptop-asus-rog-3.jpg"
+  ]
+}

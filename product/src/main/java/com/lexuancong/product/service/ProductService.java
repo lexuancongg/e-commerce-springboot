@@ -1,15 +1,20 @@
 package com.lexuancong.product.service;
 
 import com.lexuancong.product.model.*;
+import com.lexuancong.product.model.attribute.ProductAttributeGroup;
 import com.lexuancong.product.repository.*;
+import com.lexuancong.product.service.internal.MediaService;
+import com.lexuancong.product.viewmodel.image.ImageVm;
+import com.lexuancong.product.viewmodel.product.*;
 import com.lexuancong.product.viewmodel.product.databinding.BaseProductPropertiesRequire;
 import com.lexuancong.product.viewmodel.product.databinding.ProductOptionPropertyRequire;
 import com.lexuancong.product.viewmodel.product.databinding.ProductPropertiesRequire;
 import com.lexuancong.product.viewmodel.product.databinding.ProductVariationPropertiesRequire;
-import com.lexuancong.product.viewmodel.product.post.ProductPostVm;
-import com.lexuancong.product.viewmodel.product.post.ProductSummaryVm;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -28,6 +33,7 @@ public class ProductService {
     private final ProductOptionRepository productOptionRepository;
     private final ProductOptionValueRepository productOptionValueRepository;
     private final ProductOptionCombinationRepository productOptionCombinationRepository;
+    private final MediaService mediaService;
 
     public ProductSummaryVm createProduct(ProductPostVm productPostVm){
         this.validateProduct(productPostVm);
@@ -489,6 +495,146 @@ public class ProductService {
 
 
     }
+
+
+    public ProductFeaturePagingVm getFeaturedProductsPaging(int pageIndex,int pageSize){
+        // interface phn trang và sx khi truy vấn db
+        Pageable pageable = PageRequest.of(pageIndex,pageSize);
+        Page<Product> productPage = this.productRepository.findAllByFeatureIsTrueAndShownSeparatelyIsTrueAndPublicIsTrueOrderByIdAsc(pageable);
+        List<Product> productsContent = productPage.getContent();
+        List<ProductPreviewVm> productPreviewPayload = productsContent.stream()
+                .map(product -> {
+                    String avatarUrl =  this.mediaService.getImageById(product.getAvatarImageId()).url();
+                    return new ProductPreviewVm(product.getId(),product.getName(),product.getSlug(),product.getPrice(),avatarUrl);
+                }).toList();
+        return new ProductFeaturePagingVm(
+                productPreviewPayload,pageIndex,pageSize,
+                (int) productPage.getTotalElements(),
+                productPage.getTotalPages(),
+                productPage.isLast()
+        );
+
+    }
+
+
+
+
+
+
+    // lấy thông tin chi tiết về sản phâ
+    public ProductDetailVm getProductDetail(String slug){
+        Product product = this.productRepository.findBySlugAndPublicIsTrue(slug)
+                .orElseThrow(()-> new RuntimeException());
+        String avatarUrl =  this.mediaService.getImageById(product.getAvatarImageId()).url();
+        List<Long> imageIds = product.getProductImages().stream().map(ProductImage::getImageId)
+                .toList();
+        List<String> imageUrls = this.mediaService.getImageByIds(imageIds)
+                .stream().map(ImageVm::url)
+                .toList();
+
+        List<ProductAttributeValue> productAttributeValues = product.getAttributeValues();
+        List<AttributeGroupVm> attributeGroupVms = new ArrayList<>();
+        if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(productAttributeValues)) {
+            List<ProductAttributeGroup> productAttributeGroups = productAttributeValues.stream()
+                    .map(productAttributeValue ->
+                            productAttributeValue.getProductAttribute().getProductAttributeGroup())
+                    .filter(Objects::nonNull)
+                    // loại bỏ ptu trùng lặp dựa trên equa
+                    .distinct()
+                    .toList();
+
+            productAttributeGroups.forEach(productAttributeGroup -> {
+                List<AttributeValueVm> attributeValueVms = new ArrayList<>();
+                productAttributeValues.forEach(productAttributeValue -> {
+                    if(productAttributeValue.getProductAttribute().getProductAttributeGroup().getId().equals(productAttributeGroup.getId())) {
+                        String attributeName = productAttributeValue.getProductAttribute().getName();
+                        String value = productAttributeValue.getValue();
+                        AttributeValueVm attributeValueVm = new AttributeValueVm(attributeName,value);
+                        attributeValueVms.add(attributeValueVm);
+                    }
+                });
+                String attributeGroupName = productAttributeGroup.getName();
+                AttributeGroupVm attributeGroupVm = new AttributeGroupVm(attributeGroupName,attributeValueVms);
+                attributeGroupVms.add(attributeGroupVm);
+            });
+
+        }
+        return new ProductDetailVm(
+                product.getId(),
+                product.getName(),
+                product.getBrand().getName(),
+                product.getProductCategories().stream().map(productCategory -> productCategory.getCategory().getName())
+                        .toList(),
+                attributeGroupVms,
+                product.getShortDescription(),
+                product.getDescription(),
+                product.getSpecifications(),
+                product.getPrice(),
+                product.isHasOptions(),
+                avatarUrl,
+                product.isFeature(),
+                imageUrls,
+                product.isOrderEnable()
+        );
+
+    }
+
+
+    // xóa mềm tránh maats dữ liệu cho các bảng khác
+    public void deleteProduct(Long id){
+        Product product = this.productRepository.findById(id).orElseThrow(()-> new RuntimeException());
+        product.setPublic(false);
+        // check xem có phải là biến thể không
+        if(!Objects.isNull(product.getParent())){
+            // xóa các combination của biến thể này
+            List<ProductOptionCombination> combinations = this.productOptionCombinationRepository
+                    .findAllByProduct(product);
+            if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(combinations)) {
+                this.productOptionCombinationRepository.deleteAll(combinations);
+            }
+        }
+        this.productRepository.save(product);
+
+
+    }
+
+    // lấy sp
+    public ProductPagingVm getProductsPaging(int pageIndex,int pageSize){
+        Pageable pageable = PageRequest.of(pageIndex,pageSize);
+
+    }
+
+
+
+    public ProductPagingVm getProductsFromCategoryPaging(int pageIndex,int pageSize,Long categoryId){
+        Pageable pageable = PageRequest.of(pageIndex,pageSize);
+        Category category = this.categoryRepository.findById(categoryId).orElseThrow(()-> new RuntimeException());
+        Page<ProductCategory> productCategoryPage = this.productCategoryRepository.findAllByCategory(category,pageable);
+        List<Product> productContents = productCategoryPage.getContent().stream()
+                .map(ProductCategory::getProduct)
+                .toList();
+
+        List<ProductPreviewVm> productPreviewVms = productContents.stream().map(product -> {
+            String avatarUrl =  this.mediaService.getImageById(product.getAvatarImageId()).url();
+            return new ProductPreviewVm(
+                    product.getId(),product.getName(),product.getSlug(),product.getPrice(),avatarUrl
+            );
+        }).toList();
+        return new ProductPagingVm(
+                productPreviewVms,
+                pageIndex,
+                pageSize,
+                (int) productCategoryPage.getTotalElements(),
+                productCategoryPage.getTotalPages(),
+                productCategoryPage.isLast()
+        );
+
+
+
+
+
+    }
+
 
 
 

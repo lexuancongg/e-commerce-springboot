@@ -1,10 +1,9 @@
-package com.lexuancong.product.viewmodel.product.post;
+package com.lexuancong.product.viewmodel.product;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.lexuancong.product.model.Product;
 import com.lexuancong.product.validation.ValidateProductPrice;
-import com.lexuancong.product.viewmodel.product.ProductOptionPostValueVm;
 import com.lexuancong.product.viewmodel.product.databinding.ProductPropertiesRequire;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.util.CollectionUtils;
