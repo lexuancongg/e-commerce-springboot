@@ -1,0 +1,36 @@
+{
+  "id": 1,
+  "email": "customer@example.com",
+  "shippingAddressVm": {
+    "id": 101,
+    "customerName": "Nguyễn Văn A",
+    "phoneNumber": "0987654321",
+    "specificAddress": "123 Đường ABC, Phường X, Quận Y",
+    "districtId": 10,
+    "provinceId": 2,
+    "countryId": 1
+  },
+  "note": "Giao hàng vào buổi sáng",
+  "numberItem": 2,
+  "totalPrice": 1500000.00,
+  "oderStatus": "CONFIRMED",
+  "deliveryStatus": "PENDING",
+  "orderItemVms": [
+    {
+      "id": 201,
+      "productId": 301,
+      "quantity": 1,
+      "productPrice": 500000.00,
+      "totalPrice": 500000.00,
+      "orderId": 1
+    },
+    {
+      "id": 202,
+      "productId": 302,
+      "quantity": 2,
+      "productPrice": 500000.00,
+      "totalPrice": 1000000.00,
+      "orderId": 1
+    }
+  ]
+}
