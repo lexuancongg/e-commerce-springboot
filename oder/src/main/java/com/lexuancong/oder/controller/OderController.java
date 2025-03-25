@@ -23,7 +23,7 @@ public class OderController {
     // khách hàng mua sp
     @PostMapping("/store/orders")
     public ResponseEntity<OrderVm> createOrder(@RequestBody @Valid OrderPostVm orderPostVm) {
-        return this.orderService.createOrder(orderPostVm);
+        return  ResponseEntity.ok(orderService.createOrder(orderPostVm));
 
     }
 

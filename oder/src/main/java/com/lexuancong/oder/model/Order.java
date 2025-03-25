@@ -1,7 +1,7 @@
 package com.lexuancong.oder.model;
 
 import com.lexuancong.oder.model.enum_status.DeliveryStatus;
-import com.lexuancong.oder.model.enum_status.OderStatus;
+import com.lexuancong.oder.model.enum_status.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,7 +33,7 @@ public class Order {
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private OderStatus oderStatus;
+    private OrderStatus oderStatus;
 
     @Column(name = "delivery_status")
     @Enumerated(EnumType.STRING)

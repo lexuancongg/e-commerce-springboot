@@ -1,6 +1,6 @@
 package com.lexuancong.oder.model.enum_status;
 
-public enum OderStatus {
+public enum OrderStatus {
     // Đơn hàng đã được tạo nhưng chưa được thanh toán hoặc xác nhận.
     PENDING("PENDING"),
     // Đơn hàng đã được xác nhận bởi hệ thống hoặc người bán.
@@ -29,7 +29,7 @@ public enum OderStatus {
 
 
     private final String name;
-    private OderStatus(String name) {
+    private OrderStatus(String name) {
         this.name = name;
     }
 

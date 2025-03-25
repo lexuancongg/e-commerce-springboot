@@ -1,6 +1,6 @@
 {
   "email": "customer@example.com",
-  "shippingAddressVm": {
+  "shippingAddressPostVm": {
     "id": 101,
     "customerName": "Nguyễn Văn A",
     "phoneNumber": "0987654321",

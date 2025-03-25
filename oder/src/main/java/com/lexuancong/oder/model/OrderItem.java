@@ -18,12 +18,11 @@ public class OrderItem extends AuditEntity{
     private Long id ;
     private Long productId ;
     private int quantity ;
-    private Long orderId ;
     @Column(name = "price")
     private BigDecimal productPrice ;
     private BigDecimal totalPrice ;
     @Column(name = "order_id")
-    private String oderId;
+    private Long oderId;
     @ManyToOne(fetch = FetchType.LAZY)
     // cả order và oderId đều ánh xạ tới cột oder_id , insertable = false,updatable = false giúp hibernate khoongc inser, update cột oder_id dựa trên obj order
     @JoinColumn(name = "order_id", insertable = false,updatable = false)
