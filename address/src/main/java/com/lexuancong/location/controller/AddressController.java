@@ -16,31 +16,31 @@ import java.util.List;
 public class AddressController{
     private final AddressService addressService;
 
-    @PostMapping("/storefront/address")
+    @PostMapping("/customer/address")
     public ResponseEntity<AddressVm> createAddress(@RequestBody @Valid AddressPostVm addressPostVm){
         return ResponseEntity.ok(addressService.createAddress(addressPostVm));
     }
 
-    @PutMapping("/storefront/address/{id}")
+    @PutMapping("/customer/address/{id}")
     public ResponseEntity<Void> updateAddress(@PathVariable Long id, @RequestBody @Valid AddressPostVm addressPostVm){
         addressService.updateAddress(id,addressPostVm);
         return ResponseEntity.ok().build();
     }
 
     // api cho service customer call get default address
-    @GetMapping("storefront/address/{id}")
+    @GetMapping("customer/address/{id}")
     public ResponseEntity<AddressDetailVm> getAddress(@PathVariable Long id){
         AddressDetailVm addressDetailVm = addressService.getAddressById(id);
         return ResponseEntity.ok(addressDetailVm);
     }
 
     // api lấy ds address hiển thị giao diện
-    @GetMapping("/storefront/addresses")
+    @GetMapping("/customer/addresses")
     public ResponseEntity<List<AddressDetailVm>> getAddresses(@RequestParam List<Long> ids){
         return ResponseEntity.ok(addressService.getAddresses(ids));
     }
 
-    @DeleteMapping("/storefront/address/{id}")
+    @DeleteMapping("/customer/address/{id}")
     public ResponseEntity<Void> deleteAddress(@PathVariable Long id){
         addressService.deleteAddress(id);
         return ResponseEntity.ok().build();

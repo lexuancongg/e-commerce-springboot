@@ -32,7 +32,7 @@ public class ProductController {
     }
 
     // lấy danh sách nổi bật hiển thị đầu tiên
-    @GetMapping("/store/products/featured")
+    @GetMapping("/customer/products/featured")
     public ResponseEntity<ProductFeaturePagingVm> getFeaturedProductsPaging(
             @RequestParam(value = "pageIndex", defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER) int pageIndex,
             @RequestParam(value = "pageSize",defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE) int pageSize
@@ -41,7 +41,7 @@ public class ProductController {
     }
 
     // xem chi tiết sp
-    @GetMapping("/store/products/{slug}")
+    @GetMapping("/customer/products/{slug}")
     public ResponseEntity<ProductDetailVm> getProductDetail(@PathVariable("slug") String slug) {
         return ResponseEntity.ok(this.productService.getProductDetail(slug));
 
@@ -59,7 +59,7 @@ public class ProductController {
 
 
     // lây ra ds sp
-    @GetMapping({"/store/products"})
+    @GetMapping({"/customer/products"})
     public ResponseEntity<ProductPagingVm> getProductsPaging(
             @RequestParam(value = "pageIndex", defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER,required = false) int pageIndex,
             @RequestParam(value = "pageSize",defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE ,required = false) int pageSize
@@ -71,7 +71,7 @@ public class ProductController {
 
 
     // lấy ra ds sp trong category
-    @GetMapping({"/store/category/{categoryId}/products"})
+    @GetMapping({"/customer/category/{categoryId}/products"})
     public ResponseEntity<ProductPagingVm> getProductsFromCategoryPaging(
             @RequestParam(value = "pageIndex",defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER,required = false) int pageIndex,
             @RequestParam(value = "pageSize",defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE,required = false) int pageSize,

@@ -17,7 +17,7 @@ public class BrandController {
     public BrandController(BrandService brandService) {
         this.brandService = brandService;
     }
-    @GetMapping({"/backoffice/brands","/storefront/brands"})
+    @GetMapping({"/management/brands","/customer/brands"})
     public ResponseEntity<List<BrandVm>> getBrands(
             @RequestParam(name = "brandName" , required = false,defaultValue = "") String brandName
             ) {
@@ -26,7 +26,7 @@ public class BrandController {
     }
 
 
-    @PostMapping("/backoffice/brands")
+    @PostMapping("/management/brands")
     public ResponseEntity<BrandVm> createBrand(
             @RequestBody @Valid BrandPostVm brandPostVm,
             UriComponentsBuilder uriComponentsBuilder
@@ -37,13 +37,13 @@ public class BrandController {
                 .body(brandSaved);
 
     }
-    @PutMapping("/backoffice/brands/{id}")
+    @PutMapping("/management/brands/{id}")
     public ResponseEntity<Void> updateBrand(@PathVariable Long id, @RequestBody @Valid BrandPostVm brandPostVm) {
         brandService.updateBrand(id,brandPostVm);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/backoffice/brands/{id}")
+    @DeleteMapping("/management/brands/{id}")
     public ResponseEntity<Void> deleteBrand(@PathVariable Long id) {
         brandService.deleteBrand(id);
         return ResponseEntity.noContent().build();

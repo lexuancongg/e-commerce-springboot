@@ -20,26 +20,26 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CartItemController {
     private final CartItemService cartItemService;
-    @PostMapping("storefront/cart/items")
+    @PostMapping("customer/cart/items")
     public ResponseEntity<CartItemGetVm> addCartItem(@Valid @RequestBody CartItemPostVm cartItemPostVm){
         CartItemGetVm cartItemGetVm = cartItemService.addCartItem(cartItemPostVm);
         return ResponseEntity.ok(cartItemGetVm);
     }
 
-    @PutMapping("/storefront/cart/items/{productId}")
+    @PutMapping("/customer/cart/items/{productId}")
     public ResponseEntity<CartItemGetVm> updateCartItem(@PathVariable Long productId,
                                                         @Valid @RequestBody CartItemPutVm cartItemPutVm){
         CartItemGetVm cartItemGetVm = cartItemService.updateCartItem(productId,cartItemPutVm);
         return  ResponseEntity.ok(cartItemGetVm);
     }
 
-    @GetMapping("/storefront/cart/items")
+    @GetMapping("/customer/cart/items")
     public ResponseEntity<List<CartItemGetVm>> getCartItems(){
         List<CartItemGetVm> cartItemGetVms = cartItemService.getCartItems();
         return ResponseEntity.ok(cartItemGetVms);
     }
 
-    @DeleteMapping("/storefront/cart/items/{productId}")
+    @DeleteMapping("/customer/cart/items/{productId}")
     public ResponseEntity<Void> deleteCartItem(@PathVariable Long productId){
         cartItemService.deleteCartItem(productId);
         return ResponseEntity.noContent().build();

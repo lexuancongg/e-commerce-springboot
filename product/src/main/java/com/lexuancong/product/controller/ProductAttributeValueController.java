@@ -19,7 +19,7 @@ public class ProductAttributeValueController {
         this.productAttributeValueService = productAttributeValueService;
     }
 
-    @GetMapping("/backoffice/product-attribute-value/{productId}")
+    @GetMapping("/management/product-attribute-value/{productId}")
     public ResponseEntity<List<ProductAttributeValueVm>> getProductAttributeValueByProductId (
             @PathVariable("productId") Long productId) {
         List<ProductAttributeValueVm> productAttributeValueVms = this.productAttributeValueService
@@ -28,7 +28,7 @@ public class ProductAttributeValueController {
 
     }
 
-    @PostMapping("/backoffice/product-attribute-value")
+    @PostMapping("/management/product-attribute-value")
     public ResponseEntity<ProductAttributeValueVm> createProductAttributeValue(
             @Valid @RequestBody ProductAttributeValuePostVm productAttributeValuePostVm,
             UriComponentsBuilder uriComponentsBuilder,
@@ -42,13 +42,13 @@ public class ProductAttributeValueController {
                 .body(productAttributeValueVm);
     }
 
-    @DeleteMapping({"/backoffice/product-attribute-value/{id}"})
+    @DeleteMapping({"/management/product-attribute-value/{id}"})
     public ResponseEntity<Void> deleteProductAttributeValue(@PathVariable(name = "id") Long id){
         this.productAttributeValueService.deleteProductAttributeValue(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping({"/backoffice/product-attribute-value/{id}"})
+    @PutMapping({"/management/product-attribute-value/{id}"})
     public ResponseEntity<Void> updateProductAttributeValue(@PathVariable(value = "id") Long id,
                                                             @Valid @RequestBody ProductAttributeValuePostVm productAttributeValuePostVm){
         this.productAttributeValueService.updateProductAttributeValue(id,productAttributeValuePostVm);

@@ -19,7 +19,7 @@ public class ProvinceController {
         this.provinceService = provinceService;
     }
 
-    @GetMapping("/backoffice/provinces/paging")
+    @GetMapping("/management/provinces/paging")
     public ResponseEntity<ProvincePagingVm> getProvincesPaging(
             @RequestParam(value = "pageIndex",defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER,required = false)
             final int pageIndex,
@@ -32,7 +32,7 @@ public class ProvinceController {
 
     }
     // show province with country
-    @GetMapping({"/backoffice/provinces/{countryId}","/storefront/provinces/{countryId}"})
+    @GetMapping({"/management/provinces/{countryId}","/customer/provinces/{countryId}"})
     public ResponseEntity<List<ProvinceVm>> getProvincesByCountryId(
             @PathVariable(value = "countryId",required = true) final Long countryId
     ) {
@@ -40,7 +40,7 @@ public class ProvinceController {
         return ResponseEntity.ok(provinceVms);
     }
 
-    @PostMapping("/backoffice/provinces")
+    @PostMapping("/management/provinces")
     public ResponseEntity<ProvinceVm> createProvince(
             @RequestBody @Valid final ProvincePostVm provincePostVm,
             UriComponentsBuilder uriComponentsBuilder
@@ -52,14 +52,14 @@ public class ProvinceController {
         ).body(provinceSaved);
     }
 
-    @PutMapping("/backoffice/provinces/{id}")
+    @PutMapping("/management/provinces/{id}")
     public ResponseEntity<Void> updateProvince(@PathVariable Long id ,
                                                @RequestBody @Valid ProvincePostVm provincePostVm){
         provinceService.updateProvince(id,provincePostVm);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/backoffice/provinces/{id}")
+    @DeleteMapping("/management/provinces/{id}")
     public ResponseEntity<Void> deleteProvince(@PathVariable Long id){
         provinceService.deleteProvince(id);
         return ResponseEntity.noContent().build();

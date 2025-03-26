@@ -18,13 +18,13 @@ public class ProductAttributeGroupController {
         this.productAttributeGroupService = productAttributeGroupService;
     }
 
-    @GetMapping({"/backoffice/product-attribute-group"})
+    @GetMapping({"/management/product-attribute-group"})
     public ResponseEntity<List<ProductAttributeGroupVm>> getProductAttributeGroups() {
         List<ProductAttributeGroupVm> productAttributeGroupVms = this.productAttributeGroupService.getProductAttributeGroups();
         return new ResponseEntity<>(productAttributeGroupVms, HttpStatus.OK);
     }
 
-    @PostMapping({"/backoffice/product-attribute-group"})
+    @PostMapping({"/management/product-attribute-group"})
     public ResponseEntity<ProductAttributeGroupVm> createProductAttributeGroup(
             @Valid @RequestBody ProductAttributeGroupPostVm productAttributeGroupPostVm,
             // đuược inject dựa trên thông tin request hienej tại
@@ -32,20 +32,20 @@ public class ProductAttributeGroupController {
             ) {
         ProductAttributeGroupVm productAttributeGroupVm = this.productAttributeGroupService
                 .createProductAttributeGroup(productAttributeGroupPostVm);
-        return ResponseEntity.created(uriComponentsBuilder.replacePath("backoffice/product-attribute-group/{id}")
+        return ResponseEntity.created(uriComponentsBuilder.replacePath("management/product-attribute-group/{id}")
                 .buildAndExpand(productAttributeGroupVm.id()).toUri()
         ).body(productAttributeGroupVm);
 
     }
 
-    @PutMapping({"/backoffice/product-attribute-group/{id}"})
+    @PutMapping({"/management/product-attribute-group/{id}"})
     public ResponseEntity<Void> updateProductAttributeGroup(@PathVariable Long id,
                                                             @Valid @RequestBody ProductAttributeGroupPostVm productAttributeGroupPostVm){
         this.productAttributeGroupService.updateProductAttributeGroup(id,productAttributeGroupPostVm);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping({"/backoffice/product-attribute-group/{id}"})
+    @DeleteMapping({"/management/product-attribute-group/{id}"})
     public ResponseEntity<Void> deleteProductAttributeGroup(@PathVariable Long id){
         this.productAttributeGroupService.deleteProductAttributeGroup(id);
         return ResponseEntity.noContent().build();

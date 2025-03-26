@@ -29,7 +29,7 @@ public class CountryController {
         return ResponseEntity.ok(countryService.getCountriesPaging(pageIndex,pageSize));
     }
 
-    @GetMapping({"/management/countries","/storefront/countries"})
+    @GetMapping({"/management/countries","/customer/countries"})
     public ResponseEntity<List<CountryVm>> getCountries(){
         return ResponseEntity.ok(countryService.getCountries());
     }

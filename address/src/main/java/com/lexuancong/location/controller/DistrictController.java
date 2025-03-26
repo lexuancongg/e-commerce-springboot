@@ -18,8 +18,8 @@ public class DistrictController {
 
 
     // lấy district dựa vào province
-    @GetMapping({"/backoffice/district/{provinceId}","/storefront/district/{provinceId}"})
-    public ResponseEntity<List<DistrictVm>>  getDistrictByProvinceId(@PathVariable int provinceId){
+    @GetMapping({"/management/district/{provinceId}","/customer/district/{provinceId}"})
+    public ResponseEntity<List<DistrictVm>>  getDistrictByProvinceId(@PathVariable long provinceId){
         List<DistrictVm> districtVms = districtService.getDistrictByProvinceId(provinceId);
         return ResponseEntity.ok(districtVms);
     }

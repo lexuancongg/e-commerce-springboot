@@ -19,12 +19,12 @@ public class CustomerController {
     }
 
     // api xem thông tin
-    @GetMapping("/storefront/customer/profile")
+    @GetMapping("/customer/customer/profile")
     public ResponseEntity<CustomerVm> getCustomerProfile() {
         return ResponseEntity.ok(customerService.getCustomerProfile());
     }
 
-    @PostMapping("/storefront/customer")
+    @PostMapping("/customer/customer")
     public ResponseEntity<CustomerVm> createCustomer(@RequestBody @Valid CustomerPostVm customerPostVm,
                                                      UriComponentsBuilder uriComponentsBuilder) {
         CustomerVm customerVm = customerService.createCustomer(customerPostVm);
