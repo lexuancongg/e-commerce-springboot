@@ -1,9 +1,11 @@
-package com.lexuancong.oder.viewmodel;
+package com.lexuancong.oder.viewmodel.order;
 
 import com.lexuancong.oder.model.Order;
 import com.lexuancong.oder.model.ShippingAddress;
 import com.lexuancong.oder.model.enum_status.DeliveryStatus;
 import com.lexuancong.oder.model.enum_status.OrderStatus;
+import com.lexuancong.oder.viewmodel.orderitem.OrderItemPostVm;
+import com.lexuancong.oder.viewmodel.shippingaddress.ShippingAddressPostVm;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 

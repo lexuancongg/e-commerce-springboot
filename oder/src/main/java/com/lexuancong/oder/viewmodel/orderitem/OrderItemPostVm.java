@@ -1,4 +1,4 @@
-package com.lexuancong.oder.viewmodel;
+package com.lexuancong.oder.viewmodel.orderitem;
 
 import com.lexuancong.oder.model.Order;
 import com.lexuancong.oder.model.OrderItem;

@@ -1,4 +1,4 @@
-package com.lexuancong.oder.viewmodel;
+package com.lexuancong.oder.viewmodel.shippingaddress;
 
 import com.lexuancong.oder.model.ShippingAddress;
 import jakarta.validation.constraints.NotBlank;

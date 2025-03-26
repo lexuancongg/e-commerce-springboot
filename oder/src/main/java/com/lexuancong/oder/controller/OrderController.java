@@ -1,21 +1,21 @@
 package com.lexuancong.oder.controller;
 
 import com.lexuancong.oder.service.OderService;
-import com.lexuancong.oder.viewmodel.OrderPostVm;
-import com.lexuancong.oder.viewmodel.OrderVm;
+import com.lexuancong.oder.viewmodel.order.OrderGetVm;
+import com.lexuancong.oder.viewmodel.order.OrderPostVm;
+import com.lexuancong.oder.viewmodel.order.OrderVm;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @CrossOrigin(origins = "*",maxAge = 3600)
 @RestController
-public class OderController {
+public class OrderController {
     private final OderService orderService;
-    public OderController(OderService orderService) {
+    public OrderController(OderService orderService) {
         this.orderService = orderService;
 
     }
@@ -26,6 +26,13 @@ public class OderController {
         return  ResponseEntity.ok(orderService.createOrder(orderPostVm));
 
     }
+
+    @GetMapping("/store/orders/my-orders")
+    public ResponseEntity<List<OrderGetVm>> getMyOrders() {
+        return ResponseEntity.ok(this.orderService.getMyOrders());
+
+    }
+
 
 
 }

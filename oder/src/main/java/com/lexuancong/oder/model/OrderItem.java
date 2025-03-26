@@ -21,6 +21,7 @@ public class OrderItem extends AuditEntity{
     @Column(name = "price")
     private BigDecimal productPrice ;
     private BigDecimal totalPrice ;
+    private String productName ;
     @Column(name = "order_id")
     private Long oderId;
     @ManyToOne(fetch = FetchType.LAZY)
