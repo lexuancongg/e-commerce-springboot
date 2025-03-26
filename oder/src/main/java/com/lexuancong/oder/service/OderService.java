@@ -6,9 +6,13 @@ import com.lexuancong.oder.model.enum_status.OrderStatus;
 import com.lexuancong.oder.repository.OderRepository;
 import com.lexuancong.oder.repository.OrderItemRepository;
 import com.lexuancong.oder.service.internal.CartService;
+import com.lexuancong.oder.utils.Constants;
 import com.lexuancong.oder.viewmodel.order.OrderGetVm;
 import com.lexuancong.oder.viewmodel.order.OrderPostVm;
 import com.lexuancong.oder.viewmodel.order.OrderVm;
+import lombok.extern.java.Log;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,6 +32,9 @@ public class OderService {
     }
     public OrderVm createOrder(OrderPostVm orderPostVm){
         Order order = orderPostVm.toModel();
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        order.setCustomerId(userId);
+
         this.oderRepository.save(order); // shipping address đã lưu cùng oder
         Set<OrderItem> orderItemSet = orderPostVm.orderItemPostVms().stream()
                 .map(orderItemPostVm -> orderItemPostVm.toModel(order))
@@ -57,7 +64,17 @@ public class OderService {
     }
 
     public List<OrderGetVm> getMyOrders(){
-        return  null;
+        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Sort sort = Sort.by(Sort.Direction.DESC, Constants.Column.CREATE_AT_COLUMN);
+        List<Order> orders = this.oderRepository.findAllByCustomerId(userId,sort);
+        return orders.stream()
+                .map(order -> {
+                    Long orderId = order.getId();
+                    List<OrderItem> orderItems = this.orderItemRepository.findAllByOderId(orderId);
+                    return OrderGetVm.fromModel(order,orderItems);
+                })
+                .toList();
+
     }
 
 }

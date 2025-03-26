@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Order {
+public class Order extends AuditEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,6 +29,7 @@ public class Order {
     private ShippingAddress shippingAddress;
     private int numberItem;
     private BigDecimal totalPrice;
+    // đã có createBy
     private String customerId;
 
     @Column(name = "status")
