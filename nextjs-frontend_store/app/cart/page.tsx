@@ -11,27 +11,18 @@ import cartService from "@/services/cartService";
 
 
 const Cart = () => {
-
+    // thông tin cartItem
     const [cartItems, setCartItems] = useState<CartItemDetailVm[]>([]);
-
+    // ds productId đã chọn
     const [selectedProductIds, setSelectedProductIds] = useState<Set<number>>(new Set());
 
     const [loadingItems, setLoadingItems] = useState<Set<number>>(new Set());
 
 
-    const [totalPrice, setTotalPrice] = useState(0);
-
     const [isShowModelConfirmDelete, setIsShowModelConfirmDelete] = useState(false);
 
     const [productIdToRemove, setProductIdToRemove] = useState<number>(0);
 
-
-    const [couponCode, setCouponCode] = useState<string>('');
-
-
-
-    const [discountMoney, setDiscountMoney] = useState<number>(0);
-    const [subTotalPrice, setSubTotalPrice] = useState<number>(0);
 
 
     useEffect(() => {
@@ -63,7 +54,7 @@ const Cart = () => {
 
     }
 
-    // handle event checked cartItem
+    // chọn từng cartItem
     const handleSelectCartItemChange = (productId: number) => {
         setSelectedProductIds((prevSelectedProductIds) => {
             // new lại vì set là kiểu tham chiếu
@@ -92,9 +83,8 @@ const Cart = () => {
         } catch (error) {
             throw new Error();
         }
-
     }
-    // handle up quantity
+    // tăng số lượng 1
     const handleIncreaseQuantity = async (productId: number) => {
         const cartItem = cartItems.find((item, index) => item.productId == productId);
         if (!cartItem) {
@@ -106,7 +96,7 @@ const Cart = () => {
     }
 
 
-    // handle dow quantity 1
+    // khi giảm số lượng xuống 1
     const handleDecreaseQuantity = async (productId: number) => {
         const cartItem = cartItems.find((item, index, obj) => {
             return item.productId == productId;
@@ -252,54 +242,7 @@ const Cart = () => {
                         </div>
                     </div>
                 </div>
-                <div className="row">
-                    <div className="col-lg-6">
-                        <div className="discount__content">
-                            <h6>Discount codes</h6>
-                            <form action="#">
-                                <input
-                                    type="text"
-                                    placeholder="Enter your coupon code"
-                                    onChange={(e) => setCouponCode(e.target.value)}
-                                />
-                                <button
-                                    className="site-btn primary-btn btn btn-primary"
-                                    disabled={selectedProductIds.size === 0}
-                                    onClick={applyCopounCode}
-                                >
-                                    Apply
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                    <div className="section">
-                        <div>
-                            LỰA CHỌN CỦA BẠN
-                        </div>
-                        <div>
-                            Tổng <span>{formatPrice(subTotalPrice)}</span>
-                        </div>
-                        <div>
-                            Shop vocher <span>{formatPrice(discountMoney)}</span>
-                        </div>
-                        <div>
-                            <div>
-                                <input onChange={handleSelectAllCartItemsChange} id="select-all" type="checkbox"/>
-                                <label htmlFor="select-all">Chọn Tất Cả</label>
-                            </div>
-                            <div>Xóa</div>
-                            <span>Tổng thanh toán Sản phẩm <span>{formatPrice(totalPrice)}</span>:₫
 
-                        </span>
-                            <button className="primary-btn"
-                                    onClick={handleCheckout}
-                                    disabled={selectedProductIds.size === 0}
-                            >Mua Hàng
-                            </button>
-
-                        </div>
-                    </div>
-                </div>
                 <ConfirmationDialog
                     isOpen={isShowModelConfirmDelete}
                     okText="Remove"

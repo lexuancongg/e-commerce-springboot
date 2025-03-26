@@ -1,6 +1,6 @@
 "use client"
 import React, {Context, ReactElement, useCallback, useContext, useEffect, useMemo, useState} from "react";
-import CustomerService from "@/services/customerService";
+import customerService from "@/services/customerService";
 
 // khởi tạo context
 export const UserInfoContext: Context<UserInfo> = React.createContext({
@@ -22,7 +22,7 @@ export function UserInfoProvider({children}: React.PropsWithChildren): ReactElem
 
     // tráng lặp khai báo lại hàm
     const fetchUserInfo: () => void = useCallback(() => {
-        CustomerService.getMyProfile()
+        customerService.getMyProfile()
             .then((userInfo) => {
                 setFirstName(userInfo.firstName);
                 setLastName(userInfo.lastName);

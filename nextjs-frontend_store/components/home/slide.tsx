@@ -31,6 +31,7 @@ export   function Slide(){
     React.useEffect(() => {
         let i = 0;
         const idInterval = setInterval(() => {
+            // trong dom thì mỗi ptu chỉ có một vị trí trong cây html , nếu append ptu đã tồn tại thì nó bị di chuyển xuống cuối thay vì đc nhân bản
             if(slideRef.current)  slideRef.current.append(slide_items_refs.current[i]);
             i = i == slide_items_refs.current.length -1 ? 0 : i +1 ;
         }, 2500);
@@ -46,6 +47,7 @@ export   function Slide(){
             <div ref={slideRef} className="slide">
                 {featuredProduct && featuredProduct.map((product, index) => {
                     return (
+                        // khi map qua từng ptu , react tạo ptu Dom (div) => gọi callback và truyền vao ptu mới tạo(div)
                         <div ref={(element)=>{
                             if(element) slide_items_refs.current[index] = element;
                         }} key={product.id} className="item" style={{backgroundImage: `url(${product.url})`}}></div>

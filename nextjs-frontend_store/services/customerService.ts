@@ -1,9 +1,9 @@
 class CustomerService{
     private baseUrl : string = "api/"
 
-    public static async getMyProfile():Promise<any>{
+    public  async getMyProfile():Promise<any>{
         return  null;
     }
 
 }
-export default CustomerService;
+export default new CustomerService();

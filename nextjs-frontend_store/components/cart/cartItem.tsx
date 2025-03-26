@@ -3,13 +3,12 @@ import {CartItemDetailVm} from "@/models/cart/cartItemDetailVm";
 import LoadImageSafe from "@/components/common/loadImageSafe";
 import Link from "next/link";
 import {formatPrice} from "@/utils/formatPrice";
-import {PromotionVerifyResult} from "@/models/promotion/promotion";
+// import {PromotionVerifyResult} from "@/models/promotion/promotion";
 
 interface CartItemProps {
     item:CartItemDetailVm;
     isLoading: boolean;
     isSelected: boolean;
-    promotionApply?: PromotionVerifyResult;
     handleSelectCartItemChange: (productId: number) => void;
     handleDecreaseQuantity: (productId: number) => void;
     handleIncreaseQuantity: (productId: number) => void;
@@ -24,26 +23,11 @@ interface CartItemProps {
     handleShowModelConfirmDelete: (productId: number) => void;
 }
 
-const calculateProductPrice = (
-    item: any,
-    promotionApply?: PromotionVerifyResult
-) => {
-    let discount = 0;
 
-    // Check if discountType is 'PERCENTAGE' and calculate accordingly
-    if (promotionApply?.discountType === 'PERCENTAGE') {
-        discount = (item.price * item.quantity * (promotionApply.discountValue ?? 0)) / 100;
-    } else {
-        discount = promotionApply?.discountValue ?? 0;
-    }
-
-    return formatPrice(item.price * item.quantity - discount);
-};
 const CartItem: FC<CartItemProps> = ({
                                          item,
                                          isLoading,
                                          isSelected,
-                                         promotionApply,
                                          handleSelectCartItemChange,
                                          handleDecreaseQuantity,
                                          handleIncreaseQuantity,
@@ -60,6 +44,7 @@ const CartItem: FC<CartItemProps> = ({
                         className="form-check-input item-checkbox"
                         type="checkbox"
                         checked={isSelected}
+                        // sử lý sự kiện cho chọn cartItem
                         onChange={() => handleSelectCartItemChange(item.productId)}
                     />
                 </label>
@@ -91,17 +76,7 @@ const CartItem: FC<CartItemProps> = ({
                 </div>
             </td>
             <td className="cart__price">
-                {promotionApply?.productId === item.productId && (
-                    <div style={{ textDecorationLine: 'line-through' }}>{formatPrice(item.price)}</div>
-                )}
 
-                <div>
-                    {
-                        promotionApply?.discountType === 'PERCENTAGE'
-                            ? formatPrice(item.price - item.price * (promotionApply.discountValue / 100)) // Calculate percentage discount
-                            : formatPrice(item.price - (promotionApply?.discountValue ?? 0)) // Fixed discount
-                    }
-                </div>
             </td>
             <td className="cart__quantity">
                 <div className="pro-qty">
@@ -142,7 +117,7 @@ const CartItem: FC<CartItemProps> = ({
                     </div>
                 </div>
             </td>
-            <td className="cart__total">{calculateProductPrice(item, promotionApply)}</td>
+            <td className="cart__total">{item.price}</td>
             <td className="cart__close">
                 {' '}
                 <button
