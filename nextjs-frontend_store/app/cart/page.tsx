@@ -1,13 +1,13 @@
 'use client'
 import React, {ChangeEvent, useCallback, useEffect, useState} from "react";
-import {CartItemDetailVm} from "@/models/cart/cartItemDetailVm";
+import {CartItemDetailVm} from "@/models/cart/CartItemDetailVm";
 import CartItem from "@/components/cart/cartItem";
 import Link from "next/link";
 import {Button} from "react-bootstrap";
 import {formatPrice} from "@/utils/formatPrice";
 import ConfirmationDialog from "@/components/dialog/confirmDialog";
-import {CartItemPutVm} from "@/models/cart/cartItemPutVm";
-import cartService from "@/services/cartService";
+import {CartItemPutVm} from "@/models/cart/CartItemPutVm";
+import cartService from "@/services/cart/cartService";
 
 
 const Cart = () => {

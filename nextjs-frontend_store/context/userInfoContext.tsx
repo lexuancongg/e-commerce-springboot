@@ -1,6 +1,6 @@
 "use client"
 import React, {Context, ReactElement, useCallback, useContext, useEffect, useMemo, useState} from "react";
-import customerService from "@/services/customerService";
+import customerService from "@/services/customer/customerService";
 
 // khởi tạo context
 export const UserInfoContext: Context<UserInfo> = React.createContext({

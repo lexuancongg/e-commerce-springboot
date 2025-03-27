@@ -1,15 +1,16 @@
-import {CartItemDetailVm} from "@/models/cart/cartItemDetailVm";
-import {CartItemVm} from "@/models/cart/cartItemVm";
+import {CartItemDetailVm} from "@/models/cart/CartItemDetailVm";
+import {CartItemVm} from "@/models/cart/CartItemVm";
 import apiClient from "@/utils/api/apiClient";
-import productService from "@/services/productService";
-import {ProductPreviewVm} from "@/models/product/productPreviewVm";
-import {CartItemPutVm} from "@/models/cart/cartItemPutVm";
+import productService from "@/services/product/productService";
+import {ProductPreviewVm} from "@/models/product/ProductPreviewVm";
+import {CartItemPutVm} from "@/models/cart/CartItemPutVm";
 
 class CartService{
     private  baseUrl : string = "api";
     public  async getNumberCartItems():Promise<number>{
         return 1;
     }
+
 
     public async getCartItemsFullPayload():Promise<CartItemDetailVm[]>{
         return [

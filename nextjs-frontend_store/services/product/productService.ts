@@ -1,4 +1,4 @@
-import {ProductPreviewVm} from "@/models/product/productPreviewVm";
+import {ProductPreviewVm} from "@/models/product/ProductPreviewVm";
 import apiClient from "@/utils/api/apiClient";
 
 class ProductService {

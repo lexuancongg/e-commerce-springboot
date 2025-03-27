@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 public record OrderItemPostVm(
         Long productId,
         int quantity,
+        String productName,
         BigDecimal productPrice,
         BigDecimal totalPrice
 ) {
@@ -17,6 +18,7 @@ public record OrderItemPostVm(
                 .quantity(quantity)
                 .productPrice(productPrice)
                 .totalPrice(totalPrice)
+                .productName(productName)
                 .order(order)
                 .oderId(order.getId())
                 .build();

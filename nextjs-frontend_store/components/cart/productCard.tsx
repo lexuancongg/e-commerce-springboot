@@ -1,4 +1,4 @@
-import {ProductPreviewVm} from "@/models/product/productPreviewVm";
+import {ProductPreviewVm} from "@/models/product/ProductPreviewVm";
 import {NextPage} from "next";
 import {useEffect, useState} from "react";
 import Link from "next/link";

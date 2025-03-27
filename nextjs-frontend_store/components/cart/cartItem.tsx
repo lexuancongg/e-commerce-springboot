@@ -1,5 +1,5 @@
 import {FC} from "react";
-import {CartItemDetailVm} from "@/models/cart/cartItemDetailVm";
+import {CartItemDetailVm} from "@/models/cart/CartItemDetailVm";
 import LoadImageSafe from "@/components/common/loadImageSafe";
 import Link from "next/link";
 import {formatPrice} from "@/utils/formatPrice";

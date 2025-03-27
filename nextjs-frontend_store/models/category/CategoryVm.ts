@@ -1,4 +1,4 @@
-export type Category ={
+export type CategoryVm ={
     id:number;
     name:string;
     slug: string;

@@ -1,7 +1,7 @@
 'use client'
 import {NextPage} from "next";
 import {useMemo, useState} from "react";
-import {Category as CategoryModel} from "@/models/category/category";
+import {CategoryVm as CategoryModel} from "@/models/category/CategoryVm";
 import {Container} from "react-bootstrap";
 const categoriess: CategoryModel[] = [
     {
