@@ -42,8 +42,8 @@ public class AddressService {
         // throw exception
         Address address = addressRepository.findById(id).orElseThrow(() -> null);
         address.setContactName(addressPostVm.contactName());
-        address.setAddressLine(addressPostVm.addressLine());
-        address.setPhone(addressPostVm.phone());
+        address.setSpecificAddress(addressPostVm.addressLine());
+        address.setPhoneNumber(addressPostVm.phone());
 
         countryRepository.findById(addressPostVm.countryId()).ifPresent(address::setCountry);
         provinceRepository.findById(addressPostVm.provinceId()).ifPresent(address::setProvince);

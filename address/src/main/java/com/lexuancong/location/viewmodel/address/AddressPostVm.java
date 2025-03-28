@@ -16,7 +16,7 @@ public record AddressPostVm(
         return Address.builder()
                 .contactName(this.contactName)
                 .phone(this.phone)
-                .addressLine(this.addressLine)
+                .specificAddress(this.addressLine)
                 .build();
     }
 }

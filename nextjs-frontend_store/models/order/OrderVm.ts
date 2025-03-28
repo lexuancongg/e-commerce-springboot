@@ -11,6 +11,6 @@ export interface OrderVm{
     deliveryStatus: DeliveryStatus;
     deliveryMethod: DeliveryMethod;
     orderItemVms: OrderItemVm[];
-    createdOn: Dayjs;
+    createdAt: Dayjs;
 
 }

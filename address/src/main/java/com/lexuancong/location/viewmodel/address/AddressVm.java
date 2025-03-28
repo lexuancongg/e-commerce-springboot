@@ -7,8 +7,8 @@ import lombok.Builder;
 public record AddressVm(
         Long id,
         String contactName,
-        String phone,
-        String addressLine,
+        String phoneNumber,
+        String specificAddress,
         Long districtId,
         Long provinceId,
         Long countryId
@@ -17,8 +17,8 @@ public record AddressVm(
         return  AddressVm.builder()
                 .id(address.getId())
                 .contactName(address.getContactName())
-                .phone(address.getPhone())
-                .addressLine(address.getAddressLine())
+                .phoneNumber(address.getPhoneNumber())
+                .specificAddress(address.getSpecificAddress())
                 .districtId(address.getDistrict().getId())
                 .provinceId(address.getProvince().getId())
                 .countryId(address.getCountry().getId())

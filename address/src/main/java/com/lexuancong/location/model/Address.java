@@ -18,10 +18,10 @@ public class Address extends AuditEntity {
     private String contactName;
 
     @Column(length = 25)
-    private String phone;
+    private String phoneNumber;
 
     @Column(length = 450)
-    private String addressLine;
+    private String specificAddress;
 
     @ManyToOne
     @JoinColumn(name = "district_id", nullable = false)

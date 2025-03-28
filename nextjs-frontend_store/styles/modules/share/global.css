@@ -1,3 +1,11 @@
+/* import các css mặc định cơ bản dành cho toàn bộ ter như html*/
+@tailwind base;
+/* import component để sử dụng*/
+@tailwind components;
+/* khác với bootraps , nó chỉ inject css của cacs class chúng ta sử dụng , nó giúp inject vào trình duyệt*/
+@tailwind utilities;
+
+
 a {
     color: inherit;
     text-decoration: none;

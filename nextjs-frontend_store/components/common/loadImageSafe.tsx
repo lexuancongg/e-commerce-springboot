@@ -18,17 +18,18 @@
             className,
             style,
             alt,
-            fallBack : fallBackImage ='../../asset/images/fallback/default-fallback-image.png',
+            fallBack : fallBackImage ='../asset/images/fallback/default-fallback-image.png',
             ...props
         }: Props
     ) => {
         const [fallBack,setFallBack] = useState<string|null>(null);
         const [srcUrl,setSrcUrl] = useState<string>(src);
 
+        // neeus src thay doi => fallback nhường chổ để thử lai src
         useEffect(()=>{
             setSrcUrl(src);
             setFallBack(null);
-        },[src ,fallBack])
+        },[src])
 
         return(
             <Image
