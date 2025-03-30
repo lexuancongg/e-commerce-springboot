@@ -6,7 +6,7 @@ type DialogProps = {
     isOpen?: boolean;
     title?: string;
     children: JSX.Element;
-    isShowOk?: boolean;
+    isShowOk?: boolean ;
     isShowCancel?: boolean;
     okText?: string;
     cancelText?: string;

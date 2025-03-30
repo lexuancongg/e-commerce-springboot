@@ -6,9 +6,17 @@ import { FiEdit } from "react-icons/fi";
 import { HiCheckCircle } from "react-icons/hi";
 import { TiContacts } from "react-icons/ti";
 type Props = {
-    address: AddressVm
+  address: AddressVm,
+  handleChooseAddressDefault: (addressId: number) => void,
+  handleChooseDeleteAddress: (addressId: number) => void
 }
-const CardAddress: FC<{ address: any }> = ({ address }) => {
+const CardAddress: FC<Props> = (
+  {
+    address,
+    handleChooseAddressDefault,
+    handleChooseDeleteAddress
+  }
+) => {
   return (
     <div className="col-span-4  w-1/2 p-2" key={address.id}>
       <div className="flex bg-red-500 rounded-lg overflow-hidden shadow-md">
@@ -16,7 +24,7 @@ const CardAddress: FC<{ address: any }> = ({ address }) => {
           <TiContacts className="text-white text-5xl" />
         </div>
         <div className="p-4 w-full bg-red-500 text-white">
-          <div  className="text-sm">Contact name: {address.contactName}</div>
+          <div className="text-sm">Contact name: {address.contactName}</div>
           <div className="text-sm break-words">Address: {address.specificAddress}</div>
           <div className="text-sm">Phone number: {address.phoneNumber}</div>
           <div className="flex justify-end space-x-3 mt-3">
@@ -24,7 +32,9 @@ const CardAddress: FC<{ address: any }> = ({ address }) => {
             <Link href={`/address/${address.id}/edit`}>
               <FiEdit className="cursor-pointer text-blue-300" title="Edit" />
             </Link>
-            <FaTrash className="cursor-pointer text-red-300" title="Delete" />
+            <FaTrash className="cursor-pointer text-red-300" title="Delete"
+              onClick={() => handleChooseDeleteAddress(address.id)}
+            />
           </div>
         </div>
       </div>
