@@ -11,6 +11,13 @@ public record ShippingAddressVm(
         Long provinceId,
         Long countryId
 ) {
+
+
+
+
+
+
+
     public static ShippingAddressVm fromModel(ShippingAddress shippingAddress) {
         return new ShippingAddressVm(
                 shippingAddress.getId(),

@@ -6,7 +6,7 @@ type Props<T extends FieldValues>  = {
     // nội dung của input
     labelText: string,
     // field để đăng ký cho input , path chi cho lấy key hợp lệ của T(object đại diện cho dữ liệu của form)
-    field : Path<T>,
+    fieldName : Path<T>,
     register: UseFormRegister<T>,
     type ?: HTMLInputTypeAttribute,
     registerOptions: RegisterOptions<T>,
@@ -18,7 +18,7 @@ type Props<T extends FieldValues>  = {
 }
 const Input = <T extends FieldValues> (
     {
-        field,
+        fieldName,
         labelText,
         register,
         registerOptions,
@@ -31,14 +31,14 @@ const Input = <T extends FieldValues> (
 )=>{
     return (
         <div className="mb-3">
-        <label className="form-label" htmlFor={field}>
+        <label className="form-label" htmlFor={fieldName}>
           {labelText} {registerOptions?.required && <span className="text-danger">*</span>}
         </label>
         <input
           type={type}
-          id={field}
+          id={fieldName}
           className={`form-control ${error ? 'border-danger' : ''}`}
-          {...register(field, registerOptions)}
+          {...register(fieldName, registerOptions)}
           defaultValue={defaultValue}
           disabled={disabled}
           placeholder={placehoder}
