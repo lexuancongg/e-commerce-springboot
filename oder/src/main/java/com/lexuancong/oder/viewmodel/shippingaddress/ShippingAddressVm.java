@@ -18,6 +18,8 @@ public record ShippingAddressVm(
 
 
 
+    
+    
     public static ShippingAddressVm fromModel(ShippingAddress shippingAddress) {
         return new ShippingAddressVm(
                 shippingAddress.getId(),

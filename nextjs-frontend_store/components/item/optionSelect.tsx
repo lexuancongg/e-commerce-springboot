@@ -10,7 +10,7 @@ type Props<T extends FieldValues> = {
     register : UseFormRegister<T>,
   registerOptions?: RegisterOptions<T>,
   options: Option[],
-  defaultValue?: string ,
+  defaultValue?: string | number,
   placeholder?: string,
   disabled?: boolean,
   error?: string
@@ -36,7 +36,7 @@ const OptionSelect =<T extends FieldValues> (
     </label>
     <select
       id={`select-option-${fieldName}`}
-      className={`form-select ${error ? 'border-danger' : ''}`}
+      className={`block w-full px-3 py-2 pr-10 text-base font-normal h-[50px] rounded-md border border-gray-300 bg-white  ${error ? 'border-danger' : ''}`}
       defaultValue={defaultValue || ''}
       {...register(fieldName, registerOptions)}
       disabled={disabled}
