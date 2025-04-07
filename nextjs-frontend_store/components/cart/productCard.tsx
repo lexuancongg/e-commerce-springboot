@@ -14,7 +14,7 @@ type Props = {
 
 }
 const ProductCard : NextPage<Props> = ({product,imageId,className}:Props)=>{
-    const [imageUrl,setImageUrl] = useState<string>(imageId ? '' : product.imageUrl);
+    const [imageUrl,setImageUrl] = useState<string>(imageId ? '' : product.avatarUrl);
     useEffect(()=>{
         if(imageId){
             // fetach image

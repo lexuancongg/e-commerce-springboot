@@ -1,128 +1,13 @@
 'use client'
 import {NextPage} from "next";
-import {useMemo, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {CategoryVm as CategoryModel} from "@/models/category/CategoryVm";
 import {Container} from "react-bootstrap";
-const categoriess: CategoryModel[] = [
-    {
-        id: 1,
-        name: "Electronics",
-        slug: "electronics",
-        categoryImage: {
-            id: 101,
-            url: "https://thuthuatnhanh.com/wp-content/uploads/2022/08/ao-thun-in-hinh-theo-yeu-cau.jpg",
-        },
-    },
-    {
-        id: 2,
-        name: "Fashion",
-        slug: "fashion",
-        categoryImage: {
-            id: 102,
-            url: "https://example.com/images/fashion.jpg",
-        },
-    },
-    {
-        id: 2,
-        name: "Fashion",
-        slug: "fashion",
-        categoryImage: {
-            id: 102,
-            url: "https://example.com/images/fashion.jpg",
-        },
-    },{
-        id: 2,
-        name: "Fashion",
-        slug: "fashion",
-        categoryImage: {
-            id: 102,
-            url: "https://example.com/images/fashion.jpg",
-        },
-    },{
-        id: 2,
-        name: "Fashion",
-        slug: "fashion",
-        categoryImage: {
-            id: 102,
-            url: "https://example.com/images/fashion.jpg",
-        },
-    },{
-        id: 2,
-        name: "Fashion",
-        slug: "fashion",
-        categoryImage: {
-            id: 102,
-            url: "https://example.com/images/fashion.jpg",
-        },
-    },{
-        id: 2,
-        name: "Fashion",
-        slug: "fashion",
-        categoryImage: {
-            id: 102,
-            url: "https://example.com/images/fashion.jpg",
-        },
-    },{
-        id: 2,
-        name: "Fashion",
-        slug: "fashion",
-        categoryImage: {
-            id: 102,
-            url: "https://example.com/images/fashion.jpg",
-        },
-    },{
-        id: 2,
-        name: "Fashion",
-        slug: "fashion",
-        categoryImage: {
-            id: 102,
-            url: "https://example.com/images/fashion.jpg",
-        },
-    },{
-        id: 2,
-        name: "Fashion",
-        slug: "fashion",
-        categoryImage: {
-            id: 102,
-            url: "https://example.com/images/fashion.jpg",
-        },
-    },{
-        id: 2,
-        name: "Fashion",
-        slug: "fashion",
-        categoryImage: {
-            id: 102,
-            url: "https://example.com/images/fashion.jpg",
-        },
-    },{
-        id: 2,
-        name: "Fashion",
-        slug: "fashion",
-        categoryImage: {
-            id: 102,
-            url: "https://example.com/images/fashion.jpg",
-        },
-    },{
-        id: 2,
-        name: "Fashion",
-        slug: "fashion",
-        categoryImage: {
-            id: 102,
-            url: "https://example.com/images/fashion.jpg",
-        },
-    },{
-        id: 2,
-        name: "Fashion",
-        slug: "fashion",
-        categoryImage: {
-            id: 102,
-            url: "https://example.com/images/fashion.jpg",
-        },
-    }
-];
+import categoryService from "@/services/category/categoryService";
+import CategoryCard from "@/components/category/categoryCard";
 
 const Category: NextPage = () => {
-    const [categories, setCategories] = useState<CategoryModel[]>(categoriess);
+    const [categories, setCategories] = useState<CategoryModel[]>([]);
     const [currentPage, setCurentPage] = useState<number>(1);
     const defaultItemsPerPage: number = 20;
 
@@ -151,6 +36,14 @@ const Category: NextPage = () => {
     const handleClick = (slug:string)=>{
 
     }
+    // feach Api
+    useEffect(() => {
+        categoryService.getCategories()
+            .then((responseCategoriesVms)=>{
+                setCategories(responseCategoriesVms);
+            })
+
+    }, []);
 
 
     return (
@@ -166,22 +59,8 @@ const Category: NextPage = () => {
                 <ul>
                     {chunkedItems.map((chunk, index) => (
                         <li key={index}>
-                            {chunk.map((item) => (
-                                <div className="category" key={item.id} onClick={() => handleClick(item.slug)}>
-                                    <div className="image-wrapper">
-                                        {item.categoryImage ? (
-                                            <div
-                                                className="image"
-                                                style={{
-                                                    backgroundImage: 'url(' + item.categoryImage.url + ')',
-                                                }}
-                                            ></div>
-                                        ) : (
-                                            <div className="image">No image</div>
-                                        )}
-                                    </div>
-                                    <p style={{fontSize: '14px'}}>{item.name}</p>
-                                </div>
+                            {chunk.map((category) => (
+                                <CategoryCard category={category} handleClick={handleClick}></CategoryCard>
                             ))}
                         </li>
                     ))}

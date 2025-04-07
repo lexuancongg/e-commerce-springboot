@@ -24,11 +24,11 @@ export default function CreateAddress (){
 
     }
 
-    const {register,handleSubmit,formState: {errors}} = useForm<AddressVm>();
+    const {register,handleSubmit,formState: {errors},setValue} = useForm<AddressVm>();
     
     return (
         <ProfileLayoutComponent menuActive="address" navigationPaths={navigationPaths}>
-            <AddressForm register={register} handleSubmit={handleSubmit(onSubmit)} buttonText="create" errors={errors} address={undefined} ></AddressForm>
+            <AddressForm setValue={setValue} register={register} handleSubmit={handleSubmit(onSubmit)} buttonText="create" errors={errors} address={undefined} ></AddressForm>
         </ProfileLayoutComponent>
     )
 }

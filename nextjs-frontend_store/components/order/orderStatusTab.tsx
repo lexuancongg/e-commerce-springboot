@@ -83,7 +83,7 @@ export default function OrderStatusTab({ orderStatus }: Props) {
                         orderVm.orderItemVms.forEach((orderItemVm) => {
                             const productPreview: ProductPreviewVm = productPreviewVms.find(
                                 (product) => product.id == orderItemVm.productId)!;
-                            orderItemVm.productAvatarUrl = productPreview.imageUrl;
+                            orderItemVm.productAvatarUrl = productPreview.avatarUrl;
 
                         })
                     })

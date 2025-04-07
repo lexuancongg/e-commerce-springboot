@@ -4,5 +4,5 @@ export type ProductPreviewVm ={
     name:string;
     slug:string;
     price:number;
-    imageUrl : string
+    avatarUrl : string
 }

@@ -8,7 +8,8 @@ import { CountryVm } from "@/models/address/CountryVm";
 import { ProvinceVm } from "@/models/address/ProvinceVm";
 import { DistrictVm } from "@/models/address/DistrictVm";
 import addressService from "@/services/address/addressService";
-import { useRouter } from "next/router";
+import { useParams, useRouter } from "next/navigation"; // ✅ Dùng đúng cho App Router
+
 
 type Props = {
   // để đăng ký
@@ -36,8 +37,9 @@ const AddressForm: FC<Props> = (
 
   // dành cho update 
   const router = useRouter();
-  const { id } = router.query; // Lấy giá trị 'id' từ query params
+  const params = useParams();
 
+  const id = params.id; 
   const [countries, setCountries] = useState<CountryVm[]>([]);
   const [provinces, setProvinces] = useState<ProvinceVm[]>([]);
   const [districts, setDistricts] = useState<DistrictVm[]>([]);

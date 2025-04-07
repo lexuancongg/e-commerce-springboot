@@ -1,32 +1,23 @@
 "use client"
-import React, { useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
+import productService from "@/services/product/productService";
+import {ProductPreviewVm} from "@/models/product/ProductPreviewVm";
 
 export   function Slide(){
-    const [featuredProduct,setFeaturedProduct] = useState([
-        {
-            id:1,
-            url: 'https://luvinus.com/wp-content/uploads/2020/01/cach-phoi-ao-len.jpg',
-        },
-        {
-            id:2,
-            url:'https://obs.line-scdn.net/0hYVn9GL_6BnlTQBPC0sJ5LmoWCghgJBN_PThKTyEUDUF_dl18aHUbA3MQW0FieEJ6aTpIHnFHX0B8eEJ8PC4',
-        },
-        {
-            id:3,
-            url: 'https://luvinus.com/wp-content/uploads/2020/01/cach-phoi-ao-len.jpg',
-        },
-        {
-            id:4,
-            url: 'https://luvinus.com/wp-content/uploads/2020/01/cach-phoi-ao-len.jpg',
-        },
-        {
-            id:5,
-            url: 'https://luvinus.com/wp-content/uploads/2020/01/cach-phoi-ao-len.jpg',
-        },
-    ]);
-
+    const [featuredProduct,setFeaturedProduct] = useState<ProductPreviewVm[]>([]);
+    // lấy theo kiểu tham chiếu tới trong dom
     const slideRef = useRef<HTMLDivElement>(null);
     const slide_items_refs = useRef<HTMLDivElement[]>([]);
+    // get api lấy ngẫu nhiên 10sp noi bat lam slide
+    useEffect(() => {
+        productService.getProductFeaturedMakeSlide()
+            .then((responseProductPreviews)=>{
+                setFeaturedProduct(responseProductPreviews);
+            })
+            .catch((error)=>{
+                console.log('error' , error)
+            })
+    }, []);
 
     React.useEffect(() => {
         let i = 0;
@@ -50,7 +41,7 @@ export   function Slide(){
                         // khi map qua từng ptu , react tạo ptu Dom (div) => gọi callback và truyền vao ptu mới tạo(div)
                         <div ref={(element)=>{
                             if(element) slide_items_refs.current[index] = element;
-                        }} key={product.id} className="item" style={{backgroundImage: `url(${product.url})`}}></div>
+                        }} key={product.id} className="item" style={{backgroundImage: `url(${product.avatarUrl})`}}></div>
                     )
                 })}
             </div>

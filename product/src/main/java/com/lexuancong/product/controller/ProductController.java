@@ -5,10 +5,12 @@ import com.lexuancong.product.utils.Constants;
 import com.lexuancong.product.viewmodel.product.*;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
+import java.util.List;
+@RequestMapping("/api/product")
 @RestController
 public class ProductController {
     private final ProductService productService;
@@ -39,6 +41,7 @@ public class ProductController {
     ) {
         return ResponseEntity.ok(productService.getFeaturedProductsPaging(pageIndex,pageSize));
     }
+
 
     // xem chi tiết sp
     @GetMapping("/customer/products/{slug}")
@@ -78,6 +81,14 @@ public class ProductController {
             @PathVariable Long categoryId
     ){
         return ResponseEntity.ok(this.productService.getProductsFromCategoryPaging(pageIndex,pageSize,categoryId));
+    }
+
+
+    // api lấy ngẫu nhiên ds sp nôổi bật lam slide
+    @GetMapping({"/customer/products/featured/slide"})
+    public ResponseEntity<List<ProductPreviewVm>> getProductFeaturedMakeSlide(){
+        List<ProductPreviewVm> productPreviewVms =  productService.getProductFeaturedMakeSlide();
+        return new ResponseEntity<>(productPreviewVms, HttpStatus.OK);
     }
 
 

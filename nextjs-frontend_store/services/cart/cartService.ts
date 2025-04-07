@@ -81,7 +81,7 @@ class CartService{
                     ...cartItem,
                     productName: product.name,
                     slug: product.slug,
-                    imageUrl: product.imageUrl,
+                    imageUrl: product.avatarUrl,
                     price: product.price,
                 }
             );

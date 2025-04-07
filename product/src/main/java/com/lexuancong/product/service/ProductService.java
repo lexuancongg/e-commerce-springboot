@@ -638,5 +638,20 @@ public class ProductService {
 
 
 
+    // fix sau: hiệu năng không tốt vì phải lấy ht toa bộ sp db
+    public List<ProductPreviewVm> getProductFeaturedMakeSlide(){
+        List<Product> productsFeatured = this.productRepository.findAllByFeatureIsTrue();
+        // sxep theo random
+        Collections.shuffle(productsFeatured);
+        return productsFeatured.stream().limit(10)
+                .map(product -> {
+                    return new ProductPreviewVm(
+                            product.getId() , product.getName(),product.getSlug() , product.getPrice(),
+                            mediaService.getImageById(product.getAvatarImageId()).url()
+                    );
+                })
+                .toList();
+    }
+
 
 }
