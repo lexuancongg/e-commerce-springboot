@@ -15,6 +15,7 @@ import '../styles/modules/home/components/featuredProduct.css'
 import '../styles/modules/common/paging.css';
 import '../styles/modules/common/footer.css';
 import '../styles/modules/cart/cart.css'
+import '../styles/modules/common/loading.css';
 
 import { Geist } from 'next/font/google'
 

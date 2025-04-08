@@ -1,12 +1,13 @@
 'use client'
 import { NavigationPathModel } from "@/models/Navigation/NavigationPathModel";
-import React, { JSX, useState } from "react";
-import { AddressVm } from "@/models/address/AddressVm";
+import React, {JSX, useEffect, useState} from "react";
+import { AddressDetailVm } from "@/models/address/AddressDetailVm";
 import ProfileLayoutComponent from "@/components/common/profileLayout";
 import { BiPlusMedical } from "react-icons/bi";
 import CardAddress from "@/components/address/cardAddress";
 import ConfirmationDialog from "@/components/dialog/confirmDialog";
 import addressService from "@/services/address/addressService";
+import customerService from "@/services/customer/customerService";
 
 const navigationPaths: NavigationPathModel[] = [
     {
@@ -19,38 +20,10 @@ const navigationPaths: NavigationPathModel[] = [
     }
 ]
 
-const addressess: AddressVm[] = [
-    {
-        id: 1,
-        contactName: "Nguyễn Văn A",
-        phoneNumber: "0987654321",
-        specificAddress: "123 Đường ABC",
-        districtId: 10,
-        districtName: "Quận Ba Đình",
-        provinceId: 1,
-        provinceName: "Hà Nội",
-        countryId: 84,
-        countryName: "Việt Nam",
-        isActive: true
-    },
-    {
-        id: 1,
-        contactName: "Nguyễn Văn A",
-        phoneNumber: "0987654321",
-        specificAddress: "123 Đường ABC",
-        districtId: 10,
-        districtName: "Quận Ba Đình",
-        provinceId: 1,
-        provinceName: "Hà Nội",
-        countryId: 84,
-        countryName: "Việt Nam",
-        isActive: false
-    },
-];
 
 const MyAddress = (): JSX.Element => {
 
-    const [addresses, setAddresses] = useState<AddressVm[]>(addressess);
+    const [addresses, setAddresses] = useState<AddressDetailVm[]>([]);
     // show
     const [isShowModelDelete, setIsShowModelDelete] = useState<boolean>(false);
     const [isShowModeConfirmChooseAddressDefaul, setIsShowModelConfirmChooseAddressDefault] = useState<boolean>(false);
@@ -58,6 +31,15 @@ const MyAddress = (): JSX.Element => {
     const [addressWantDeleteId, setAddressWantDeleteId] = useState<number>(0);
     const [addressWantDefaultId, setAddressWantDefaultId] = useState<number>(0);
 
+
+    useEffect(() => {
+        customerService.getDetailAddresses()
+            .then(responseDetailAddresses=>{
+                setAddresses(responseDetailAddresses);
+                setCurrentDefaultAddressId(responseDetailAddresses.find((address)=> address.isActive)?.id ?? 0)
+            })
+
+    }, []);
 
     // đồng ý xóa địa chỉ
     const handleAgreeDeleteAddressFromModel = () => {

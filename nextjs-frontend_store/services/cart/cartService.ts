@@ -4,54 +4,25 @@ import apiClient from "@/utils/api/apiClient";
 import productService from "@/services/product/productService";
 import {ProductPreviewVm} from "@/models/product/ProductPreviewVm";
 import {CartItemPutVm} from "@/models/cart/CartItemPutVm";
+import {cartItems_demo_data} from "@/demo_data/cart/cart_demo_data";
 
 class CartService{
-    private  baseUrl : string = "api";
+    private  baseUrl : string = `${process.env.API_BASE_URL_CART}`;
     public  async getNumberCartItems():Promise<number>{
         return 1;
     }
 
 
-    public async getCartItemsFullPayload():Promise<CartItemDetailVm[]>{
-        return [
-            {
-                productId: 101,
-                quantity: 2,
-                productName: "Product A",
-                slug: "product-a",
-                imageUrl: "https://th.bing.com/th/id/OIP.VSnbm5qgNu_BDNvyBa0I5AHaHa?rs=1&pid=ImgDetMain",
-                price: 199.99,
-            },
-            {
-                productId: 102,
-                quantity: 1,
-                productName: "Product B",
-                slug: "product-b",
-                imageUrl: "https://th.bing.com/th/id/OIP.VSnbm5qgNu_BDNvyBa0I5AHaHa?rs=1&pid=ImgDetMain",
-                price: 299.99,
-            },
-            {
-                productId: 103,
-                quantity: 3,
-                productName: "Product C",
-                slug: "product-c",
-                imageUrl: "https://th.bing.com/th/id/OIP.VSnbm5qgNu_BDNvyBa0I5AHaHa?rs=1&pid=ImgDetMain",
-                price: 149.99,
-            },
-
-        ];
-
-
-
+    public async getCartItemDetails():Promise<CartItemDetailVm[]>{
 
         const cartItems:CartItemVm[] = await this.getCartItems();
         const cartItemProductIds:number[] = cartItems.map(cartItem => cartItem.productId);
         const products:ProductPreviewVm[] = await productService.getProductsByIds(cartItemProductIds);
 
-        return this.mergeCartItemsToProductDetails(cartItems,products);
+        return this.mergeCartItemsWithProductInfo(cartItems,products);
     }
 
-    public mergeCartItemsToProductDetails(cartItems : CartItemVm[] , productCartItemPreview:ProductPreviewVm[]):CartItemDetailVm[]{
+    public mergeCartItemsWithProductInfo(cartItems : CartItemVm[] , productCartItemPreview:ProductPreviewVm[]):CartItemDetailVm[]{
         const cartItemsDetailVm:CartItemDetailVm[] = [];
         // cartItems.forEach(cartItem =>{
         //     const product = cartItemProducts.find((item)=>item.id == cartItem.productId);
@@ -89,26 +60,16 @@ class CartService{
 
         }
         return cartItemsDetailVm;
-
-
     }
 
     public async getCartItems():Promise<CartItemVm[]>{
 
-        return  [
-            { productId: 1, quantity: 2 },
-            { productId: 2, quantity: 5 },
-            { productId: 3, quantity: 1 },
-            { productId: 4, quantity: 3 },
-            { productId: 5, quantity: 4 },
-        ];
-
-        const response = await apiClient.get(this.baseUrl);
+        const response = await apiClient.get( `${this.baseUrl}/customer/cart/items`);
 
         if(response.ok){
             return await response.json();
         }
-        console.log("get cartItems error")
+        return cartItems_demo_data;
         throw new Error();
     }
 

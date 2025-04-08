@@ -14,5 +14,6 @@ class CategoryService{
         throw response;
 
     }
+
 }
 export default new CategoryService();

@@ -1,4 +1,4 @@
-import { AddressVm } from "@/models/address/AddressVm";
+import { AddressDetailVm } from "@/models/address/AddressDetailVm";
 import Link from "next/link";
 import { FC } from "react";
 import { FaTrash } from "react-icons/fa";
@@ -6,7 +6,7 @@ import { FiEdit } from "react-icons/fi";
 import { HiCheckCircle } from "react-icons/hi";
 import { TiContacts } from "react-icons/ti";
 type Props = {
-  address: AddressVm,
+  address: AddressDetailVm,
   handleChooseAddressDefault: (addressId: number) => void,
   handleChooseDeleteAddress: (addressId: number) => void
 }
@@ -24,6 +24,18 @@ const CardAddress: FC<Props> = (
           <TiContacts className="text-white text-5xl" />
         </div>
         <div className="p-4 w-full bg-red-500 text-white">
+          {address.isActive == true && (
+              <div className="m-2" style={{ float: 'right' }}>
+                <div
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      borderRadius: '50%',
+                      background: '#0eea5d',
+                    }}
+                ></div>
+              </div>
+          )}
           <div className="text-sm">Contact name: {address.contactName}</div>
           <div className="text-sm break-words">Address: {address.specificAddress}</div>
           <div className="text-sm">Phone number: {address.phoneNumber}</div>

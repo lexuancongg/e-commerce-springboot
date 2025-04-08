@@ -4,7 +4,7 @@ import com.lexuancong.cart.mapper.CartItemMapper;
 import com.lexuancong.cart.model.CartItem;
 import com.lexuancong.cart.repository.CartItemRepository;
 import com.lexuancong.cart.utils.AuthenticationUtils;
-import com.lexuancong.cart.viewmodel.CartItemGetVm;
+import com.lexuancong.cart.viewmodel.CartItemVm;
 import com.lexuancong.cart.viewmodel.CartItemPostVm;
 import com.lexuancong.cart.viewmodel.CartItemPutVm;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class CartItemService {
     private final CartItemRepository cartItemRepository;
     private final CartItemMapper cartItemMapper;
     private final ProductService productService;
-    public CartItemGetVm addCartItem(CartItemPostVm cartItemPostVm){
+    public CartItemVm addCartItem(CartItemPostVm cartItemPostVm){
         this.validateproduct(cartItemPostVm.productId());
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         CartItem cartItem = performAddCartItem(cartItemPostVm,customerId);
@@ -65,7 +65,7 @@ public class CartItemService {
 
 
     // api put cartItem about quantity
-    public CartItemGetVm updateCartItem(Long productId, CartItemPutVm cartItemPutVm){
+    public CartItemVm updateCartItem(Long productId, CartItemPutVm cartItemPutVm){
         this.validateproduct(productId);
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         CartItem cartItem = cartItemMapper.toCartItem(customerId,productId, cartItemPutVm.quantity());
@@ -76,7 +76,7 @@ public class CartItemService {
 
 
     // api get cartItem
-    public List<CartItemGetVm> getCartItems(){
+    public List<CartItemVm> getCartItems(){
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         List<CartItem> cartItems = cartItemRepository.findByCustomerIdOrderByCreatedAtDesc(customerId);
         return cartItemMapper.toCartItemGetVmList(cartItems);

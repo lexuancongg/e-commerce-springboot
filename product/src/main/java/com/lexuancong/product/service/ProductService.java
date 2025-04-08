@@ -654,4 +654,31 @@ public class ProductService {
     }
 
 
+    public List<ProductPreviewVm>  getProductsByIds(List<Long> ids){
+        List<Product> products = this.productRepository.findAllByIdIn(ids);
+        return products.stream().map(product -> {
+            String avatarUrl =  this.mediaService.getImageById(product.getAvatarImageId()).url();
+            // nếu avataurl = null mà không có parent nữa thì trả về null luôn
+            if(StringUtils.isEmpty(avatarUrl) && Objects.nonNull(product.getParent()) ){
+                    Optional<Product> parentProduct = this.productRepository.findById(product.getParent().getId());
+                    avatarUrl = parentProduct.map(item->
+                            this.mediaService.getImageById(item.getAvatarImageId()).url())
+                            .orElse("");
+
+            }
+            return new ProductPreviewVm(
+                    product.getId(),
+                    product.getName(),
+                    product.getSlug(),
+                    product.getPrice(),
+                    avatarUrl
+
+            );
+
+        }).toList();
+
+
+    }
+
+
 }

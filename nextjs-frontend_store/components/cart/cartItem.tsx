@@ -79,43 +79,36 @@ const CartItem: FC<CartItemProps> = ({
 
             </td>
             <td className="cart__quantity">
-                <div className="pro-qty">
-                    <div className={`quantity buttons_added ${isLoading ? 'disabled' : ''}`}>
-                        <button
-                            id="minus-button"
-                            type="button"
-                            className="minus"
-                            onClick={() => handleDecreaseQuantity(item.productId)}
-                            disabled={isLoading}
-                        >
-                            -
-                        </button>
-
-                        <input
-                            id="quanity"
-                            type="number"
-                            step="1"
-                            min="1"
-                            max=""
-                            name="quantity"
-                            defaultValue={item.quantity}
-                            onBlur={(e) => handleCartItemQuantityOnBlur(item.productId, e)}
-                            onKeyDown={(e) => handleCartItemQuantityKeyDown(item.productId, e)}
-                            title="Qty"
-                            className="input-text qty text"
-                            disabled={isLoading}
-                        />
-                        <button
-                            id="plus-button"
-                            type="button"
-                            className="plus"
-                            onClick={() => handleIncreaseQuantity(item.productId)}
-                            disabled={isLoading}
-                        >
-                            +
-                        </button>
-                    </div>
+                <div className="flex items-center border border-gray-300 rounded-md overflow-hidden w-fit">
+                    <button
+                        type="button"
+                        onClick={() => handleDecreaseQuantity(item.productId)}
+                        disabled={isLoading}
+                        className="w-10 h-10 flex justify-center items-center text-lg bg-white hover:bg-gray-100 disabled:opacity-50"
+                    >
+                        -
+                    </button>
+                    <input
+                        type="number"
+                        step="1"
+                        min="1"
+                        name="quantity"
+                        defaultValue={item.quantity}
+                        onBlur={(e) => handleCartItemQuantityOnBlur(item.productId, e)}
+                        onKeyDown={(e) => handleCartItemQuantityKeyDown(item.productId, e)}
+                        disabled={isLoading}
+                        className="w-14 h-10 text-center border-l border-r border-gray-300 focus:outline-none"
+                    />
+                    <button
+                        type="button"
+                        onClick={() => handleIncreaseQuantity(item.productId)}
+                        disabled={isLoading}
+                        className="w-10 h-10 flex justify-center items-center text-lg bg-white hover:bg-gray-100 disabled:opacity-50"
+                    >
+                        +
+                    </button>
                 </div>
+
             </td>
             <td className="cart__total">{item.price}</td>
             <td className="cart__close">
@@ -125,7 +118,8 @@ const CartItem: FC<CartItemProps> = ({
                     onClick={() => handleShowModelConfirmDelete(item.productId)}
                 >
                     <i className="bi bi-x-lg fs-5"></i>
-                </button>{' '}
+                </button>
+                {' '}
             </td>
         </tr>
     );

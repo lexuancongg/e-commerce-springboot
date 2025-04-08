@@ -1,6 +1,7 @@
 import {ProductPreviewVm} from "@/models/product/ProductPreviewVm";
+import {ProductFeaturePagingVm} from "@/models/product/productFeaturePagingVm";
 
-export const productsFeaturedMakeSlide : ProductPreviewVm[] = [
+export const productsFeaturedMakeSlide_demo : ProductPreviewVm[] = [
     {
         id:1,
         avatarUrl: 'https://luvinus.com/wp-content/uploads/2020/01/cach-phoi-ao-len.jpg',
@@ -38,3 +39,18 @@ export const productsFeaturedMakeSlide : ProductPreviewVm[] = [
     },
 ]
 
+
+export  const productFeaturePagingVm_demo : ProductFeaturePagingVm = {
+    productPreviewsPayload: [
+        { id: 1, name: "Product 1", slug: "product-1", price: 100000, avatarUrl: "https://th.bing.com/th/id/OIP.j42T-H3P0LqlfQ1TVU8zggHaF7?rs=1&pid=ImgDetMain" },
+        { id: 2, name: "Product 2", slug: "product-2", price: 150, avatarUrl: "https://th.bing.com/th/id/OIP.j42T-H3P0LqlfQ1TVU8zggHaF7?rs=1&pid=ImgDetMain" },
+        { id: 3, name: "Product 3", slug: "product-3", price: 200, avatarUrl: "https://th.bing.com/th/id/OIP.j42T-H3P0LqlfQ1TVU8zggHaF7?rs=1&pid=ImgDetMain" },
+        { id: 4, name: "Product 4", slug: "product-4", price: 250, avatarUrl: "https://th.bing.com/th/id/OIP.j42T-H3P0LqlfQ1TVU8zggHaF7?rs=1&pid=ImgDetMain" },
+        { id: 5, name: "Product 5", slug: "product-5", price: 300, avatarUrl: "https://th.bing.com/th/id/OIP.j42T-H3P0LqlfQ1TVU8zggHaF7?rs=1&pid=ImgDetMain" },
+    ],
+    pageIndex:1,
+    pageSize:10,
+    totalPages:15,
+    isLast:false,
+    totalElements:50
+}

@@ -91,6 +91,13 @@ public class ProductController {
         return new ResponseEntity<>(productPreviewVms, HttpStatus.OK);
     }
 
+    @GetMapping("/customer/products")
+    public ResponseEntity<List<ProductPreviewVm>> getProductsByIds (
+            @RequestParam("productIds") List<Long> productIds
+    ){
+        return ResponseEntity.ok(this.productService.getProductsByIds(productIds));
+    }
+
 
 
 

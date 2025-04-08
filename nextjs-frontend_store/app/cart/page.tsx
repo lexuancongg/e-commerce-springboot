@@ -8,6 +8,20 @@ import {formatPrice} from "@/utils/formatPrice";
 import ConfirmationDialog from "@/components/dialog/confirmDialog";
 import {CartItemPutVm} from "@/models/cart/CartItemPutVm";
 import cartService from "@/services/cart/cartService";
+import {useCartContext} from "@/context/cartContext";
+import NavigationComponent from "@/components/common/navigationComponent";
+import {NavigationPathModel} from "@/models/Navigation/NavigationPathModel";
+
+const navigationPaths : NavigationPathModel[] = [
+    {
+        pageName :'Home',
+        url:'#'
+    },
+    {
+        pageName:'My-cart',
+        url:'#'
+    }
+];
 
 
 const Cart = () => {
@@ -23,20 +37,22 @@ const Cart = () => {
 
     const [productIdToRemove, setProductIdToRemove] = useState<number>(0);
 
+    const { fetchNumberCartItems } = useCartContext();
 
 
     useEffect(() => {
-        // fetach api cartItems
-        loadCartItems();
+        loadCart()
+            .catch(error=> console.log(error))
     }, [])
 
 
 
     // get data cartItems
-    const loadCartItems = useCallback(async () => {
+    const loadCart = useCallback(async () => {
         try {
-            const cartItemsPayload = await cartService.getCartItemsFullPayload();
-            setCartItems(cartItemsPayload);
+            const cartItemDetailsPayload = await cartService.getCartItemDetails();
+            setCartItems(cartItemDetailsPayload);
+            fetchNumberCartItems();
         } catch (error) {
             throw new Error();
         }
@@ -78,7 +94,7 @@ const Cart = () => {
         try {
             // call api update tại đây
             await cartService.updateCartItemAboutQuantity(productId, cartItemPutVm);
-            loadCartItems();
+            loadCart();
 
         } catch (error) {
             throw new Error();
@@ -179,6 +195,7 @@ const Cart = () => {
     return (
         <section className="shop-cart spad">
             <div className="container">
+                <NavigationComponent props={navigationPaths}></NavigationComponent>
                 <div className="row">
                     <div className="col-lg-12">
                         <div className="shop__cart__table">

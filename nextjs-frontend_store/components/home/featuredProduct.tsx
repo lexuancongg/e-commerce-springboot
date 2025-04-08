@@ -1,30 +1,34 @@
 'use client'
 import {NextPage} from "next";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {ProductPreviewVm} from "@/models/product/ProductPreviewVm";
 import {Col, Container, Row} from "react-bootstrap";
 import ProductCard from "@/components/cart/productCard";
 import ReactPaginate from "react-paginate";
+import categoryService from "@/services/category/categoryService";
+import productService from "@/services/product/productService";
 
 
-export const productss: ProductPreviewVm[] = [
-    { id: 1, name: "Product 1", slug: "product-1", price: 100000, avatarUrl: "https://th.bing.com/th/id/OIP.j42T-H3P0LqlfQ1TVU8zggHaF7?rs=1&pid=ImgDetMain" },
-    { id: 2, name: "Product 2", slug: "product-2", price: 150, avatarUrl: "https://th.bing.com/th/id/OIP.j42T-H3P0LqlfQ1TVU8zggHaF7?rs=1&pid=ImgDetMain" },
-    { id: 3, name: "Product 3", slug: "product-3", price: 200, avatarUrl: "https://th.bing.com/th/id/OIP.j42T-H3P0LqlfQ1TVU8zggHaF7?rs=1&pid=ImgDetMain" },
-    { id: 4, name: "Product 4", slug: "product-4", price: 250, avatarUrl: "https://th.bing.com/th/id/OIP.j42T-H3P0LqlfQ1TVU8zggHaF7?rs=1&pid=ImgDetMain" },
-    { id: 5, name: "Product 5", slug: "product-5", price: 300, avatarUrl: "https://th.bing.com/th/id/OIP.j42T-H3P0LqlfQ1TVU8zggHaF7?rs=1&pid=ImgDetMain" },
-];
+
 
 
 const FeaturedProduct : NextPage = ()=>{
-    const [products,setProducts] = useState<ProductPreviewVm[]>(productss);
-    const [pageNo,setPageNo] = useState<number>(0);
-    const [totalPage, setTotalPage] = useState<number>(5);
+    const [products,setProducts] = useState<ProductPreviewVm[]>([]);
+    const [pageIndex,setPageIndex] = useState<number>(0);
+    const [totalPage, setTotalPage] = useState<number>(1);
 
     const  changePage = ({selected}:any)=>{
-        setPageNo(selected);
+        setPageIndex(selected);
     }
-    
+
+    // fetch api
+    useEffect(() => {
+        productService.getFeaturedProductsPaging(pageIndex)
+            .then((responseFeaturedProductsPaging)=>{
+                setProducts(responseFeaturedProductsPaging.productPreviewsPayload)
+                setTotalPage(responseFeaturedProductsPaging.totalPages);
+            })
+    }, []);
 
 
 
@@ -44,7 +48,7 @@ const FeaturedProduct : NextPage = ()=>{
             {totalPage > 1 &&  (
                 // phân trang
                 <ReactPaginate
-                    forcePage={pageNo}
+                    forcePage={pageIndex}
                     previousLabel={'Previous'}
                     nextLabel={'Next'}
                     pageCount={totalPage}

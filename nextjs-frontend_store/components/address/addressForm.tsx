@@ -1,5 +1,5 @@
 'use client'
-import { AddressVm } from "@/models/address/AddressVm";
+import { AddressDetailVm } from "@/models/address/AddressDetailVm";
 import React, { FC, useEffect, useState } from "react";
 import { FieldErrors, set, useForm, UseFormRegister, UseFormSetValue } from "react-hook-form";
 import Input from "../item/input";
@@ -13,15 +13,15 @@ import { useParams, useRouter } from "next/navigation"; // ✅ Dùng đúng cho 
 
 type Props = {
   // để đăng ký
-  register: UseFormRegister<AddressVm>,
+  register: UseFormRegister<AddressDetailVm>,
   // submit
   handleSubmit: () => void,
-  errors: FieldErrors<AddressVm>,
+  errors: FieldErrors<AddressDetailVm>,
   // trường hợp có nếu update , còn undefine nếu create
-  address?: AddressVm | undefined,
+  address?: AddressDetailVm | undefined,
   // xác định tên nút là create hay update
   buttonText?: string,
-  setValue: UseFormSetValue<AddressVm>;
+  setValue: UseFormSetValue<AddressDetailVm>;
 }
 const AddressForm: FC<Props> = (
   {

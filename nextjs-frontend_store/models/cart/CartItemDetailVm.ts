@@ -6,3 +6,4 @@ export type CartItemDetailVm = {
     imageUrl: string;
     price: number;
 }
+

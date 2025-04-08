@@ -1,7 +1,7 @@
 'use client'
 import AddressForm from "@/components/address/addressForm";
 import ProfileLayoutComponent from "@/components/common/profileLayout";
-import { AddressVm } from "@/models/address/AddressVm";
+import { AddressDetailVm } from "@/models/address/AddressDetailVm";
 import { NavigationPathModel } from "@/models/Navigation/NavigationPathModel";
 import { useForm } from "react-hook-form";
 
@@ -24,7 +24,7 @@ export default function CreateAddress (){
 
     }
 
-    const {register,handleSubmit,formState: {errors},setValue} = useForm<AddressVm>();
+    const {register,handleSubmit,formState: {errors},setValue} = useForm<AddressDetailVm>();
     
     return (
         <ProfileLayoutComponent menuActive="address" navigationPaths={navigationPaths}>

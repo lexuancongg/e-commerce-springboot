@@ -10,7 +10,7 @@ export   function Slide(){
     const slide_items_refs = useRef<HTMLDivElement[]>([]);
     // get api lấy ngẫu nhiên 10sp noi bat lam slide
     useEffect(() => {
-        productService.getProductFeaturedMakeSlide()
+        productService.getFeaturedProductsMakeSlide()
             .then((responseProductPreviews)=>{
                 setFeaturedProduct(responseProductPreviews);
             })
