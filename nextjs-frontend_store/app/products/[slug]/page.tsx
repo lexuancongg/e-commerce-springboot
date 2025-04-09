@@ -5,6 +5,7 @@ import apiClient from "@/utils/api/apiClient";
 const ProductDetailPage :NextPage =   ()=>{
 
     return (
-        <div></div>
+        <div>cong</div>
     )
 }
+export default ProductDetailPage;

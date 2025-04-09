@@ -1,5 +1,8 @@
 package com.lexuancong.product.viewmodel.product;
 
+import com.lexuancong.product.viewmodel.image.ImageVm;
+import com.lexuancong.product.viewmodel.productattribute.AttributeGroupValueVm;
+
 import java.util.List;
 
 public record ProductDetailVm(
@@ -15,8 +18,9 @@ public record ProductDetailVm(
         boolean hasOptions,
         String avatarUrl,
         boolean isFeatured,
-        List<String> images,
-        boolean isOrderEnable
+        List<String> productImageUrls,
+        boolean isOrderEnable,
+        boolean isPublic
 ) {
 
 }

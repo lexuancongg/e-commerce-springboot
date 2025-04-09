@@ -6,8 +6,8 @@ import com.lexuancong.product.model.attribute.ProductAttribute;
 import com.lexuancong.product.repository.ProductAttributeRepository;
 import com.lexuancong.product.repository.ProductAttributeValueRepository;
 import com.lexuancong.product.repository.ProductRepository;
-import com.lexuancong.product.viewmodel.productattributevalue.ProductAttributeValuePostVm;
-import com.lexuancong.product.viewmodel.productattributevalue.ProductAttributeValueVm;
+import com.lexuancong.product.viewmodel.productattribute.ProductAttributeValuePostVm;
+import com.lexuancong.product.viewmodel.productattribute.ProductAttributeValueVm;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

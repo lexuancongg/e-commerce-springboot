@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.lexuancong.product.model.Product;
 import com.lexuancong.product.validation.ValidateProductPrice;
 import com.lexuancong.product.viewmodel.product.databinding.ProductPropertiesRequire;
+import com.lexuancong.product.viewmodel.product.productoptions.ProductOptionPostValueVm;
+import com.lexuancong.product.viewmodel.product.variants.ProductVariationPostVm;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.util.CollectionUtils;
 

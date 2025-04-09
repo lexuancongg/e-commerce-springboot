@@ -10,9 +10,10 @@ import ProductCard from "@/components/cart/productCard";
 import ReactPaginate from "react-paginate";
 import {CategoryVm} from "@/models/category/CategoryVm";
 import categoryService from "@/services/category/categoryService";
-import { usePathname, useSearchParams } from 'next/navigation'
+import {usePathname, useSearchParams} from 'next/navigation'
 import * as querystring from "node:querystring";
 import productService from "@/services/product/productService";
+
 const navigationPaths: NavigationPathModel[] = [
     {
         pageName: "Home",
@@ -25,32 +26,32 @@ const navigationPaths: NavigationPathModel[] = [
 ]
 const CATEGORY_SLUG = 'categorySlug';
 
-export default function ProductList(){
+export default function ProductList() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [products, setProducts] = useState<ProductPreviewVm[]>([]);
-    const [totalPage , setTotalPage] = useState<number>(1);
-    const [pageIndex,setPageIndex] = useState<number>(0);
-    const [categories ,setCategories] = useState<CategoryVm[]>([]);
-    const [filters , setFilters] = useState<any>(null);
+    const [totalPage, setTotalPage] = useState<number>(1);
+    const [pageIndex, setPageIndex] = useState<number>(0);
+    const [categories, setCategories] = useState<CategoryVm[]>([]);
+    const [filters, setFilters] = useState<any>(null);
     const inputSearchRef = useRef<HTMLInputElement>(null);
     const inputStartPriceRef = useRef<HTMLInputElement>(null);
     const inputEndPriceRef = useRef<HTMLInputElement>(null);
-    const [categoryIdActive , setCategoryIdActive] = useState<number>(0);
+    const [categoryIdActive, setCategoryIdActive] = useState<number>(0);
 
 
     // khi nhung param query thay doi thi set lai page 0
-    const updateFilter = (key:string, value:string|number)=>{
+    const updateFilter = (key: string, value: string | number) => {
         // trường hợp push key và value đã có => giá trị không thaydodoiri thì không set lại page
-        const currentValue =  searchParams.get(key);
-        if(currentValue && currentValue == value){
+        const currentValue = searchParams.get(key);
+        if (currentValue && currentValue == value) {
             return;
         }
-        pushParamsToRouter(key,value)
+        pushParamsToRouter(key, value)
         setPageIndex(0)
 
     }
-    const pushParamsToRouter = (key: string , value:string|number)=>{
+    const pushParamsToRouter = (key: string, value: string | number) => {
         const params = new URLSearchParams(searchParams.toString())
         params.set(key, String(value))
         router.push(`?${params.toString()}`)
@@ -59,57 +60,57 @@ export default function ProductList(){
     useEffect(() => {
         // lấy ds category để lọc
         categoryService.getCategories()
-            .then((responseCategories)=>{
-                let  categoryId : number = 0;
+            .then((responseCategories) => {
+                let categoryId: number = 0;
                 // check xem trên query url có param nào không
-                if(Array.from(searchParams.entries()).length > 0 && searchParams.get(CATEGORY_SLUG)){
-                    const categorySlugValue : string = searchParams.get(CATEGORY_SLUG) as string;
-                    categoryId  = responseCategories.find(cate => cate.slug == categorySlugValue )?.id !;
+                if (Array.from(searchParams.entries()).length > 0 && searchParams.get(CATEGORY_SLUG)) {
+                    const categorySlugValue: string = searchParams.get(CATEGORY_SLUG) as string;
+                    categoryId = responseCategories.find(cate => cate.slug == categorySlugValue)?.id !;
+
 
                 }
-                if(categoryId)  setCategoryIdActive(categoryId);
+                if (categoryId) setCategoryIdActive(categoryId);
                 setCategories(responseCategories);
             })
     }, []);
 
 
     useEffect(() => {
-
-        if(Array.from(searchParams.entries()).length > 0){
-        }
-        const paramsObj : Record<string, string> = {}
-        for(const [key,value] of searchParams.entries()){
-            paramsObj[key] = value;
+        const paramsObj: Record<string, string> = {}
+        if (Array.from(searchParams.entries()).length > 0) {
+            for (const [key, value] of searchParams.entries()) {
+                paramsObj[key] = value;
+            }
         }
         setFilters(paramsObj);
 
-    },[searchParams.toString()])
+    }, [searchParams.toString()])
 
     // khi filter thay đổi thì load lại product
-    useEffect(()=>{
+    useEffect(() => {
 
 
-        if(filters == null){
+        if (filters == null) {
             return;
         }
 
         // querystring : thư vện hổ trợ convert từ object sang query teen url
-        let predicates = querystring.stringify({ ...filters, pageIndex: pageIndex });
+        let predicates = querystring.stringify({...filters, pageIndex: pageIndex});
         productService.getProductByMultiParams(predicates)
             .then(responseProductsPagingVm => {
                 setProducts(responseProductsPagingVm.productPreviewsPayload);
                 setTotalPage(responseProductsPagingVm.totalPages);
             })
 
-    },[filters])
+    }, [filters])
 
 
-    const changePage = ({selected}: any)=>{
+    const changePage = ({selected}: any) => {
         setPageIndex(selected);
         pushParamsToRouter("pageIndex", selected)
     }
 
-    const handleDeleteFilter = (event:any)=>{
+    const handleDeleteFilter = (event: any) => {
         setPageIndex(0);
         setCategoryIdActive(0)
         router.push('/products')

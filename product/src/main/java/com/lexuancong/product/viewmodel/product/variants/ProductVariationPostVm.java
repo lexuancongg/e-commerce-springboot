@@ -1,4 +1,4 @@
-package com.lexuancong.product.viewmodel.product;
+package com.lexuancong.product.viewmodel.product.variants;
 
 import com.lexuancong.product.model.Product;
 import com.lexuancong.product.viewmodel.product.databinding.ProductVariationPropertiesRequire;

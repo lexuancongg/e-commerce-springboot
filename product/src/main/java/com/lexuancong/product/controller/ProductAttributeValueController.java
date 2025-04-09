@@ -1,8 +1,8 @@
 package com.lexuancong.product.controller;
 
 import com.lexuancong.product.service.ProductAttributeValueService;
-import com.lexuancong.product.viewmodel.productattributevalue.ProductAttributeValuePostVm;
-import com.lexuancong.product.viewmodel.productattributevalue.ProductAttributeValueVm;
+import com.lexuancong.product.viewmodel.productattribute.ProductAttributeValuePostVm;
+import com.lexuancong.product.viewmodel.productattribute.ProductAttributeValueVm;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

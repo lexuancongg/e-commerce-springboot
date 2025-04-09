@@ -69,7 +69,7 @@ public class Product extends AuditEntity{
 
     @OneToMany(mappedBy = "product")
     @Builder.Default
-    private List<ProductAttributeValue> attributeValues = new ArrayList<>();
+    private List<ProductAttributeValue> productAttributeValues = new ArrayList<>();
 
     @OneToMany(mappedBy = "product",cascade = {CascadeType.PERSIST})
     @Builder.Default

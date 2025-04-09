@@ -1,4 +1,4 @@
-package com.lexuancong.product.viewmodel.product;
+package com.lexuancong.product.viewmodel.productattribute;
 
 import java.util.List;
 

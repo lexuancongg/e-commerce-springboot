@@ -10,6 +10,8 @@ import com.lexuancong.product.viewmodel.product.databinding.BaseProductPropertie
 import com.lexuancong.product.viewmodel.product.databinding.ProductOptionPropertyRequire;
 import com.lexuancong.product.viewmodel.product.databinding.ProductPropertiesRequire;
 import com.lexuancong.product.viewmodel.product.databinding.ProductVariationPropertiesRequire;
+import com.lexuancong.product.viewmodel.productattribute.AttributeGroupValueVm;
+import com.lexuancong.product.viewmodel.productattribute.AttributeValueVm;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -519,20 +521,18 @@ public class ProductService {
 
 
 
-
-
     // lấy thông tin chi tiết về sản phâ
-    public ProductDetailVm getProductDetail(String slug){
+    public ProductDetailVm getProductDetailBySlug(String slug){
         Product product = this.productRepository.findBySlugAndPublicIsTrue(slug)
                 .orElseThrow(()-> new RuntimeException());
         String avatarUrl =  this.mediaService.getImageById(product.getAvatarImageId()).url();
         List<Long> imageIds = product.getProductImages().stream().map(ProductImage::getImageId)
                 .toList();
-        List<String> imageUrls = this.mediaService.getImageByIds(imageIds)
+        List<String> productImageUrls = this.mediaService.getImageByIds(imageIds)
                 .stream().map(ImageVm::url)
                 .toList();
 
-        List<ProductAttributeValue> productAttributeValues = product.getAttributeValues();
+        List<ProductAttributeValue> productAttributeValues = product.getProductAttributeValues();
         List<AttributeGroupValueVm> attributeGroupValueVms = new ArrayList<>();
         if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(productAttributeValues)) {
             List<ProductAttributeGroup> productAttributeGroups = productAttributeValues.stream()
@@ -573,8 +573,9 @@ public class ProductService {
                 product.isHasOptions(),
                 avatarUrl,
                 product.isFeature(),
-                imageUrls,
-                product.isOrderEnable()
+                productImageUrls,
+                product.isOrderEnable(),
+                product.isPublic()
         );
 
     }

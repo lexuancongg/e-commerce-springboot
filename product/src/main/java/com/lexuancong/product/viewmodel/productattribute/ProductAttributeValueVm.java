@@ -1,4 +1,4 @@
-package com.lexuancong.product.viewmodel.productattributevalue;
+package com.lexuancong.product.viewmodel.productattribute;
 
 import com.lexuancong.product.model.ProductAttributeValue;
 

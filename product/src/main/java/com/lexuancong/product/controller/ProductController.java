@@ -5,7 +5,6 @@ import com.lexuancong.product.utils.Constants;
 import com.lexuancong.product.viewmodel.product.*;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,7 +45,7 @@ public class ProductController {
     // xem chi tiết sp
     @GetMapping("/customer/products/{slug}")
     public ResponseEntity<ProductDetailVm> getProductDetail(@PathVariable("slug") String slug) {
-        return ResponseEntity.ok(this.productService.getProductDetail(slug));
+        return ResponseEntity.ok(this.productService.getProductDetailBySlug(slug));
 
     }
 
@@ -114,6 +113,12 @@ public class ProductController {
                 this.productService.getProductByMultiParams(pageIndex,pageSize,productName,categorySlug,startPrice,endPrice)
                 );
 
+    }
+
+
+    @GetMapping("/customer/product/{slug}")
+    public ResponseEntity<ProductDetailVm> getProductDetailBySlug(@PathVariable("slug") String slug) {
+        return ResponseEntity.ok(this.productService.getProductDetailBySlug(slug));
     }
 
 
