@@ -1,7 +1,7 @@
 'use client'
 import {NavigationPathModel} from "@/models/Navigation/NavigationPathModel";
 import {useRouter} from "next/navigation";
-import {ChangeEvent, useEffect, useState} from "react";
+import {ChangeEvent, useEffect, useRef, useState} from "react";
 import {ProductPreviewVm} from "@/models/product/ProductPreviewVm";
 import {Container, Row} from "react-bootstrap";
 import Head from "next/head";
@@ -14,6 +14,7 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import Link from "next/link";
 import {URLSearchParamsIterator} from "url";
 import * as querystring from "node:querystring";
+import productService from "@/services/product/productService";
 const navigationPaths: NavigationPathModel[] = [
     {
         pageName: "Home",
@@ -35,9 +36,21 @@ export default function ProductList(){
     const [pageIndex,setPageIndex] = useState<number>(0);
     const [categories ,setCategories] = useState<CategoryVm[]>([]);
     const [filters , setFilters] = useState<any>(null);
+    const inputSearchRef = useRef<HTMLInputElement>(null);
+    const inputStartPriceRef = useRef<HTMLInputElement>(null);
+    const inputEndPriceRef = useRef<HTMLInputElement>(null);
 
-    const handleFilter = ()=>{
 
+    const updateFilter = (key:string, value:string|number)=>{
+        setPageIndex(0);
+        pushParamsToRouter(key,value)
+
+    }
+    const pushParamsToRouter = (key: string , value:string|number)=>{
+        const params = new URLSearchParams(searchParams.toString())
+        params.set(key, String(value))
+
+        router.push(`?${params.toString()}`)
     }
 
     useEffect(() => {
@@ -65,25 +78,48 @@ export default function ProductList(){
         }
         setFilters(paramsObj);
 
-    },[searchParams.entries()])
+    },[searchParams.toString()])
 
     // khi filter thay đổi thì load lại product
     useEffect(()=>{
         if(filters == null){
             return;
         }
-        let predicates = querystring.stringify({ ...filters, pageNo: pageNo });
-
+        // querystring : thư vện hổ trợ convert từ object sang query teen url
+        let predicates = querystring.stringify({ ...filters, pageIndex: pageIndex });
+        productService.getProductByMultiParams(predicates)
+            .then(responseProductsPagingVm => {
+                setProducts(responseProductsPagingVm.productPreviewsPayload);
+                setTotalPage(responseProductsPagingVm.totalPages);
+            })
 
     },[filters])
 
 
+    const changePage = ({selected}: any)=>{
+        setPageIndex(selected);
+        pushParamsToRouter("pageIndex", selected)
+    }
+
+    const handleDeleteFilter = (event:any)=>{
+        setPageIndex(0);
+        router.push('/products')
+        if (inputSearchRef.current) {
+            inputSearchRef.current.value = '';
+        }
+        if (inputStartPriceRef.current) {
+            inputStartPriceRef.current.value = '';
+        }
+        if (inputEndPriceRef.current) {
+            inputEndPriceRef.current.value = '';
+        }
+
+    }
     return (
         <Container>
             <Head>
                 <title>listProduct</title>
             </Head>
-            <Link href={'/products?bu=5'}>click</Link>
 
             <NavigationComponent props={navigationPaths}></NavigationComponent>
             <div className="py-8 bg-gray-100">
@@ -93,7 +129,7 @@ export default function ProductList(){
                         <div className="hidden lg:block bg-white p-6 rounded-lg shadow">
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="text-lg font-semibold">Filter By</h3>
-                                <button className="text-sm text-white bg-gray-600 px-3 py-1 rounded hover:bg-gray-700">
+                                <button onClick={handleDeleteFilter} className="text-sm text-white bg-gray-600 px-3 py-1 rounded hover:bg-gray-700">
                                     Clear filter
                                 </button>
                             </div>
@@ -107,6 +143,7 @@ export default function ProductList(){
                                             key={cate.id}
                                             className="cursor-pointer px-3 py-1 border border-gray-500 rounded-full text-sm hover:bg-gray-200"
                                             onClick={() => {
+                                                updateFilter(CATEGORY_SLUG , cate.slug)
                                             }}
                                         >
                                             {cate.name}
@@ -125,7 +162,9 @@ export default function ProductList(){
                                             type="number"
                                             className="w-full p-2 border rounded text-sm"
                                             placeholder="0"
-                                            onChange={(e) => {
+                                            ref={inputStartPriceRef}
+                                            onChange={(event) => {
+                                                updateFilter("startPrice",Number(event.target.value))
                                             }}
                                         />
                                     </div>
@@ -135,8 +174,11 @@ export default function ProductList(){
                                             type="number"
                                             className="w-full p-2 border rounded text-sm"
                                             placeholder="0"
-                                            onChange={(e) => {
+                                            onChange={(event) => {
+
+                                                updateFilter("endPrice", Number(event.target.value))
                                             }}
+                                            ref={inputEndPriceRef}
                                         />
                                     </div>
                                 </div>
@@ -159,8 +201,10 @@ export default function ProductList(){
                                         type="text"
                                         className="w-full border p-2 rounded text-sm"
                                         placeholder="Search..."
-                                        onChange={(e) => {
+                                        onChange={(event) => {
+                                            updateFilter('productName',event.target.value)
                                         }}
+                                        ref={inputSearchRef}
                                     />
                                 </div>
                             </div>
@@ -185,12 +229,12 @@ export default function ProductList(){
                                         previousLabel={'Previous'}
                                         nextLabel={'Next'}
                                         pageCount={totalPage}
-                                        // onPageChange={changePage}
-                                        containerClassName={'flex gap-2 justify-center mt-4'}
-                                        previousClassName={'px-3 py-1 border rounded hover:bg-gray-200'}
-                                        nextClassName={'px-3 py-1 border rounded hover:bg-gray-200'}
-                                        disabledClassName={'opacity-50 pointer-events-none'}
-                                        activeClassName={'bg-blue-500 text-white'}
+                                        onPageChange={changePage}
+                                        containerClassName={'pagination-container'}
+                                        previousClassName={'previous-btn'}
+                                        nextClassName={'next-btn'}
+                                        disabledClassName={'pagination-disabled'}
+                                        activeClassName={'pagination-active'}
                                     />
                                 </div>
                             )}

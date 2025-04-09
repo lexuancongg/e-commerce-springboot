@@ -676,6 +676,14 @@ public class ProductService {
             );
 
         }).toList();
+    }
+
+    public ProductPagingVm getProductByMultiParams(int pageIndex,int pageSize,String productName,String categorySlug,Double startPrice , Double endPrice){
+        Pageable pageable = PageRequest.of(pageIndex,pageSize);
+        Page<Product> productPage = this.productRepository.findByProductNameAndCategorySlugAndPriceBetween(
+                productName.trim().toLowerCase(),
+                categorySlug.trim(), startPrice, endPrice, pageable
+        );
 
 
     }

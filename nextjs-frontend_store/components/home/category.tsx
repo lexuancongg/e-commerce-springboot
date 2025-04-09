@@ -5,8 +5,10 @@ import {CategoryVm as CategoryModel} from "@/models/category/CategoryVm";
 import {Container} from "react-bootstrap";
 import categoryService from "@/services/category/categoryService";
 import CategoryCard from "@/components/category/categoryCard";
+import {useRouter , useParams , usePathname , useSearchParams} from "next/navigation";
 
 const Category: NextPage = () => {
+    const router = useRouter();
     const [categories, setCategories] = useState<CategoryModel[]>([]);
     const [currentPage, setCurentPage] = useState<number>(1);
     const defaultItemsPerPage: number = 20;
@@ -34,6 +36,7 @@ const Category: NextPage = () => {
     }
 
     const handleClick = (slug:string)=>{
+        router.push(`/products?categorySlug=${slug}`)
 
     }
     // feach Api
@@ -60,7 +63,7 @@ const Category: NextPage = () => {
                     {chunkedItems.map((chunk, index) => (
                         <li key={index}>
                             {chunk.map((category) => (
-                                <CategoryCard category={category} handleClick={handleClick}></CategoryCard>
+                                <CategoryCard key={category.id} category={category} handleClick={handleClick}></CategoryCard>
                             ))}
                         </li>
                     ))}

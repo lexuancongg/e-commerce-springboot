@@ -31,10 +31,20 @@ class ProductService {
 
 
     public async  getFeaturedProductsPaging(pageIndex: number):Promise<ProductFeaturePagingVm>{
-        const response = await apiClient.get(`${this.baseUrl}/customer/products/featured`);
+        const response = await apiClient.get(`${this.baseUrl}/customer/products/featured?pageIndex=${pageIndex}`);
         if(response.ok) return await  response.json();
         return  productFeaturePagingVm_demo
         throw response;
+
+    }
+
+
+    public async getProductByMultiParams(predicates:string):Promise<ProductFeaturePagingVm>{
+        const response  = await apiClient.get(`${this.baseUrl}/customer/products?${predicates}`);
+        if(response.ok) return await response.json();
+        return productFeaturePagingVm_demo;
+        throw response;
+
 
     }
 

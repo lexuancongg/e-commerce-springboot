@@ -100,6 +100,24 @@ public class ProductController {
 
 
 
+    // GET DS SP BY FILTER
+    @GetMapping("/customer/products")
+    public ResponseEntity<ProductPagingVm> getProductByMultiParams(
+            @RequestParam(value = "pageIndex" ,required = false , defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE) int pageIndex,
+            @RequestParam(value = "pageSize", defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+            @RequestParam(value = "productName", defaultValue = "", required = false) String productName,
+            @RequestParam(value = "categorySlug", defaultValue = "", required = false) String categorySlug,
+            @RequestParam(value = "startPrice", defaultValue = "", required = false) Double startPrice,
+            @RequestParam(value = "endPrice", defaultValue = "", required = false) Double endPrice
+    ){
+        return ResponseEntity.ok(
+                this.productService.getProductByMultiParams(pageIndex,pageSize,productName,categorySlug,startPrice,endPrice)
+                );
+
+    }
+
+
+
 
 
 }
