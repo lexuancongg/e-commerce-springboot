@@ -533,7 +533,7 @@ public class ProductService {
                 .toList();
 
         List<ProductAttributeValue> productAttributeValues = product.getAttributeValues();
-        List<AttributeGroupVm> attributeGroupVms = new ArrayList<>();
+        List<AttributeGroupValueVm> attributeGroupValueVms = new ArrayList<>();
         if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(productAttributeValues)) {
             List<ProductAttributeGroup> productAttributeGroups = productAttributeValues.stream()
                     .map(productAttributeValue ->
@@ -554,8 +554,8 @@ public class ProductService {
                     }
                 });
                 String attributeGroupName = productAttributeGroup.getName();
-                AttributeGroupVm attributeGroupVm = new AttributeGroupVm(attributeGroupName,attributeValueVms);
-                attributeGroupVms.add(attributeGroupVm);
+                AttributeGroupValueVm attributeGroupValueVm = new AttributeGroupValueVm(attributeGroupName,attributeValueVms);
+                attributeGroupValueVms.add(attributeGroupValueVm);
             });
 
         }
@@ -565,7 +565,7 @@ public class ProductService {
                 product.getBrand().getName(),
                 product.getProductCategories().stream().map(productCategory -> productCategory.getCategory().getName())
                         .toList(),
-                attributeGroupVms,
+                attributeGroupValueVms,
                 product.getShortDescription(),
                 product.getDescription(),
                 product.getSpecifications(),

@@ -11,8 +11,6 @@ import ReactPaginate from "react-paginate";
 import {CategoryVm} from "@/models/category/CategoryVm";
 import categoryService from "@/services/category/categoryService";
 import { usePathname, useSearchParams } from 'next/navigation'
-import Link from "next/link";
-import {URLSearchParamsIterator} from "url";
 import * as querystring from "node:querystring";
 import productService from "@/services/product/productService";
 const navigationPaths: NavigationPathModel[] = [
@@ -29,7 +27,6 @@ const CATEGORY_SLUG = 'categorySlug';
 
 export default function ProductList(){
     const router = useRouter();
-    const pathname = usePathname();
     const searchParams = useSearchParams();
     const [products, setProducts] = useState<ProductPreviewVm[]>([]);
     const [totalPage , setTotalPage] = useState<number>(1);
@@ -39,38 +36,46 @@ export default function ProductList(){
     const inputSearchRef = useRef<HTMLInputElement>(null);
     const inputStartPriceRef = useRef<HTMLInputElement>(null);
     const inputEndPriceRef = useRef<HTMLInputElement>(null);
+    const [categoryIdActive , setCategoryIdActive] = useState<number>(0);
 
 
+    // khi nhung param query thay doi thi set lai page 0
     const updateFilter = (key:string, value:string|number)=>{
-        setPageIndex(0);
+        // trường hợp push key và value đã có => giá trị không thaydodoiri thì không set lại page
+        const currentValue =  searchParams.get(key);
+        if(currentValue && currentValue == value){
+            return;
+        }
         pushParamsToRouter(key,value)
+        setPageIndex(0)
 
     }
     const pushParamsToRouter = (key: string , value:string|number)=>{
         const params = new URLSearchParams(searchParams.toString())
         params.set(key, String(value))
-
         router.push(`?${params.toString()}`)
     }
 
     useEffect(() => {
-        // check xem trên query url có param nào không
-        if(Array.from(searchParams.entries()).length > 0 && searchParams.get(CATEGORY_SLUG)){
-            const categorySlugValue : string = searchParams.get(CATEGORY_SLUG) as string;
-
-
-        }
         // lấy ds category để lọc
         categoryService.getCategories()
             .then((responseCategories)=>{
+                let  categoryId : number = 0;
+                // check xem trên query url có param nào không
+                if(Array.from(searchParams.entries()).length > 0 && searchParams.get(CATEGORY_SLUG)){
+                    const categorySlugValue : string = searchParams.get(CATEGORY_SLUG) as string;
+                    categoryId  = responseCategories.find(cate => cate.slug == categorySlugValue )?.id !;
+
+                }
+                if(categoryId)  setCategoryIdActive(categoryId);
                 setCategories(responseCategories);
             })
     }, []);
 
 
     useEffect(() => {
+
         if(Array.from(searchParams.entries()).length > 0){
-            setPageIndex(0)
         }
         const paramsObj : Record<string, string> = {}
         for(const [key,value] of searchParams.entries()){
@@ -82,9 +87,12 @@ export default function ProductList(){
 
     // khi filter thay đổi thì load lại product
     useEffect(()=>{
+
+
         if(filters == null){
             return;
         }
+
         // querystring : thư vện hổ trợ convert từ object sang query teen url
         let predicates = querystring.stringify({ ...filters, pageIndex: pageIndex });
         productService.getProductByMultiParams(predicates)
@@ -103,6 +111,7 @@ export default function ProductList(){
 
     const handleDeleteFilter = (event:any)=>{
         setPageIndex(0);
+        setCategoryIdActive(0)
         router.push('/products')
         if (inputSearchRef.current) {
             inputSearchRef.current.value = '';
@@ -122,6 +131,7 @@ export default function ProductList(){
             </Head>
 
             <NavigationComponent props={navigationPaths}></NavigationComponent>
+
             <div className="py-8 bg-gray-100">
                 <div className="max-w-screen-xl mx-auto px-4">
                     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -129,7 +139,8 @@ export default function ProductList(){
                         <div className="hidden lg:block bg-white p-6 rounded-lg shadow">
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="text-lg font-semibold">Filter By</h3>
-                                <button onClick={handleDeleteFilter} className="text-sm text-white bg-gray-600 px-3 py-1 rounded hover:bg-gray-700">
+                                <button onClick={handleDeleteFilter}
+                                        className="text-sm text-white bg-gray-600 px-3 py-1 rounded hover:bg-gray-700">
                                     Clear filter
                                 </button>
                             </div>
@@ -141,10 +152,15 @@ export default function ProductList(){
                                     {categories.map((cate) => (
                                         <li
                                             key={cate.id}
-                                            className="cursor-pointer px-3 py-1 border border-gray-500 rounded-full text-sm hover:bg-gray-200"
+                                            className={`cursor-pointer px-3 py-1 border border-gray-500 rounded-full text-sm hover:bg-gray-200 
+                                            ${categoryIdActive === cate.id ? 'bg-violet-500 text-white' : ''}`}
                                             onClick={() => {
-                                                updateFilter(CATEGORY_SLUG , cate.slug)
+                                                if (categoryIdActive != cate.id) {
+                                                    updateFilter(CATEGORY_SLUG, cate.slug)
+                                                }
+                                                setCategoryIdActive(cate.id);
                                             }}
+
                                         >
                                             {cate.name}
                                         </li>
@@ -164,7 +180,7 @@ export default function ProductList(){
                                             placeholder="0"
                                             ref={inputStartPriceRef}
                                             onChange={(event) => {
-                                                updateFilter("startPrice",Number(event.target.value))
+                                                updateFilter("startPrice", Number(event.target.value))
                                             }}
                                         />
                                     </div>
@@ -202,7 +218,7 @@ export default function ProductList(){
                                         className="w-full border p-2 rounded text-sm"
                                         placeholder="Search..."
                                         onChange={(event) => {
-                                            updateFilter('productName',event.target.value)
+                                            updateFilter('productName', event.target.value)
                                         }}
                                         ref={inputSearchRef}
                                     />
@@ -245,7 +261,7 @@ export default function ProductList(){
 
 
         </Container>
-    )
+    );
 
 
 }

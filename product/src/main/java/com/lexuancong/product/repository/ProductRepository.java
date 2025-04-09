@@ -20,7 +20,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findAllByFeatureIsTrueAndShownSeparatelyIsTrueAndPublicIsTrueOrderByIdAsc(Pageable pageable);
 
     Optional<Product> findBySlugAndPublicIsTrue(String slug);
-git
+
 
     @Query(value = "select product from Product product" +
             " where product.isFeature = true order by random() limit 10 ", nativeQuery = true)

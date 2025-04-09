@@ -7,15 +7,16 @@ public record ProductDetailVm(
         String name,
         String brandName,
         List<String> categories,
-        List<AttributeGroupVm> attributeGroups,
+        List<AttributeGroupValueVm> attributeGroupValues,
         String shortDescription,
         String description,
         String specifications,
         Double price,
         boolean hasOptions,
-        String avatarImageUrl,
+        String avatarUrl,
         boolean isFeatured,
         List<String> images,
         boolean isOrderEnable
 ) {
+
 }
