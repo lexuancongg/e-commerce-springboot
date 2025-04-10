@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class MediaService {
+public class ImageService {
     public ImageVm getImageById (Long id){
         return null;
     }

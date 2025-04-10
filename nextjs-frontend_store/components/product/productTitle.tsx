@@ -1,4 +1,5 @@
 import {FC} from "react";
+import Star from "@/components/star/star";
 type Props = {
     productName: string,
     averageStar: number,
@@ -12,13 +13,13 @@ const ProductTitle : FC<Props> = (
     }
 )=>{
     return (
-        <div className="product-detail-header">
-            <div className="left">
-                <h4 className="title">{productName}</h4>
-                <div className="rating-star">
-                    <Star star={averageStar}/>
+        <div >
+            <div>
+                <h4 >{productName}</h4>
+                <div >
+                    <Star averageStar={averageStar}/>
                 </div>
-                <span className="rating-count">({totalRating})</span>
+                <span >({totalRating})</span>
             </div>
 
             <span>

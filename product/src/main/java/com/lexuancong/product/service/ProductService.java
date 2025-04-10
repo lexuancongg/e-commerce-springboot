@@ -3,13 +3,14 @@ package com.lexuancong.product.service;
 import com.lexuancong.product.model.*;
 import com.lexuancong.product.model.attribute.ProductAttributeGroup;
 import com.lexuancong.product.repository.*;
-import com.lexuancong.product.service.internal.MediaService;
+import com.lexuancong.product.service.internal.ImageService;
 import com.lexuancong.product.viewmodel.image.ImageVm;
 import com.lexuancong.product.viewmodel.product.*;
 import com.lexuancong.product.viewmodel.product.databinding.BaseProductPropertiesRequire;
 import com.lexuancong.product.viewmodel.product.databinding.ProductOptionPropertyRequire;
 import com.lexuancong.product.viewmodel.product.databinding.ProductPropertiesRequire;
 import com.lexuancong.product.viewmodel.product.databinding.ProductVariationPropertiesRequire;
+import com.lexuancong.product.viewmodel.product.variants.ProductVariantVm;
 import com.lexuancong.product.viewmodel.productattribute.AttributeGroupValueVm;
 import com.lexuancong.product.viewmodel.productattribute.AttributeValueVm;
 import io.micrometer.common.util.StringUtils;
@@ -35,7 +36,7 @@ public class ProductService {
     private final ProductOptionRepository productOptionRepository;
     private final ProductOptionValueRepository productOptionValueRepository;
     private final ProductOptionCombinationRepository productOptionCombinationRepository;
-    private final MediaService mediaService;
+    private final ImageService imageService;
 
     public ProductSummaryVm createProduct(ProductPostVm productPostVm){
         this.validateProduct(productPostVm);
@@ -506,7 +507,7 @@ public class ProductService {
         List<Product> productsContent = productPage.getContent();
         List<ProductPreviewVm> productPreviewPayload = productsContent.stream()
                 .map(product -> {
-                    String avatarUrl =  this.mediaService.getImageById(product.getAvatarImageId()).url();
+                    String avatarUrl =  this.imageService.getImageById(product.getAvatarImageId()).url();
                     return new ProductPreviewVm(product.getId(),product.getName(),product.getSlug(),product.getPrice(),avatarUrl);
                 }).toList();
         return new ProductFeaturePagingVm(
@@ -525,10 +526,10 @@ public class ProductService {
     public ProductDetailVm getProductDetailBySlug(String slug){
         Product product = this.productRepository.findBySlugAndPublicIsTrue(slug)
                 .orElseThrow(()-> new RuntimeException());
-        String avatarUrl =  this.mediaService.getImageById(product.getAvatarImageId()).url();
+        String avatarUrl =  this.imageService.getImageById(product.getAvatarImageId()).url();
         List<Long> imageIds = product.getProductImages().stream().map(ProductImage::getImageId)
                 .toList();
-        List<String> productImageUrls = this.mediaService.getImageByIds(imageIds)
+        List<String> productImageUrls = this.imageService.getImageByIds(imageIds)
                 .stream().map(ImageVm::url)
                 .toList();
 
@@ -539,7 +540,7 @@ public class ProductService {
                     .map(productAttributeValue ->
                             productAttributeValue.getProductAttribute().getProductAttributeGroup())
                     .filter(Objects::nonNull)
-                    // loại bỏ ptu trùng lặp dựa trên equa
+                    // loại bỏ ptu trùng lặp dựa trên equal
                     .distinct()
                     .toList();
 
@@ -616,7 +617,7 @@ public class ProductService {
                 .toList();
 
         List<ProductPreviewVm> productPreviewVms = productContents.stream().map(product -> {
-            String avatarUrl =  this.mediaService.getImageById(product.getAvatarImageId()).url();
+            String avatarUrl =  this.imageService.getImageById(product.getAvatarImageId()).url();
             return new ProductPreviewVm(
                     product.getId(),product.getName(),product.getSlug(),product.getPrice(),avatarUrl
             );
@@ -648,7 +649,7 @@ public class ProductService {
                 .map(product -> {
                     return new ProductPreviewVm(
                             product.getId() , product.getName(),product.getSlug() , product.getPrice(),
-                            mediaService.getImageById(product.getAvatarImageId()).url()
+                            imageService.getImageById(product.getAvatarImageId()).url()
                     );
                 })
                 .toList();
@@ -658,12 +659,12 @@ public class ProductService {
     public List<ProductPreviewVm>  getProductsByIds(List<Long> ids){
         List<Product> products = this.productRepository.findAllByIdIn(ids);
         return products.stream().map(product -> {
-            String avatarUrl =  this.mediaService.getImageById(product.getAvatarImageId()).url();
+            String avatarUrl =  this.imageService.getImageById(product.getAvatarImageId()).url();
             // nếu avataurl = null mà không có parent nữa thì trả về null luôn
             if(StringUtils.isEmpty(avatarUrl) && Objects.nonNull(product.getParent()) ){
                     Optional<Product> parentProduct = this.productRepository.findById(product.getParent().getId());
                     avatarUrl = parentProduct.map(item->
-                            this.mediaService.getImageById(item.getAvatarImageId()).url())
+                            this.imageService.getImageById(item.getAvatarImageId()).url())
                             .orElse("");
 
             }
@@ -685,6 +686,73 @@ public class ProductService {
                 productName.trim().toLowerCase(),
                 categorySlug.trim(), startPrice, endPrice, pageable
         );
+        List<Product> products = productPage.getContent();
+        List<ProductPreviewVm> contentPayload = products.stream()
+                .map(product -> {
+                    String avatarUrl =  this.imageService.getImageById(product.getAvatarImageId()).url();
+                    return new ProductPreviewVm(
+                            product.getId(),
+                            product.getName(),
+                            product.getSlug(),
+                            product.getPrice(),
+                            avatarUrl
+                    );
+
+                }).toList();
+
+        return new ProductPagingVm(
+                contentPayload,
+                pageIndex,
+                pageSize,
+                (int) productPage.getTotalElements(),
+                productPage.getTotalPages(),
+                productPage.isLast()
+
+        );
+
+    }
+
+    public List<ProductVariantVm> getProductVariationsByParentId(Long parentId){
+        Product parentProduct = this.productRepository.findById(parentId).orElseThrow(()-> new RuntimeException());
+//       // autoboxing : convert lên nếu là bolean
+        if(Boolean.TRUE.equals(parentProduct.isHasOptions())){
+            List<Product> productVariations  = parentProduct.getChild().stream()
+                    .filter(Product::isPublic)
+                    .toList();
+            return productVariations.stream()
+                    .map(variant -> {
+                        List<ProductOptionCombination> productOptionCombinations = this.productOptionCombinationRepository
+                                .findAllByProduct(variant);
+                        Map<Long,String> optionsValues = productOptionCombinations.stream()
+                                .collect(
+                                        Collectors.toMap(
+                                                productOptionCombination ->productOptionCombination.getProductOption().getId() ,
+                                                ProductOptionCombination :: getValue
+                                                )
+                                );
+                        String avatarUrl = null;
+                        if(variant.getAvatarImageId()!= null){
+                            avatarUrl = this.imageService.getImageById(variant.getAvatarImageId()).url();
+                        }
+                        List<Long> imageIds = variant.getProductImages().stream().map(ProductImage::getId).toList();
+                        List<ImageVm> productImages =  this.imageService.getImageByIds(imageIds);
+                        return new ProductVariantVm(
+                                variant.getId(),
+                                variant.getName(),
+                                variant.getSlug(),
+                                variant.getSku(),
+                                variant.getGtin(),
+                                variant.getPrice(),
+                                avatarUrl,
+                                productImages,
+                                optionsValues
+                        );
+
+
+                    }).toList();
+
+        }
+        return Collections.emptyList();
 
 
     }

@@ -3,6 +3,7 @@ package com.lexuancong.product.controller;
 import com.lexuancong.product.service.ProductService;
 import com.lexuancong.product.utils.Constants;
 import com.lexuancong.product.viewmodel.product.*;
+import com.lexuancong.product.viewmodel.product.variants.ProductVariantVm;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -119,6 +120,13 @@ public class ProductController {
     @GetMapping("/customer/product/{slug}")
     public ResponseEntity<ProductDetailVm> getProductDetailBySlug(@PathVariable("slug") String slug) {
         return ResponseEntity.ok(this.productService.getProductDetailBySlug(slug));
+    }
+
+
+    // lay ds bien the
+    @GetMapping("/customer/product-variations/{parentId}")
+    public ResponseEntity<List<ProductVariantVm>> getProductVariationsByParentId(@PathVariable Long parentId) {
+        return new ResponseEntity<>(this.productService.getProductVariationsByParentId(parentId),HttpStatus.OK);
     }
 
 

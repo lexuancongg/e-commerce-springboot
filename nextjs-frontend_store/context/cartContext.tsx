@@ -26,7 +26,7 @@ export function CartProvider({children}: React.PropsWithChildren<{}>) {
             }
         ),[numberCartItems,fetchNumberCartItems]
     );
-    return <CartContext value={stateCartContext}>{children}</CartContext>
+    return <CartContext.Provider value={stateCartContext}>{children}</CartContext.Provider>
 
 }
 export const useCartContext = ()=>{

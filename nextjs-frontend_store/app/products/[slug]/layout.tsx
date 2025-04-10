@@ -4,7 +4,8 @@ import productService from "@/services/product/productService";
 import {ProductDetailVm} from "@/models/product/productDetailVm";
 import {ProductOptionValuesVm} from "@/models/product/options/ProductOptionValuesVm";
 import {ProductOptionValueVm} from "@/models/product/options/ProductOptionValueVm";
-import ProductDetailContext from "@/context/productDetailContext";
+import ProductDetailProvider, {ProductDetailContext} from "@/context/productDetailContext";
+import ClientProductDetailLayout from "@/components/product/ClientProductDetailLayout";
 
 
 const fetchProductVariations = async (productId: number): Promise<ProductVariantVm[]> => {
@@ -24,10 +25,10 @@ const fetchProductVariations = async (productId: number): Promise<ProductVariant
 }
 const fetchDetailProduct = async (slug: string): Promise<ProductDetailVm | null> => {
     try {
-        return await productService.getDetailProductBySlug(slug);
 
+        return await productService.getDetailProductBySlug(slug)
     } catch (error) {
-        console.log("error")
+        console.log("error fetchDetailProduct", error)
         return null;
 
     }
@@ -38,7 +39,7 @@ const fetchProductOptionValues = async (productId: number): Promise<ProductOptio
     try {
         return await productService.getProductOptionValues(productId);
     } catch (error) {
-        console.log("error")
+        console.log("error fetchProductOptionValues ", error)
         return [];
     }
 }
@@ -48,14 +49,15 @@ const fetchProductOptionValues = async (productId: number): Promise<ProductOptio
 export default async function ProductDetailLayout(
     {
         children,
-        params: {slug}
+        params
     }: {
         children: React.ReactNode,
-        params: {
+        params: Promise<{
             slug: string
-        }
+        }>
     }
 ) {
+    const {slug} = await params;
     // call api trực tiếp trên server component
     const product = await fetchDetailProduct(slug as string);
     if (product == null) return;
@@ -83,16 +85,33 @@ export default async function ProductDetailLayout(
 
 
     return (
-        <ProductDetailContext
-            value={
-                {
-                    productDetail: product,
-                    productVariations: productVariations,
-                    productOptionValues: options
-                }
-            }>
-            {children}
-        </ProductDetailContext>
+        // đây là server component mà conentext na l client compoennt => trực tiếp => lôĩ
+        // <ProductDetailContext.Provider
+        //     value={{
+        //         productDetail: product,
+        //         productVariations: productVariations,
+        //         productOptionValues: options
+        //     }}
+        // >
+        //     {children}
+        // </ProductDetailContext.Provider>
+            // <ClientProductDetailLayout
+            //     productDetail={product}
+            //     productOptionValues={options}
+            //     productVariations={productVariations}
+            // >
+            //     {children}
+            // </ClientProductDetailLayout>
+        <ProductDetailProvider value={{
+            productDetail:product,
+            productVariations:productVariations,
+            productOptionValues:options
+        }}>{children}</ProductDetailProvider>
+    );
 
-    )
+
+
+
+
+
 }

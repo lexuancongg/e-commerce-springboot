@@ -10,10 +10,27 @@ type ProductContextType = {
     productVariations: ProductVariantVm[];
 };
 
-const productDetailContext = createContext<ProductContextType | null>(null);
+export const ProductDetailContext = createContext<ProductContextType | null>(null);
 
 export const useProductDetailContext = () => {
-    return useContext(productDetailContext)
+    return useContext(ProductDetailContext)
 }
 
-export default productDetailContext;
+export default function ProductDetailProvider(
+    {
+        children,
+        value
+    }: {
+        children: React.ReactNode;
+        value: {
+            productDetail: ProductDetailVm;
+            productOptionValues: ProductOptionValuesVm[];
+            productVariations: ProductVariantVm[];
+        }
+    }) {
+    return (
+        <ProductDetailContext.Provider value={value}>
+            {children}
+        </ProductDetailContext.Provider>
+    );
+}

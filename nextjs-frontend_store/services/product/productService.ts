@@ -14,6 +14,9 @@ class ProductService {
     // process.env : biến của nodejs => object toàn cục chứa các biến môi trường
     private baseUrl:string = `${process.env.API_BASE_URL_PRODUCT}`
 
+    constructor() {
+        console.log("constructor ",this.baseUrl)
+    }
     public async getProductsByIds(ids : number[]):Promise<ProductPreviewVm[]>{
         const response = await apiClient.get(`${this.baseUrl}/customer/products?productIds=${ids}`)
         if(response.ok){
@@ -28,6 +31,7 @@ class ProductService {
 
     // lấy ngau nhien ds sp noi bat lam slide
     public async getFeaturedProductsMakeSlide():Promise<ProductPreviewVm[]>{
+        console.log(this.baseUrl)
         const response = await  apiClient.get(`${this.baseUrl}/customer/products/featured/slide`);
         if(response.ok) return  await  response.json();
         return  productsFeaturedMakeSlide_demo;
@@ -56,7 +60,7 @@ class ProductService {
 
 
     public async getProductVariationsByParentId(parentProductId: number) : Promise<ProductVariantVm[]>{
-        const response = await  apiClient.get(`${this.baseUrl}/customer/product-variations/${parentProductId}`);
+        const response = await  apiClient.get(`http://localhost:3000/customer/product-variations/${parentProductId}`);
         if(response.ok) return await response.json();
         return product_variant_demo_data;
         throw  response;
@@ -64,7 +68,8 @@ class ProductService {
 
     }
     public  async  getDetailProductBySlug(slug: string):Promise<ProductDetailVm>{
-        const response = await apiClient.get(`${this.baseUrl}/customer/products/${slug}}`)
+        console.log("method ", this.baseUrl)
+        const response = await apiClient.get(`http://localhost:3000/customer`);
         if(response.ok) return await response.json();
         return Product_detail_demo_data;
         throw  response;
@@ -72,7 +77,7 @@ class ProductService {
     }
 
     public async getProductOptionValues(parentProductId: number):Promise<ProductOptionValueVm[]>{
-        const response = await apiClient.get(`${this.baseUrl}/customer/product-option-combinations/${parentProductId}`)
+        const response = await apiClient.get(`http://localhost:3000/customer/product-option-combinations/${parentProductId}`)
         if(response.ok) return await response.json();
         return Product_option_value_demo_data;
         throw response;
