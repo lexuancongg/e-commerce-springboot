@@ -6,7 +6,7 @@ import {ProductPreviewVm} from "@/models/product/ProductPreviewVm";
 import {Container, Row} from "react-bootstrap";
 import Head from "next/head";
 import NavigationComponent from "@/components/common/navigationComponent";
-import ProductCard from "@/components/cart/productCard";
+import ProductCard from "@/components/product/productCard";
 import ReactPaginate from "react-paginate";
 import {CategoryVm} from "@/models/category/CategoryVm";
 import categoryService from "@/services/category/categoryService";

@@ -7,7 +7,7 @@ export type ProductVariantVm = {
     sku: string,
     gtin: string,
     price: number,
-    avatarUrl: ImageVm,
+    avatarUrl: string,
     productImages: {
         id: number,
         url: string

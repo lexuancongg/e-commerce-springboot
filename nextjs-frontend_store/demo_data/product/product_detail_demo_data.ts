@@ -27,15 +27,12 @@ export const Product_detail_demo_data : ProductDetailVm =
         specifications: "Chất liệu: Cotton | Cân nặng mẫu mặc: 70kg | Size M",
         price: 199000,
         hasOptions: true,
-        avatarUrl: {
-            id: 101,
-            url: "https://example.com/avatar.jpg",
-        },
+        avatarUrl: "https://example.com/avatar.jpg",
+
         isFeatured: true,
         isPublic: true,
         isOrderEnable: true,
         productImageUrls: [
-            { id: 201, url: "https://example.com/image1.jpg" },
-            { id: 202, url: "https://example.com/image2.jpg" },
+            "https://example.com/image1.jpg", "https://example.com/image1.jpg"
         ],
     };

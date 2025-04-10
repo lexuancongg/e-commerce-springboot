@@ -3,7 +3,7 @@ import {NextPage} from "next";
 import {useEffect, useState} from "react";
 import {ProductPreviewVm} from "@/models/product/ProductPreviewVm";
 import {Col, Container, Row} from "react-bootstrap";
-import ProductCard from "@/components/cart/productCard";
+import ProductCard from "@/components/product/productCard";
 import ReactPaginate from "react-paginate";
 import categoryService from "@/services/category/categoryService";
 import productService from "@/services/product/productService";
