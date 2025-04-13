@@ -32,7 +32,7 @@ const ProductDetailPage :NextPage =   ()=>{
 
 
     const [ratings , setRatings] = useState<RatingVm[]>([]);
-    const [averageStar, setAverageStar] = useState<number>(0);
+    const [averageStar, setAverageStar] = useState<number>(4.6);
 
 
     return (

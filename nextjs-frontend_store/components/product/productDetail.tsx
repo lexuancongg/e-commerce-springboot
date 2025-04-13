@@ -6,6 +6,7 @@ import {Container} from "react-bootstrap";
 import NavigationComponent from "@/components/common/navigationComponent";
 import ProductTitle from "@/components/product/productTitle";
 import ProductImageGallery from "@/components/common/ProductImageGallery";
+import LoadImageSafe from "@/components/common/loadImageSafe";
 
 type Props = {
     productDetail: ProductDetailVm,
@@ -29,18 +30,19 @@ const ProductDetail: FC<Props> = ({
             <ProductTitle
                 productName={productDetail.name} averageStar={averageStar} totalRating={totalRating}
             ></ProductTitle>
-            {/* chia ra hai phan*/}
+             {/*chia ra hai phan*/}
             <div className={"row justify-content-center"}>
                 <div className={"col-6"}>
-                {/*    thông tin hinh ảnh*/}
-                    <ProductImageGallery productImageUrls={["bu","bu","bu","bu"]}></ProductImageGallery>
+                    {/*    thông tin hinh ảnh*/}
+                    <ProductImageGallery productImageUrls={['','','','','','']}></ProductImageGallery>
+                </div>
+                <div className={"col-6"}>le xuan cong</div>
+
                 </div>
 
-            </div>
-
-        </>
-    )
+            </>
+            )
 
 
-}
-export default ProductDetail;
+            }
+            export default ProductDetail;

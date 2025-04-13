@@ -15,10 +15,11 @@
             width = 500,
             height =500,
             src,
+            // mỗi giao dienj cần một css rieneg
             className,
             style,
             alt,
-            fallBack : fallBackImage ='../asset/images/fallback/default-fallback-image.png',
+            fallBack : fallBackImage ='../../asset/images/fallback/default-fallback-image.png',
             ...props
         }: Props
     ) => {

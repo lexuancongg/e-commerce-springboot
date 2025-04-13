@@ -23,7 +23,6 @@ type Props = {
 const ProfileLayoutComponent: FC<Props> = ({ children, menuActive, title, navigationPaths }) => {
   return (
     <Container>
-      <head title={title ?? "Profile"}></head>
       <div className="flex justify-between pt-5 mb-2 h-24">
         <NavigationComponent props={navigationPaths} />
       </div>

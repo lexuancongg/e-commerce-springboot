@@ -15,30 +15,35 @@ export default function  ProductImageGallery({productImageUrls}:Props){
 
     return (
         <>
-            <Figure className={"transition-transform duration-300 w-full flex items-center justify-center"}>
+            {/* ảnh chinhs */}
+            <div className={"transition-transform duration-300 w-full flex items-center justify-center"}>
                 <LoadImageSafe src={productImageUrls.length ? productImageUrls[0] : ""}></LoadImageSafe>
-            </Figure>
-            <button disabled={currentIndex === 0} className="border-0 bg-none p-0 text-3xl text-gray-400"
+            </div>
+            {/* danh sách ảnh con*/}
+            <div className={'flex  w-full items-center justify-between mt-4 '}>
+                <button disabled={currentIndex === 0} className="border-0 bg-none p-0 text-3xl text-gray-400"
+                        onClick={() => {
+                        }}>
+                    <i className="bi bi-chevron-left"></i>
+                </button>
+                <div className={'flex '}>
+                    {productImageUrls.map(imageUrl => {
+                        return (
+                            <div className={productImageUrls[currentIndex] == imageUrl ? 'border-black' : ''}>
+                                <LoadImageSafe width={100} height={100} src={imageUrl}></LoadImageSafe>
+                            </div>
+                        )
+                    })}
+                </div>
+                <button
+                    disabled={currentIndex === productImageUrls.length - 1 || !productImageUrls.length}
+                    className="border-0 bg-none p-0 text-3xl text-gray-400"
                     onClick={() => {
-                    }}>
-                <i className="bi bi-chevron-left"></i>
-            </button>
-            <Figure>
-                {productImageUrls.map(imageUrl => {
-                    return (
-                        <div>
-                            <LoadImageSafe src={imageUrl}></LoadImageSafe>
-                        </div>
-                    )
-                })}
-            </Figure>
-            <button
-                disabled={currentIndex === productImageUrls.length - 1 || !images.length}
-                className="slider-button"
-                onClick={()=>{}}
-            >
-                <i className="bi bi-chevron-right"></i>
-            </button>
+                    }}
+                >
+                    <i className="bi bi-chevron-right"></i>
+                </button>
+            </div>
 
         </>
     )
