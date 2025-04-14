@@ -75,7 +75,7 @@ public class ProductService {
                                                 List<ProductOptionValue> productOptionValues,
                                                 List<? extends ProductVariationPropertiesRequire> variationVms,
                                                 Map<Long,ProductOption> mapOptionById){
-        List<ProductOptionCombination> productOptionCombinations = new ArrayList<>();
+        List<SpecificProductVariant> specificProductVariants = new ArrayList<>();
         // variationSave rồi nhưng chưa bt nó ứng với productOption Id nào và value gì => dua vao variationVm
         // variantSaved và variantVm có cùng slug => dựa vào slug để lấy
         Map<String,Product> mapProductBySlug = variationsSaved.stream()
@@ -97,17 +97,17 @@ public class ProductService {
                 if(!isExitOptionValue){
                     throw new RuntimeException();
                 }
-                ProductOptionCombination productOptionCombination = ProductOptionCombination.builder()
+                SpecificProductVariant specificProductVariant = SpecificProductVariant.builder()
                         .productOption(productOption)
                         .product(variantSaved)
                         .value(optionValue)
                         .build();
-                productOptionCombinations.add(productOptionCombination);
+                specificProductVariants.add(specificProductVariant);
             });
 
 
         }
-        this.productOptionCombinationRepository.saveAll(productOptionCombinations);
+        this.productOptionCombinationRepository.saveAll(specificProductVariants);
     }
     private List<ProductOptionValue> createProductOptionValue(ProductPostVm productPostVm ,
                                                               Product mainProduct ,Map<Long,ProductOption> productOptionMapById){
@@ -589,7 +589,7 @@ public class ProductService {
         // check xem có phải là biến thể không
         if(!Objects.isNull(product.getParent())){
             // xóa các combination của biến thể này
-            List<ProductOptionCombination> combinations = this.productOptionCombinationRepository
+            List<SpecificProductVariant> combinations = this.productOptionCombinationRepository
                     .findAllByProduct(product);
             if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(combinations)) {
                 this.productOptionCombinationRepository.deleteAll(combinations);
@@ -721,13 +721,13 @@ public class ProductService {
                     .toList();
             return productVariations.stream()
                     .map(variant -> {
-                        List<ProductOptionCombination> productOptionCombinations = this.productOptionCombinationRepository
+                        List<SpecificProductVariant> specificProductVariants = this.productOptionCombinationRepository
                                 .findAllByProduct(variant);
-                        Map<Long,String> optionsValues = productOptionCombinations.stream()
+                        Map<Long,String> optionsValues = specificProductVariants.stream()
                                 .collect(
                                         Collectors.toMap(
-                                                productOptionCombination ->productOptionCombination.getProductOption().getId() ,
-                                                ProductOptionCombination :: getValue
+                                                specificProductVariant -> specificProductVariant.getProductOption().getId() ,
+                                                SpecificProductVariant:: getValue
                                                 )
                                 );
                         String avatarUrl = null;

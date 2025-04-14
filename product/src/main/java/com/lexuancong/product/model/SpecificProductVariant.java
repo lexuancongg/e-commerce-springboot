@@ -5,14 +5,14 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "product_option_combination")
+@Table(name = "specific_product_variant")
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 // sự kết hợp giữa các tùy chọn => tạo ra biến thể sp , red + M , red + L , while + M ...
-public class ProductOptionCombination {
+public class SpecificProductVariant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

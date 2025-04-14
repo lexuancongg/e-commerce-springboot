@@ -8,7 +8,7 @@ type  Props = {
     handleSubmit: () => void,
     errors: FieldErrors<ProfileInfoVm>,
     // trường hợp có nếu update , còn undefine nếu create
-    profileInfo: ProfileInfoVm
+    profileInfo?: ProfileInfoVm
     // xác định tên nút là create hay update
     setValue: UseFormSetValue<ProfileInfoVm>;
 }
@@ -46,6 +46,32 @@ const ProfileInfoForm : FC<Props> = ({
                             required: {value: true, message: 'This feild is required'},
                         }}
                         defaultValue={profileInfo?.firstName}
+                    />
+                </div>
+            </div>
+            <div className={'row'}>
+                <div className="col-lg-9">
+                    <Input
+                        labelText="lastName"
+                        register={register}
+                        fieldName="lastName"
+                        registerOptions={{
+                            required: {value: true, message: 'This feild is required'},
+                        }}
+                        defaultValue={profileInfo?.lastName}
+                    />
+                </div>
+            </div>
+            <div className={'row'}>
+                <div className="col-lg-9">
+                    <Input
+                        labelText="email"
+                        register={register}
+                        fieldName="email"
+                        registerOptions={{
+                            required: {value: true, message: 'This feild is required'},
+                        }}
+                        defaultValue={profileInfo?.email}
                     />
                 </div>
             </div>
