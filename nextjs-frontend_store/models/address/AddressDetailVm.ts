@@ -10,7 +10,7 @@ export type AddressDetailVm = {
     districtName ?: string,
     provinceName?: string,
     countryName?: string,
-    isActive?: boolean;
 
+    isActive?: boolean;
 
 }

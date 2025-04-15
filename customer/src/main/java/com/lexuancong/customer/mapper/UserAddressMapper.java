@@ -1,18 +1,18 @@
 package com.lexuancong.customer.mapper;
 
-import com.lexuancong.customer.model.CustomerAddress;
+import com.lexuancong.customer.model.UserAddress;
 import com.lexuancong.customer.viewmodel.address.AddressVm;
 import com.lexuancong.customer.viewmodel.useraddress.UserAddressVm;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UserAddressMapper {
-    public UserAddressVm toVmFromModel(CustomerAddress customerAddress, AddressVm addressVm) {
+    public UserAddressVm toVmFromModel(UserAddress userAddress, AddressVm addressVm) {
         return UserAddressVm.builder()
-                .id(customerAddress.getId())
-                .userId(customerAddress.getUserId())
+                .id(userAddress.getId())
+                .userId(userAddress.getUserId())
                 .addressVm(addressVm)
-                .isActive(customerAddress.isActive())
+                .isActive(userAddress.isActive())
                 .build();
     }
 }

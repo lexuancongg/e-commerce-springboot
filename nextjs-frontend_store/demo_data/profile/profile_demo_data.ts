@@ -1,7 +1,7 @@
-import {ProfileInfoVm} from "@/models/profile/ProfileInfoVm";
+import {CustomerVm} from "@/models/customer/CustomerVm";
 
-export const Profile_demo_data : ProfileInfoVm ={
-    userName:'le xuan cong',
+export const Profile_demo_data : CustomerVm ={
+    username:'le xuan cong',
     firstName:'le xuan',
     email:'congle.190904@gmail.com',
     lastName:"cong"

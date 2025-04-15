@@ -18,7 +18,7 @@ type Props = {
   handleSubmit: () => void,
   errors: FieldErrors<AddressDetailVm>,
   // trường hợp có nếu update , còn undefine nếu create
-  address?: AddressDetailVm | undefined,
+  address?: AddressDetailVm ,
   // xác định tên nút là create hay update
   buttonText?: string,
   setValue: UseFormSetValue<AddressDetailVm>;
@@ -123,7 +123,7 @@ const AddressForm: FC<Props> = (
             fieldName="countryId"
             placeholder="Select country"
             defaultValue={address?.countryId}
-            options={countries}
+                options={countries}
             register={register}
             registerOptions={{
               required: { value: true, message: 'Please select country' },

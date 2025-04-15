@@ -1,16 +1,17 @@
 import React, {FC} from "react";
 import {FieldErrors, UseFormRegister, UseFormSetValue} from "react-hook-form";
-import {ProfileInfoVm} from "@/models/profile/ProfileInfoVm";
+import {CustomerVm} from "@/models/customer/CustomerVm";
 import Input from "@/components/item/input";
+import Link from "next/link";
 type  Props = {
-    register: UseFormRegister<ProfileInfoVm>,
+    register: UseFormRegister<CustomerVm>,
     // submit
     handleSubmit: () => void,
-    errors: FieldErrors<ProfileInfoVm>,
+    errors: FieldErrors<CustomerVm>,
     // trường hợp có nếu update , còn undefine nếu create
-    profileInfo?: ProfileInfoVm
+    profileInfo?: CustomerVm
     // xác định tên nút là create hay update
-    setValue: UseFormSetValue<ProfileInfoVm>;
+    setValue: UseFormSetValue<CustomerVm>;
 }
 const ProfileInfoForm : FC<Props> = ({
     errors,
@@ -28,7 +29,7 @@ const ProfileInfoForm : FC<Props> = ({
                         register={register}
                         fieldName="userName"
                         disabled={true}
-                        defaultValue={profileInfo?.userName}
+                        defaultValue={profileInfo?.username}
                         registerOptions={{
                             required: {value: true, message: 'this feild is require'}
                         }}
@@ -74,6 +75,14 @@ const ProfileInfoForm : FC<Props> = ({
                         defaultValue={profileInfo?.email}
                     />
                 </div>
+            </div>
+            <div className="text-center">
+                <button onClick={handleSubmit}  className="btn btn-primary" type="button">
+                    Update
+                </button>
+                <Link href="/">
+                    <button className="btn btn-secondary m-3">Cancel</button>
+                </Link>
             </div>
 
         </>

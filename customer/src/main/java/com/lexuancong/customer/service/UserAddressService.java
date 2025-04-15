@@ -1,8 +1,8 @@
 package com.lexuancong.customer.service;
 
 import com.lexuancong.customer.mapper.UserAddressMapper;
-import com.lexuancong.customer.model.CustomerAddress;
-import com.lexuancong.customer.repository.CustomerAddressRepository;
+import com.lexuancong.customer.model.UserAddress;
+import com.lexuancong.customer.repository.UserAddressRepository;
 import com.lexuancong.customer.utils.AuthenticationUtils;
 import com.lexuancong.customer.viewmodel.address.AddressDetailVm;
 import com.lexuancong.customer.viewmodel.address.AddressPostVm;
@@ -15,60 +15,59 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class CustomerAddressService {
-    private final CustomerAddressRepository customerAddressRepository;
+public class UserAddressService {
+    private final UserAddressRepository userAddressRepository;
     private final AddressService addressService;
     private final UserAddressMapper userAddressMapper;
 
-    public CustomerAddressService(CustomerAddressRepository customerAddressRepository, AddressService locationService, UserAddressMapper userAddressMapper) {
-        this.customerAddressRepository = customerAddressRepository;
+    public UserAddressService(UserAddressRepository userAddressRepository, AddressService locationService, UserAddressMapper userAddressMapper) {
+        this.userAddressRepository = userAddressRepository;
         this.addressService = locationService;
         this.userAddressMapper = userAddressMapper;
     }
 
 
-    public UserAddressVm createAddress(AddressPostVm addressPostVm) {
+    public UserAddressVm createUserAddress(AddressPostVm addressPostVm) {
         String userId = AuthenticationUtils.extractCustomerIdFromJwt();
         // check xem co address nào chưa để set isactive = true nếu first
-        List<CustomerAddress> customerAddresses = customerAddressRepository.findByUserId(userId);
-        boolean isFirstAddress = customerAddresses.isEmpty();
+        List<UserAddress> userAddresses = userAddressRepository.findByUserId(userId);
+        boolean isFirstAddress = userAddresses.isEmpty();
         // goi api sang service location de them address
-        AddressVm addressVmOfSavedAddress = addressService.createAddress(addressPostVm);
-        CustomerAddress customerAddress = CustomerAddress.builder()
-                .userId(userId).addressId(addressVmOfSavedAddress.id()).isActive(isFirstAddress)
+        AddressVm addressVmOfAddressSaved = addressService.createAddress(addressPostVm);
+        UserAddress userAddress = UserAddress.builder()
+                .userId(userId).addressId(addressVmOfAddressSaved.id()).isActive(isFirstAddress)
                 .build();
-        return userAddressMapper.toVmFromModel(customerAddressRepository.save(customerAddress),addressVmOfSavedAddress);
+        return userAddressMapper.toVmFromModel(userAddressRepository.save(userAddress),addressVmOfAddressSaved);
     }
 
     public AddressDetailVm getDefaultAddress(){
         String userId = AuthenticationUtils.extractCustomerIdFromJwt();
-        CustomerAddress customerAddress = customerAddressRepository.findByUserIdAndIsActiveTrue(userId)
+        UserAddress userAddress = userAddressRepository.findByUserIdAndIsActiveTrue(userId)
                 // ban ra ngoai le here
                 .orElseThrow(()-> null );
-        return  addressService.getAddressById(customerAddress.getAddressId());
+        return  addressService.getAddressById(userAddress.getAddressId());
 
     }
 
     public void deleteAddress(Long id){
         String userId = AuthenticationUtils.extractCustomerIdFromJwt();
-        Optional<CustomerAddress> optionalUserAddress = customerAddressRepository.findOneByUserIdAndAddressId(userId,id);
+        Optional<UserAddress> optionalUserAddress = userAddressRepository.findOneByUserIdAndAddressId(userId,id);
         if(optionalUserAddress.isEmpty()){
             // throw exception
         }
-        customerAddressRepository.delete(optionalUserAddress.get());
+        userAddressRepository.delete(optionalUserAddress.get());
 
     }
     public void chooseDefaultAddress(Long id){
         String userId = AuthenticationUtils.extractCustomerIdFromJwt();
-        List<CustomerAddress> customerAddresses = customerAddressRepository.findAllByUserId(userId);
-        for(CustomerAddress customerAddress : customerAddresses){
-            customerAddress.setActive(Objects.equals(customerAddress.getAddressId(),id));
+        List<UserAddress> userAddresses = userAddressRepository.findAllByUserId(userId);
+        for(UserAddress userAddress : userAddresses){
+            userAddress.setActive(Objects.equals(userAddress.getAddressId(),id));
         }
-        customerAddressRepository.saveAll(customerAddresses);
+        userAddressRepository.saveAll(userAddresses);
 
     }
 
@@ -76,14 +75,14 @@ public class CustomerAddressService {
     // get ds addresss
     public List<AddressDetailVm> getDetailAddresses(){
         String userId = AuthenticationUtils.extractCustomerIdFromJwt();
-        List<CustomerAddress> customerAddresses = this.customerAddressRepository.findAllByUserId(userId);
-        List<Long> addressIds = customerAddresses.stream().map(CustomerAddress::getAddressId).toList();
+        List<UserAddress> userAddresses = this.userAddressRepository.findAllByUserId(userId);
+        List<Long> addressIds = userAddresses.stream().map(UserAddress::getAddressId).toList();
 
         List<AddressVm> addressVms = addressService.getAddressesByIds(addressIds);
-        List<AddressDetailVm> addressDetailVms = customerAddresses.stream()
-                .flatMap(customerAddress ->
+        List<AddressDetailVm> addressDetailVms = userAddresses.stream()
+                .flatMap(userAddress ->
                         addressVms.stream()
-                                .filter(addressVm -> addressVm.id().equals(customerAddress.getAddressId()) )
+                                .filter(addressVm -> addressVm.id().equals(userAddress.getAddressId()) )
                                 .map(addressVmFiltered ->
                                         new AddressDetailVm(
                                                 addressVmFiltered.id(),
@@ -96,7 +95,7 @@ public class CustomerAddressService {
                                                 addressVmFiltered.provinceName(),
                                                 addressVmFiltered.countryId(),
                                                 addressVmFiltered.countryName(),
-                                                customerAddress.isActive()
+                                                userAddress.isActive()
                                         )
                                 )
                 ).toList();

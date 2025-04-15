@@ -8,6 +8,7 @@ import CardAddress from "@/components/address/cardAddress";
 import ConfirmationDialog from "@/components/dialog/confirmDialog";
 import addressService from "@/services/address/addressService";
 import customerService from "@/services/customer/customerService";
+import customerAddressService from "@/services/customer/customerAddressService";
 
 const navigationPaths: NavigationPathModel[] = [
     {
@@ -33,7 +34,7 @@ const MyAddress = (): JSX.Element => {
 
 
     useEffect(() => {
-        customerService.getDetailAddresses()
+        customerAddressService.getDetailAddresses()
             .then(responseDetailAddresses=>{
                 setAddresses(responseDetailAddresses);
                 setCurrentDefaultAddressId(responseDetailAddresses.find((address)=> address.isActive)?.id ?? 0)

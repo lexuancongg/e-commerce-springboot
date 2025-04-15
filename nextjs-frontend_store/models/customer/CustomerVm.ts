@@ -1,5 +1,5 @@
-export type  ProfileInfoVm = {
-    userName: string,
+export type  CustomerVm = {
+    username: string,
     firstName: string,
     lastName : string,
     email: string

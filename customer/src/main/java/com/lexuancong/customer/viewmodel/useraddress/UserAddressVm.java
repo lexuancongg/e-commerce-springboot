@@ -4,7 +4,7 @@ import com.lexuancong.customer.viewmodel.address.AddressVm;
 import lombok.Builder;
 
 @Builder
-public record UserAddressVm (
+public record UserAddressVm(
         Long id,
         String userId,
         // object chua thong tin dia chi

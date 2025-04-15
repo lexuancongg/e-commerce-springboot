@@ -4,6 +4,7 @@ import com.lexuancong.customer.config.KeycloakPropsConfig;
 import com.lexuancong.customer.mapper.CustomerMapper;
 import com.lexuancong.customer.utils.AuthenticationUtils;
 import com.lexuancong.customer.viewmodel.customer.CustomerPostVm;
+import com.lexuancong.customer.viewmodel.customer.CustomerProfilePutVm;
 import com.lexuancong.customer.viewmodel.customer.CustomerVm;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.Response;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 
+// keycloak lưu thông tin người dùng mặc điịnh có các thuộc tính như firstname, lastname, email... , nếu thêm thuộc tính khác thì thêm vào phần attribute
 @Service
 public class CustomerService {
     private final Keycloak keycloak;
@@ -89,6 +91,25 @@ public class CustomerService {
         passwordCredentials.setValue(password);
         passwordCredentials.setTemporary(false);
         return passwordCredentials;
+
+    }
+
+    public void updateCustomerProfile(CustomerProfilePutVm customerProfilePutVm){
+        String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
+        try{
+            RealmResource realmResource = keycloak.realm(keycloakPropsConfig.getRealm());
+            UserResource userResource = realmResource.users().get(customerId);
+            UserRepresentation userRepresentation = userResource.toRepresentation();
+            if(userRepresentation!=null){
+                userRepresentation.setFirstName(customerProfilePutVm.firstName());
+                userRepresentation.setLastName(customerProfilePutVm.lastName());
+                userRepresentation.setEmail(customerProfilePutVm.email());
+                userResource.update(userRepresentation);
+            }
+
+        }catch (ForbiddenException forbiddenException){
+            throw forbiddenException;
+        }
 
     }
 }

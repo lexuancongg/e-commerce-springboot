@@ -20,6 +20,8 @@ type Props = {
   children: React.ReactNode;
 };
 
+
+// chỉ có phâần childrent => component
 const ProfileLayoutComponent: FC<Props> = ({ children, menuActive, title, navigationPaths }) => {
   return (
     <Container>

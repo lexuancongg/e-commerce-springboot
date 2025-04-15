@@ -5,8 +5,8 @@ import jakarta.validation.constraints.NotNull;
 
 public record AddressPostVm(
         @NotBlank String contactName,
-        @NotBlank String phone,
-        @NotBlank String addressLine,
+        @NotBlank String phoneNumber,
+        @NotBlank String specificAddress,
         @NotNull Long districtId,
         @NotNull Long provinceId,
         @NotNull Long countryId
