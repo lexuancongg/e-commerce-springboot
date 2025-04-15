@@ -1,7 +1,8 @@
 package com.lexuancong.oder.controller;
 
+import com.lexuancong.oder.model.enum_status.OrderStatus;
 import com.lexuancong.oder.service.OderService;
-import com.lexuancong.oder.viewmodel.order.OrderGetVm;
+import com.lexuancong.oder.viewmodel.order.OrderDetailVm;
 import com.lexuancong.oder.viewmodel.order.OrderPostVm;
 import com.lexuancong.oder.viewmodel.order.OrderVm;
 import jakarta.validation.Valid;
@@ -27,9 +28,11 @@ public class OrderController {
 
     }
 
-    @GetMapping("/store/orders/my-orders")
-    public ResponseEntity<List<OrderGetVm>> getMyOrders() {
-        return ResponseEntity.ok(this.orderService.getMyOrders());
+    @GetMapping("/customer/orders/my-orders")
+    public ResponseEntity<List<OrderDetailVm>> getMyOrders(
+            @RequestParam(required = false)OrderStatus orderStatus
+            ) {
+        return ResponseEntity.ok(this.orderService.getMyOrders(orderStatus));
 
     }
 

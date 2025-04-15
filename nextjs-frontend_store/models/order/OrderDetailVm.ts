@@ -4,7 +4,7 @@ import {DeliveryStatus} from "@/models/order/DeliveryStatus";
 import {DeliveryMethod} from "@/models/order/DeliveryMethod";
 import {OrderItemVm} from "@/models/order/OrderItemVm";
 
-export interface OrderVm{
+export interface OrderDetailVm {
     id:number;
     orderStatus:OrderStatus;
     totalPrice: number;

@@ -6,12 +6,13 @@ import com.lexuancong.oder.model.enum_status.OrderStatus;
 import com.lexuancong.oder.repository.OderRepository;
 import com.lexuancong.oder.repository.OrderItemRepository;
 import com.lexuancong.oder.service.internal.CartService;
+import com.lexuancong.oder.specification.OrderSpecification;
 import com.lexuancong.oder.utils.Constants;
-import com.lexuancong.oder.viewmodel.order.OrderGetVm;
+import com.lexuancong.oder.viewmodel.order.OrderDetailVm;
 import com.lexuancong.oder.viewmodel.order.OrderPostVm;
 import com.lexuancong.oder.viewmodel.order.OrderVm;
-import lombok.extern.java.Log;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -63,15 +64,16 @@ public class OderService {
         this.oderRepository.save(order);
     }
 
-    public List<OrderGetVm> getMyOrders(){
+    public List<OrderDetailVm> getMyOrders(OrderStatus orderStatus){
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        Specification<Order> specification = OrderSpecification.findMyOrders(userId,orderStatus);
         Sort sort = Sort.by(Sort.Direction.DESC, Constants.Column.CREATE_AT_COLUMN);
-        List<Order> orders = this.oderRepository.findAllByCustomerId(userId,sort);
+        List<Order> orders = this.oderRepository.findAll(specification,sort);
         return orders.stream()
                 .map(order -> {
                     Long orderId = order.getId();
                     List<OrderItem> orderItems = this.orderItemRepository.findAllByOderId(orderId);
-                    return OrderGetVm.fromModel(order,orderItems);
+                    return OrderDetailVm.fromModel(order,orderItems);
                 })
                 .toList();
 

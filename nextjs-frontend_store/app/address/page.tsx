@@ -1,14 +1,12 @@
 'use client'
-import { NavigationPathModel } from "@/models/Navigation/NavigationPathModel";
+import {NavigationPathModel} from "@/models/Navigation/NavigationPathModel";
 import React, {JSX, useEffect, useState} from "react";
-import { AddressDetailVm } from "@/models/address/AddressDetailVm";
+import {AddressDetailVm} from "@/models/address/AddressDetailVm";
 import ProfileLayoutComponent from "@/components/common/profileLayout";
-import { BiPlusMedical } from "react-icons/bi";
+import {BiPlusMedical} from "react-icons/bi";
 import CardAddress from "@/components/address/cardAddress";
 import ConfirmationDialog from "@/components/dialog/confirmDialog";
-import addressService from "@/services/address/addressService";
-import customerService from "@/services/customer/customerService";
-import customerAddressService from "@/services/customer/customerAddressService";
+import userAddressService from "@/services/customer/userAddressService";
 
 const navigationPaths: NavigationPathModel[] = [
     {
@@ -34,10 +32,10 @@ const MyAddress = (): JSX.Element => {
 
 
     useEffect(() => {
-        customerAddressService.getDetailAddresses()
-            .then(responseDetailAddresses=>{
+        userAddressService.getDetailAddresses()
+            .then( responseDetailAddresses => {
                 setAddresses(responseDetailAddresses);
-                setCurrentDefaultAddressId(responseDetailAddresses.find((address)=> address.isActive)?.id ?? 0)
+                setCurrentDefaultAddressId(responseDetailAddresses.find((address) => address.isActive)?.id ?? 0)
             })
 
     }, []);
@@ -46,8 +44,8 @@ const MyAddress = (): JSX.Element => {
     const handleAgreeDeleteAddressFromModel = () => {
         // gọi api
         if (addressWantDeleteId == 0) return;
-        addressService.deleteUserAddress(addressWantDeleteId)
-            .then(() => { 
+        userAddressService.deleteUserAddress(addressWantDeleteId)
+            .then(() => {
                 setIsShowModelDelete(false);
             })
 
@@ -63,7 +61,7 @@ const MyAddress = (): JSX.Element => {
 
     // đồng ý địa chỉ mặc đingj
     const handleAgreeAddressDefaultFromModel = () => {
-        
+
 
     }
     // hủy thay đổi địa chỉ mặc định
@@ -87,10 +85,10 @@ const MyAddress = (): JSX.Element => {
 
     return (
         <>
-            <ProfileLayoutComponent menuActive="address" navigationPaths={navigationPaths}  >
+            <ProfileLayoutComponent menuActive="address" navigationPaths={navigationPaths}>
                 <div className="border border-dashed border-gray-300 p-3 flex justify-center items-center">
                     <button className="flex items-center text-black">
-                        <BiPlusMedical className="text-lg" />
+                        <BiPlusMedical className="text-lg"/>
                         <span className="ml-1">Create address</span>
                     </button>
                 </div>

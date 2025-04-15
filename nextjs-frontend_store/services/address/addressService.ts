@@ -5,13 +5,7 @@ import {address_demo_data} from "@/demo_data/address/address_demo_data";
 class AddressService {
     private baseUrl: string = '/address/'
 
-    public async deleteUserAddress(addressId: number) {
-        const response = await apiClient.delete(`${this.baseUrl}/${addressId}`);
-        if(response.ok) return await response.json();
-        throw response;
-        
 
-    }
 
     public async getCountries(){
         const response = await apiClient.get('/url');

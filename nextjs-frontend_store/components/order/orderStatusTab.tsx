@@ -1,7 +1,7 @@
 'use client'
 import { OrderStatus } from "@/models/order/OrderStatus";
 import { useEffect, useState } from "react";
-import { OrderVm } from "@/models/order/OrderVm";
+import { OrderDetailVm } from "@/models/order/OrderDetailVm";
 import orderService from "@/services/order/orderService";
 import { ProductPreviewVm } from "@/models/product/ProductPreviewVm";
 import productService from "@/services/product/productService";
@@ -14,7 +14,7 @@ type Props = {
 }
 
 
-const orderss: OrderVm[] = [
+const orderss: OrderDetailVm[] = [
     {
         id: 1,
         orderStatus: OrderStatus.PENDING,
@@ -65,7 +65,7 @@ const orderss: OrderVm[] = [
   ];
   
 export default function OrderStatusTab({ orderStatus }: Props) {
-    const [orders, setOrders] = useState<OrderVm[]>(orderss)
+    const [orders, setOrders] = useState<OrderDetailVm[]>([])
 
 
     useEffect(() => {

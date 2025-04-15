@@ -5,7 +5,7 @@ import { AddressDetailVm } from "@/models/address/AddressDetailVm";
 import { NavigationPathModel } from "@/models/Navigation/NavigationPathModel";
 import { useForm } from "react-hook-form";
 import {AddressPostVm} from "@/models/address/AddressPostVm";
-import customerAddressService from "@/services/customer/customerAddressService";
+import customerAddressService from "@/services/customer/userAddressService";
 import {router} from "next/client";
 
 const navigationPaths : NavigationPathModel[] = [
