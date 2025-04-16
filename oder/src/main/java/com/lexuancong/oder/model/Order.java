@@ -1,5 +1,6 @@
 package com.lexuancong.oder.model;
 
+import com.lexuancong.oder.model.enum_status.DeliveryMethod;
 import com.lexuancong.oder.model.enum_status.DeliveryStatus;
 import com.lexuancong.oder.model.enum_status.OrderStatus;
 import jakarta.persistence.*;
@@ -18,7 +19,6 @@ public class Order extends AuditEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    // email  khách hàng
     private String email;
     // ghi chú đơn hàng
     private String note;
@@ -39,6 +39,17 @@ public class Order extends AuditEntity{
     @Column(name = "delivery_status")
     @Enumerated(EnumType.STRING)
     private DeliveryStatus deliveryStatus;
+
+
+    @Column(name = "delivery_method")
+    @Enumerated(EnumType.STRING)
+    private DeliveryMethod deliveryMethod;
+
+
+    // tham chiếu tới bảng payment cho thank toán banking sau này
+    private Long paymentId;
+
+    private Long checkoutId;
 
 
 

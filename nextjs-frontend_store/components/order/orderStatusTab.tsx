@@ -65,7 +65,7 @@ const orderss: OrderDetailVm[] = [
   ];
   
 export default function OrderStatusTab({ orderStatus }: Props) {
-    const [orders, setOrders] = useState<OrderDetailVm[]>([])
+    const [orders, setOrders] = useState<OrderDetailVm[]>(orderss)
 
 
     useEffect(() => {

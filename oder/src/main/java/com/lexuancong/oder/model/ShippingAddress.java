@@ -5,7 +5,7 @@ import lombok.*;
 
 // địa chỉ đơn hàng giao tới
 @Entity
-@Table(name = "order_address")
+@Table(name = "shipping_address")
 @Getter
 @Setter
 @NoArgsConstructor
