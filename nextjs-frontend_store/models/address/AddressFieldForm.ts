@@ -1,5 +1,4 @@
-export type AddressDetailVm = {
-    id?: number,
+export type AddressFieldForm ={
     contactName : string,
     phoneNumber: string,
     specificAddress: string,
@@ -10,7 +9,5 @@ export type AddressDetailVm = {
     districtName ?: string,
     provinceName?: string,
     countryName?: string,
-
-    isActive?: boolean;
 
 }

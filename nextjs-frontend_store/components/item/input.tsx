@@ -12,7 +12,7 @@ type Props<T extends FieldValues> = {
   registerOptions: RegisterOptions<T>,
   defaultValue?: string | number,
   disabled?: boolean,
-  placehoder?: string,
+    placeholder?: string,
   error?: string
 
 }
@@ -24,8 +24,8 @@ const Input = <T extends FieldValues>(
     registerOptions,
     defaultValue,
     disabled = false,
-    placehoder,
-    type,
+    placeholder,
+    type='text',
     error
   }: Props<T>
 ) => {
@@ -41,7 +41,7 @@ const Input = <T extends FieldValues>(
         {...register(fieldName, registerOptions)}
         defaultValue={defaultValue}
         disabled={disabled}
-        placeholder={placehoder}
+        placeholder={placeholder}
       />
       <p className="error-field mt-1 text-danger">{error}</p>
     </div>

@@ -5,6 +5,7 @@ import com.lexuancong.oder.model.enum_status.CheckoutStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,12 @@ public class Checkout extends AuditEntity {
     private Long id;
     // sau này gởi toong báo về email
     private String email;
+
+    private String note;
+
+    @Builder.Default
+    private BigDecimal totalAmount = BigDecimal.ZERO;
+
 
     private String customerId;
     @Column(name = "status")

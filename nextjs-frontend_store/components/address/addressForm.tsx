@@ -12,6 +12,7 @@ import { useParams, useRouter } from "next/navigation"; // ✅ Dùng đúng cho 
 
 
 type Props = {
+    isDisplay:boolean ,
   // để đăng ký
   register: UseFormRegister<AddressDetailVm>,
   // submit
@@ -30,7 +31,8 @@ const AddressForm: FC<Props> = (
     register,
     address,
     buttonText,
-    setValue
+    setValue,
+      isDisplay = true
   }
 ) => {
 
@@ -91,7 +93,7 @@ const AddressForm: FC<Props> = (
 
 
   return (
-    <div>
+    <div className={isDisplay ? '' : 'd-none'}>
       <div className="row">
         <div className="col-lg-6">
           <Input

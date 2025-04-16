@@ -45,7 +45,7 @@ const CardAddress: FC<Props> = (
               <FiEdit className="cursor-pointer text-blue-300" title="Edit" />
             </Link>
             <FaTrash className="cursor-pointer text-red-300" title="Delete"
-              onClick={() => handleChooseDeleteAddress(address.id)}
+              onClick={() => handleChooseDeleteAddress(address.id || 0)}
             />
           </div>
         </div>
