@@ -1,11 +1,11 @@
-import { OrderDetailVm } from "@/models/order/OrderDetailVm"
+import { OrderVm } from "@/models/order/OrderVm"
 import { formatPrice } from "@/utils/formatPrice";
 import dayjs, { Dayjs, isDayjs } from "dayjs";
 import Link from "next/link";
 import LoadImageSafe from "../common/loadImageSafe";
 
 type Props = {
-    order : OrderDetailVm
+    order : OrderVm
 }
 
 export default function OrderCard({order}: Props){

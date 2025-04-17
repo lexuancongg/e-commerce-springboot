@@ -1,16 +1,18 @@
-import {OrderStatus} from "@/models/order/OrderStatus";
-import dayjs, {Dayjs} from "dayjs";
-import {DeliveryStatus} from "@/models/order/DeliveryStatus";
 import {DeliveryMethod} from "@/models/order/DeliveryMethod";
+import {DeliveryStatus} from "@/models/order/DeliveryStatus";
 import {OrderItemVm} from "@/models/order/OrderItemVm";
+import {AddressDetailVm} from "@/models/address/AddressDetailVm";
 
-export interface OrderDetailVm {
-    id:number;
-    orderStatus:OrderStatus;
-    totalPrice: number;
-    deliveryStatus: DeliveryStatus;
+export type OrderDetailVm = {
+    id:number,
+    email:string,
+    note:string,
+    numberItem : number,
+    totalPrice:number,
     deliveryMethod: DeliveryMethod;
-    orderItemVms: OrderItemVm[];
-    createdAt: Dayjs;
-
+    deliveryStatus: DeliveryStatus;
+    paymentMethod: string;
+    paymentStatus: string;
+    orderItemVms:OrderItemVm[],
+    shippingAddress:AddressDetailVm
 }

@@ -1,19 +1,21 @@
 'use client'
-import  yup from 'yup';
-import {useParams, useSearchParams} from "next/navigation";
-import {useState} from "react";
+import  * as yup from 'yup';
+import {useParams} from "next/navigation";
+import {useEffect, useState} from "react";
 import {CheckoutVm} from "@/models/order/checkout/CheckoutVm";
 import {useForm} from "react-hook-form";
 import {yupResolver} from "@hookform/resolvers/yup";
-import {AddressFieldForm} from "@/models/address/AddressFieldForm";
 import {AddressDetailVm} from "@/models/address/AddressDetailVm";
-import {responsivePropType} from "react-bootstrap/createUtilityClasses";
 import {Container} from "react-bootstrap";
 import Loading from "@/app/loading";
 import AddressForm from "@/components/address/addressForm";
 import Input from "@/components/item/input";
-import CheckOutAddress from "@/components/order/CheckOutAddress";
+import CheckOutAddress from "@/components/order/checkout/CheckOutAddress";
 import ModalAddressList from "@/components/order/ModalAddressList";
+import {OrderDetailVm} from "@/models/order/OrderDetailVm";
+import userAddressService from "@/services/customer/userAddressService";
+import orderService from "@/services/order/orderService";
+import {CheckoutItemVm} from "@/models/order/checkout/CheckoutItemVm";
 const phoneRegExp =
     /^((\+[1-9]{1,4}[ -]*)|(\([0-9]{2,3}\)[ -]*)|[0-9]{2,4}[ -]*)?[0-9]{3,4}?[ -]*[0-9]{3,4}?$/;
 const addressShippingSchema = yup.object({
@@ -30,20 +32,60 @@ const Checkout = ()=>{
     const id = params.id;
 
     const [checkout,setCheckout] = useState<CheckoutVm>()
+    const [order,setOrder] = useState<OrderDetailVm>()
+    const [disableProcessPayment, setDisableProcessPayment] = useState(false);
+    const [isShowSpinner , setIsShowSpinner] = useState<boolean>(false);
+    const [shippingAddress, setShippingAddress] = useState<AddressDetailVm>();
+    const [isAddShippingAddress,setIsAddShippingAddress] = useState<boolean>(false);
+    const  [isShowModalShippingAddress,setIsShowModalShippingAddress] = useState<boolean>(false);
+    const [currentAddressId,setCurrentAddressId] = useState<number>()
+
+
     const {
         register:registerShippingAddress,
         handleSubmit :handleSubmitShippingAddress,
         formState:{errors:errorsShippingAddress},
         setValue:setValueShippingAddress
     } = useForm<AddressDetailVm>({resolver:yupResolver(addressShippingSchema)})
+    const {
+        handleSubmit :handleSubmitOrder,
+        register:registerOrder,
+        formState: { errors:errorsOrder },
+        watch:watchOrder,
+    } = useForm<OrderDetailVm>();
 
-    const [shippingAddress, setShippingAddress] = useState<AddressDetailVm>();
-    const [isAddShippingAddress,setIsAddShippingAddress] = useState<boolean>(false);
-    const  [isShowModelShippingAddress,setIsShowModelShippingAddress] = useState<boolean>(false);
-    const [disableProcessPayment, setDisableProcessPayment] = useState(false);
-    const [isShowSpinner , setIsShowSpinner] = useState<boolean>(false);
 
 
+    const handleCloseModalShippingAddress = ()=>{
+        setIsShowModalShippingAddress(false)
+    }
+    const handleSelectedShippingAddress = (address:AddressDetailVm)=>{
+        setIsAddShippingAddress(false)
+        setShippingAddress(address);
+        setCurrentAddressId(address.id)
+    }
+
+
+    const onSubmitShippingAddress =(data:any,event:any)=>{
+    }
+
+
+    useEffect(() => {
+        userAddressService.getDetailAddresses()
+            .then((responseAddressDefault)=>{
+                setShippingAddress(responseAddressDefault);
+            }).catch((error)=>{
+                setIsAddShippingAddress(true)
+        })
+    }, []);
+    useEffect(() => {
+        if(id){
+            orderService.getCheckoutById(parseInt(id as string))
+                .then((responseCheckoutVm)=>{
+                    setCheckout(responseCheckoutVm)
+                })
+        }
+    }, [id]);
 
 
     return (
@@ -52,7 +94,7 @@ const Checkout = ()=>{
                 {isShowSpinner ? <Loading></Loading> :''}
                 <div className="container">
                     <div className="checkout__form">
-                        <form onSubmit={(event) => }>
+                        <form onSubmit={(event) => {}}>
                             <div className="row">
                                 <div className="col-lg-8 col-md-6">
                                     <h4>Shipping Address</h4>
@@ -63,7 +105,7 @@ const Checkout = ()=>{
                                                 className="btn btn-outline-primary fw-bold btn-sm me-2"
                                                 onClick={() => {
                                                     setIsAddShippingAddress(false);
-                                                    setIsShowModelShippingAddress(true);
+                                                    setIsShowModalShippingAddress(true);
                                                 }}
                                             >
                                                 Change address <i className="bi bi-plus-circle-fill"></i>
@@ -81,7 +123,7 @@ const Checkout = ()=>{
                                         <div className="checkout-address-card">
                                             <CheckOutAddress address={shippingAddress} isDisplay={!isAddShippingAddress}/>
                                             <AddressForm
-                                                handleSubmit={}
+                                                handleSubmit={handleSubmitShippingAddress(onSubmitShippingAddress)}
                                                 isDisplay={isAddShippingAddress}
                                                 register={registerShippingAddress}
                                                 setValue={setValueShippingAddress}
@@ -100,9 +142,9 @@ const Checkout = ()=>{
                                                 type="text"
                                                 labelText="Order Notes"
                                                 fieldName="note"
-                                                register={}
+                                                register={registerOrder}
                                                 placeholder="Notes about your order, e.g. special notes for delivery."
-                                                error={errors.note?.message}
+                                                error={errorsOrder.note?.message}
                                             />
                                         </div>
                                         <div className="checkout__input">
@@ -110,9 +152,9 @@ const Checkout = ()=>{
                                                 type="text"
                                                 labelText="Email"
                                                 fieldName="email"
-                                                register={+}
+                                                register={registerOrder}
                                                 defaultValue={checkout?.email}
-                                                error={errors.note?.message}
+                                                error={errorsOrder.email?.message}
                                                 disabled={true}
                                             />
                                         </div>
@@ -124,11 +166,11 @@ const Checkout = ()=>{
                             </div>
                         </form>
                         <ModalAddressList
-                            isShow={isShowModelShippingAddress}
-                            handleCloseModel={()=>{}}
-                            handleSelectAddress={()=>{}}
-                            // defaultUserAddress={shippingAddress}
-                            // selectedAddressId={shippingAddress?.id}
+                            isShow={isShowModalShippingAddress}
+                            handleCloseModel={handleCloseModalShippingAddress}
+                            handleSelectAddress={handleSelectedShippingAddress}
+                            currentAddressId = {currentAddressId}
+
                         />
 
                     </div>

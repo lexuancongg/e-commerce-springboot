@@ -9,7 +9,7 @@ type Props<T extends FieldValues> = {
   fieldName: Path<T>,
   register: UseFormRegister<T>,
   type?: HTMLInputTypeAttribute,
-  registerOptions: RegisterOptions<T>,
+  registerOptions?: RegisterOptions<T>,
   defaultValue?: string | number,
   disabled?: boolean,
     placeholder?: string,

@@ -2,9 +2,10 @@ import {AddressDetailVm} from "@/models/address/AddressDetailVm";
 
 type Props = {
     address: AddressDetailVm;
+    isSelected:boolean
 };
 
-const AddressCard = ({ address, isSelected }: { address: AddressDetailVm; isSelected: boolean }) => {
+const AddressCard = ({ address, isSelected }:Props) => {
     return (
         <div
             className={`address-card position-relative mb-4 ps-3 d-flex flex-column border-bottom border-secondary p-2 text-dark ${

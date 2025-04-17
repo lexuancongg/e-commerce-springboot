@@ -1,27 +1,45 @@
-import {FC, useState} from "react";
+import {FC, useEffect, useState} from "react";
 import {AddressDetailVm} from "@/models/address/AddressDetailVm";
 import Modal from "react-bootstrap/Modal";
-import CardAddress from "@/components/address/cardAddress";
 import AddressCard from "@/components/order/AddressCard";
+import userAddressService from "@/services/customer/userAddressService";
 
 type Props = {
     isShow: boolean,
     handleCloseModel: () => void,
-    handleSelectAddress: () => void,
+    handleSelectAddress: (address: AddressDetailVm) => void,
+    currentAddressId?: number
 }
-const ModalAddressList: FC<Props> = ({
-                                         handleCloseModel,
-                                         isShow,
-                                         handleSelectAddress
-                                     }) => {
-    const [addresses,setAddresses] = useState<AddressDetailVm[]>([])
+const ModalAddressList: FC<Props> = (
+    {
+        handleCloseModel,
+        isShow,
+        handleSelectAddress,
+        currentAddressId
+    }
+) => {
+    const [addresses, setAddresses] = useState<AddressDetailVm[]>([])
+    useEffect(() => {
+        if (!isShow) return;
+        userAddressService.getDetailAddresses()
+            .then((responseAddressDetailVm) => {
+                setAddresses(responseAddressDetailVm)
+            })
+
+    }, [isShow]);
+
+
+    const handleClickAddress = (address: AddressDetailVm) => {
+        handleSelectAddress(address);
+        handleCloseModel();
+    }
 
     return (
         <Modal show={isShow} onHide={() => handleCloseModel()} size="lg" centered>
             <Modal.Header closeButton>
                 <Modal.Title className="text-dark fw-bold">Select address</Modal.Title>
             </Modal.Header>
-            <Modal.Body style={{ minHeight: '500px' }}>
+            <Modal.Body style={{minHeight: '500px'}}>
                 <div className="body">
                     <div className="row">
                         {addresses.length == 0 ? (
@@ -31,10 +49,11 @@ const ModalAddressList: FC<Props> = ({
                                 <div
                                     className="col-lg-6 mb-2"
                                     onClick={() => {
+                                        handleClickAddress(address)
                                     }}
                                     key={address.id}
                                 >
-                                    <AddressCard address={address} isSelected={false} />
+                                    <AddressCard address={address} isSelected={address.id==currentAddressId}/>
                                 </div>
                             ))
                         )}

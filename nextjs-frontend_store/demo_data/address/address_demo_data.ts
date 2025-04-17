@@ -15,8 +15,8 @@ export const address_demo_data : AddressDetailVm[] = [
         isActive: true
     },
     {
-        id: 1,
-        contactName: "Nguyễn Văn A",
+        id: 2,
+        contactName: "Le xuan cong",
         phoneNumber: "0987654321",
         specificAddress: "123 Đường ABC",
         districtId: 10,

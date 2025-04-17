@@ -6,5 +6,4 @@ export type CheckoutVm = {
     note:string,
     totalAmount:number,
     checkoutItemVms : CheckoutItemVm[]
-
 }
