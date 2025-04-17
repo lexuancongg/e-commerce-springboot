@@ -16,6 +16,10 @@ import {OrderDetailVm} from "@/models/order/OrderDetailVm";
 import userAddressService from "@/services/customer/userAddressService";
 import orderService from "@/services/order/orderService";
 import {CheckoutItemVm} from "@/models/order/checkout/CheckoutItemVm";
+import {log} from "node:util";
+import {date} from "yup";
+import {AddressPostVm} from "@/models/address/AddressPostVm";
+import addressService from "@/services/address/addressService";
 const phoneRegExp =
     /^((\+[1-9]{1,4}[ -]*)|(\([0-9]{2,3}\)[ -]*)|[0-9]{2,4}[ -]*)?[0-9]{3,4}?[ -]*[0-9]{3,4}?$/;
 const addressShippingSchema = yup.object({
@@ -66,7 +70,33 @@ const Checkout = ()=>{
     }
 
 
-    const onSubmitShippingAddress =(data:any,event:any)=>{
+    const onSubmitShippingAddress = async (data:AddressDetailVm,event:any)=>{
+        const newAddress = await performCreateUserAddress(data);
+        setShippingAddress(newAddress);
+        setIsAddShippingAddress(false)
+
+    }
+    const performCreateUserAddress =async (address:AddressDetailVm):Promise<AddressDetailVm>=>{
+        await addressShippingSchema.validate(address).catch(error=> console.log(error))
+        let addressCreated ;
+        try {
+            const {addressVm : newAddress} = await userAddressService.createCustomerAddress(address as AddressPostVm)
+            addressCreated = newAddress;
+        }catch (error){
+
+            console.log(error)
+        }
+        let addressDetailCreated : AddressDetailVm = addressCreated as AddressDetailVm;
+        try {
+            if (addressDetailCreated.id != null) {
+                addressDetailCreated = await addressService.getAddressById(addressDetailCreated.id);
+            }
+
+        }catch (error){
+            console.log(error)
+        }
+        return addressDetailCreated;
+
     }
 
 
