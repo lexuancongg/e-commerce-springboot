@@ -1,11 +1,11 @@
-package com.lexuancong.common_module;
+package com.lexuancong.share;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CommonModuleApplication {
+public class ShareApplication {
     public static void main(String[] args) {
-        SpringApplication.run(CommonModuleApplication.class, args);
+        SpringApplication.run(ShareApplication.class, args);
     }
 }

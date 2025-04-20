@@ -1,10 +1,10 @@
-package com.lexuancong.common_module;
+package com.lexuancong.share;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CommonModuleApplicationTests {
+class ShareApplicationTests {
 
     @Test
     void contextLoads() {
