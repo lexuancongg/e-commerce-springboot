@@ -15,11 +15,10 @@ import ModalAddressList from "@/components/order/ModalAddressList";
 import {OrderDetailVm} from "@/models/order/OrderDetailVm";
 import userAddressService from "@/services/customer/userAddressService";
 import orderService from "@/services/order/orderService";
-import {CheckoutItemVm} from "@/models/order/checkout/CheckoutItemVm";
-import {log} from "node:util";
-import {date} from "yup";
-import {AddressPostVm} from "@/models/address/AddressPostVm";
 import addressService from "@/services/address/addressService";
+import {CheckoutItemVm} from "@/models/order/checkout/CheckoutItemVm";
+import {AddressPostVm} from "@/models/address/AddressPostVm";
+import CheckOutDetail from "@/components/order/checkout/CheckOutDetail";
 const phoneRegExp =
     /^((\+[1-9]{1,4}[ -]*)|(\([0-9]{2,3}\)[ -]*)|[0-9]{2,4}[ -]*)?[0-9]{3,4}?[ -]*[0-9]{3,4}?$/;
 const addressShippingSchema = yup.object({
@@ -36,13 +35,14 @@ const Checkout = ()=>{
     const id = params.id;
 
     const [checkout,setCheckout] = useState<CheckoutVm>()
-    const [order,setOrder] = useState<OrderDetailVm>()
+    const [checkoutItems,setCheckoutItems] = useState<CheckoutItemVm[]>([])
     const [disableProcessPayment, setDisableProcessPayment] = useState(false);
     const [isShowSpinner , setIsShowSpinner] = useState<boolean>(false);
     const [shippingAddress, setShippingAddress] = useState<AddressDetailVm>();
     const [isAddShippingAddress,setIsAddShippingAddress] = useState<boolean>(false);
     const  [isShowModalShippingAddress,setIsShowModalShippingAddress] = useState<boolean>(false);
     const [currentAddressId,setCurrentAddressId] = useState<number>()
+    const [isPaymentEnabled ,setIsPaymentEnabled] = useState<boolean>(false);
 
 
     const {
@@ -191,6 +191,9 @@ const Checkout = ()=>{
                                     </div>
                                 </div>
                                 <div className="col-lg-4 col-md-6">
+                                    <CheckOutDetail checkoutItems={checkoutItems} isPaymentEnabled={isPaymentEnabled}>
+
+                                    </CheckOutDetail>
 
                                 </div>
                             </div>
