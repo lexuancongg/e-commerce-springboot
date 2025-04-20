@@ -36,7 +36,8 @@ public class ImageController {
 
     @GetMapping("/customer/images/{id}")
     public ResponseEntity<ImageDetailVm> get(@PathVariable Long id){
-
+        // chúng ta chỉ mới bt  id => cần file name để lấy trong filesystem
+        return ResponseEntity.ok(this.imageService.getImageById(id));
     }
 
 

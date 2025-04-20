@@ -3,11 +3,13 @@ package com.lexuancong.media.service;
 import com.lexuancong.media.config.FilesystemConfig;
 import com.lexuancong.media.model.Image;
 import com.lexuancong.media.repository.ImageRepository;
+import com.lexuancong.media.viewmodel.ImageDetailVm;
 import com.lexuancong.media.viewmodel.ImagePostVm;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -84,6 +86,30 @@ public class imageService {
         }
 
 
+    }
+
+
+    public ImageDetailVm getImageById(Long id){
+        // dựa vào file path ddeer lays trong file sytemt
+        Image image = imageRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Image not found"));
+        Path path = Paths.get(image.getFilePath());
+        this.checkIsExitedPath(path);
+        InputStream fileContent = null;
+        try {
+            fileContent = Files.newInputStream(path);
+            return new ImageDetailVm(image.getId() ,image.getDescription() ,
+                    image.getFileName(),image.getImageType(),fileContent);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private void checkIsExitedPath(Path path) {
+        if(!Files.exists(path)) {
+            throw new RuntimeException("Image not found");
+        }
     }
 
 
