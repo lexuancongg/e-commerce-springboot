@@ -1,5 +1,5 @@
 import {ProductPreviewVm} from "@/models/product/ProductPreviewVm";
-import {ProductFeaturePagingVm} from "@/models/product/productFeaturePagingVm";
+import {ProductPreviewPagingVm} from "@/models/product/productPreviewPagingVm";
 
 export const productsFeaturedMakeSlide_demo : ProductPreviewVm[] = [
     {
@@ -40,7 +40,7 @@ export const productsFeaturedMakeSlide_demo : ProductPreviewVm[] = [
 ]
 
 
-export  const productFeaturePagingVm_demo : ProductFeaturePagingVm = {
+export  const productFeaturePagingVm_demo : ProductPreviewPagingVm = {
     productPreviewsPayload: [
         { id: 1, name: "Product 1", slug: "product-1", price: 100000, avatarUrl: "https://th.bing.com/th/id/OIP.j42T-H3P0LqlfQ1TVU8zggHaF7?rs=1&pid=ImgDetMain" },
         { id: 2, name: "Product 2", slug: "product-2", price: 150, avatarUrl: "https://th.bing.com/th/id/OIP.j42T-H3P0LqlfQ1TVU8zggHaF7?rs=1&pid=ImgDetMain" },

@@ -1,7 +1,7 @@
 import {ProductPreviewVm} from "@/models/product/ProductPreviewVm";
 import apiClient from "@/utils/api/apiClient";
 import {productFeaturePagingVm_demo, productsFeaturedMakeSlide_demo} from "@/demo_data/product/product_demo_data";
-import {ProductFeaturePagingVm} from "@/models/product/productFeaturePagingVm";
+import {ProductPreviewPagingVm} from "@/models/product/productPreviewPagingVm";
 import {ProductVariantVm} from "@/models/product/variants/ProductVariantVm";
 import {product_variant_demo_data} from "@/demo_data/product/variant/product_variant_demo_data";
 import {ProductDetailVm} from "@/models/product/productDetailVm";
@@ -40,7 +40,7 @@ class ProductService {
     }
 
 
-    public async  getFeaturedProductsPaging(pageIndex: number):Promise<ProductFeaturePagingVm>{
+    public async  getFeaturedProductsPaging(pageIndex: number):Promise<ProductPreviewPagingVm>{
         const response = await apiClient.get(`${this.baseUrl}/customer/products/featured?pageIndex=${pageIndex}`);
         if(response.ok) return await  response.json();
         return  productFeaturePagingVm_demo
@@ -49,7 +49,7 @@ class ProductService {
     }
 
 
-    public async getProductByMultiParams(predicates:string):Promise<ProductFeaturePagingVm>{
+    public async getProductByMultiParams(predicates:string):Promise<ProductPreviewPagingVm>{
         const response  = await apiClient.get(`${this.baseUrl}/customer/products?${predicates}`);
         if(response.ok) return await response.json();
         return productFeaturePagingVm_demo;
