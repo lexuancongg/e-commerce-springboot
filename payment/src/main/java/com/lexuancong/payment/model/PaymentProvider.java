@@ -20,6 +20,6 @@ public class PaymentProvider {
     private boolean isEnabled;
     private String name;
     private String configureUrl;
-    private String additionalSettings;
+    private String properties;
 
 }
