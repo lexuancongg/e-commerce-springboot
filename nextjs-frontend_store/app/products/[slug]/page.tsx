@@ -7,6 +7,8 @@ import {RatingVm} from "@/models/rating/RatingVm";
 import {Container} from "react-bootstrap";
 import NavigationComponent from "@/components/common/navigationComponent";
 import ProductDetail from "@/components/product/productDetail";
+import ProductAttribute from "@/components/product/ProductAttribute";
+import ProductSpecificationAndReviews from "@/components/product/ProductSpecificationAndReviews";
 
 
 const ProductDetailPage :NextPage =   ()=>{
@@ -33,6 +35,8 @@ const ProductDetailPage :NextPage =   ()=>{
 
     const [ratings , setRatings] = useState<RatingVm[]>([]);
     const [averageStar, setAverageStar] = useState<number>(4.6);
+    const [totalRating, setTotalRating] = useState<number>(0);
+
 
 
     return (
@@ -40,10 +44,22 @@ const ProductDetailPage :NextPage =   ()=>{
             <NavigationComponent props={navigationPaths}></NavigationComponent>
 
             <ProductDetail
-                productDetail={productDetail} productOptionValues={productOptionValues}
-                productVariations={productVariations} averageStar={averageStar} totalRating={ratings.length}>
-
+                productDetail={productDetail}
+                productOptionValues={productOptionValues}
+                productVariations={productVariations}
+                averageStar={averageStar}
+                totalRating={ratings.length}>
             </ProductDetail>
+            <ProductAttribute productDetail={productDetail}>
+
+            </ProductAttribute>
+            <ProductSpecificationAndReviews
+                productDetail={productDetail}
+                totalRating={totalRating}>
+
+            </ProductSpecificationAndReviews>
+
+
         </Container>
     )
 }

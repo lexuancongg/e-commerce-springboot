@@ -36,7 +36,7 @@ const ProductDetail: FC<Props> = ({
                     {/*    thông tin hinh ảnh*/}
                     <ProductImageGallery productImageUrls={['','','','','','']}></ProductImageGallery>
                 </div>
-                <div className={"col-6"}>le xuan cong</div>
+                <div className={"col-6"}>thông tin sản phẩm ở đây</div>
 
                 </div>
 
