@@ -1,5 +1,5 @@
 import {FC} from "react";
-import Star from "@/components/star/star";
+import Star from "@/components/rating/star/star";
 type Props = {
     productName: string,
     averageStar: number,
