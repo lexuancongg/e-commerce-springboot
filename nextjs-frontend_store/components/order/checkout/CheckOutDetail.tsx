@@ -1,14 +1,48 @@
-import {FC, useState} from "react";
-import {OrderItemVm} from "@/models/order/OrderItemVm";
-import userAddressService from "@/services/customer/userAddressService";
+import {FC, useEffect, useState} from "react";
 import {CheckoutItemVm} from "@/models/order/checkout/CheckoutItemVm";
 import {formatPrice} from "@/utils/formatPrice";
+import {PaymentProvider} from "@/models/payment/PaymentProvider";
+import paymentProviderService from "@/services/payment/PaymentProviderService";
+
 type Props = {
-    checkoutItems :CheckoutItemVm[],
-    isPaymentEnabled : boolean
+    checkoutItems: CheckoutItemVm[],
+    isPaymentEnabled: boolean
 }
-const CheckOutDetail :FC<Props> = ({checkoutItems,isPaymentEnabled})=>{
+const CheckOutDetail: FC<Props> = ({checkoutItems, isPaymentEnabled}) => {
     const [totalPrice, setTotalPrice] = useState(0);
+    // danh sách các payment hệ thống tích hợp
+    const [paymentProviders, setPaymentProviders] = useState<PaymentProvider[]>([]);
+    // xem checkout có được thông qua chưa ví dụ nếu chưa có địa chỉ nhận hàng thi chặn lại k cho thanh toán
+    const [isCheckoutEnabled, setIsCheckoutEnabled] = useState(false);
+    const [selectedPaymentType, setSelectedPaymentType] = useState<string>();
+    const [selectedPaymentProviderId, setSelectedPaymentProviderId] = useState<number>();
+    useEffect(() => {
+        // get payment provider ra cho người dùng chọn
+        paymentProviderService.getPaymentProviderEnable()
+            .then((responsePaymentProviders) => {
+                setPaymentProviders(responsePaymentProviders)
+            })
+    }, []);
+
+    useEffect(() => {
+        if (paymentProviders.length && selectedPaymentProviderId) {
+            setSelectedPaymentProviderId(paymentProviders[0].id);
+        }
+    }, [paymentProviders]);
+
+
+    const handleChangePaymentProvider = (paymentProviderId: number) => {
+        setSelectedPaymentProviderId(paymentProviderId)
+    }
+
+
+    const handelChangeAgreePolicy = (event: any) => {
+        if (event.target.checked) {
+            setIsCheckoutEnabled(true);
+            return;
+        }
+        setIsCheckoutEnabled(false)
+    }
 
     return (
         <>
@@ -36,7 +70,7 @@ const CheckOutDetail :FC<Props> = ({checkoutItems,isPaymentEnabled})=>{
                     {paymentProviders.map((provider) => (
                         <div
                             className={`payment__provider__item ${
-                                selectedPayment === provider.id ? 'payment__provider__item__active' : ''
+                                selectedPaymentProviderId === provider.id ? 'payment__provider__item__active' : ''
                             }`}
                             key={provider.id}
                         >
@@ -45,8 +79,8 @@ const CheckOutDetail :FC<Props> = ({checkoutItems,isPaymentEnabled})=>{
                                     type="radio"
                                     name="paymentMethod"
                                     value={provider.id}
-                                    checked={selectedPayment === provider.id}
-                                    onChange={() => paymentProviderChange(provider.id)}
+                                    checked={selectedPaymentProviderId === provider.id}
+                                    onChange={() => handleChangePaymentProvider(provider.id)}
                                 />
                                 {provider.name}
                             </label>
@@ -56,26 +90,19 @@ const CheckOutDetail :FC<Props> = ({checkoutItems,isPaymentEnabled})=>{
                 <div className="checkout__input__checkbox">
                     <label htmlFor="acc-or">
                         Agree to Terms and Conditions
-                        <input type="checkbox" id="acc-or"  />
+                        <input type="checkbox" id="acc-or" onChange={handelChangeAgreePolicy}/>
                         <span className="checkmark"></span>
                     </label>
                 </div>
-                <p className="mb-2">
-                    “I agree to the terms and conditions as set out by the user agreement.{' '}
-                    <a className="text-primary" href="./conditions">
-                        Learn more
-                    </a>
-                    ”
-                </p>
 
                 <button
                     type="submit"
                     className="site-btn"
                     disabled={isPaymentEnabled ? true : isPaymentEnabled}
                     style={
-                        isPaymentEnabled || disableCheckout
-                            ? { cursor: 'not-allowed', backgroundColor: 'gray' }
-                            : { cursor: 'pointer' }
+                        !(isPaymentEnabled || isCheckoutEnabled)
+                            ? {cursor: 'not-allowed', backgroundColor: 'gray'}
+                            : {cursor: 'pointer'}
                     }
                 >
                     Process to Payment

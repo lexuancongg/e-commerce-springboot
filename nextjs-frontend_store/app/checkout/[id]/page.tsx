@@ -192,7 +192,6 @@ const Checkout = ()=>{
                                 </div>
                                 <div className="col-lg-4 col-md-6">
                                     <CheckOutDetail checkoutItems={checkoutItems} isPaymentEnabled={isPaymentEnabled}>
-
                                     </CheckOutDetail>
 
                                 </div>
