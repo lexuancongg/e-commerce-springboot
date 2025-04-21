@@ -4,13 +4,13 @@ import StarRatings from 'react-star-ratings';
 
 
 type Props = {
-    averageStar: number
+    star: number
 }
 
-const Star:FC<Props> = ({averageStar})=>{
+const Star:FC<Props> = ({star})=>{
     return (
         <StarRatings
-            rating={averageStar}
+            rating={star}
             starRatedColor="#fb6e2e"
             numberOfStars={5}
             starDimension="18px"

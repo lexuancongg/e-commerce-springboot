@@ -17,7 +17,7 @@ const ProductTitle : FC<Props> = (
             <div>
                 <h4 className="text-xl font-semibold text-gray-800">{productName}</h4>
                 <div className="flex items-center space-x-2 mt-1">
-                    <Star averageStar={averageStar}/>
+                    <Star star={averageStar}/>
                     <span className="text-sm  text-gray-500">({totalRating}) đánh giá</span>
                 </div>
             </div>

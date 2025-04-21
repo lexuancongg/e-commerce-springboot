@@ -2,16 +2,24 @@ import {FC, use, useState} from "react";
 import {Tab} from "react-bootstrap";
 import FormPostRating from "@/components/rating/FormPostRating";
 import ListRating from "@/components/rating/ListRating";
+import {RatingVm} from "@/models/rating/RatingVm";
 
 type Props = {
     totalRating: number,
-    handleCreateRating: () => void
+    handleCreateRating: () => void,
+    ratings:RatingVm[],
+    handlePageChange: ({selected}: any)=> void,
+    totalPageRating:number
 
 }
 const TabRating: FC<Props> = (
     {
         totalRating,
-        handleCreateRating
+        handleCreateRating,
+        ratings,
+        handlePageChange,
+        totalPageRating
+
     }
 ) => {
 
@@ -31,6 +39,10 @@ const TabRating: FC<Props> = (
                 </div>
                 <div>
                     <ListRating
+                        totalRating={totalRating}
+                        ratings={ratings}
+                        handlePageChange={handlePageChange}
+                        totalPage={totalRating}
 
                     />
                 </div>
