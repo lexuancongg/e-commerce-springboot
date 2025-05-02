@@ -10,16 +10,18 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Rating {
+public class Rating  extends AuditEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String content;
-    private int ratingStar;
+    private int star;
 
     private Long productId;
 
-    private String productName;
+
+
+    // hai thuôc tính người dùng  của keycloak
 
     private String lastName;
 
