@@ -1,0 +1,58 @@
+body {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.kc-login-wrapper {
+    max-width: 360px;
+    margin: 5% auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.kc-login-logo {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.kc-login-logo img {
+    max-width: 120px;
+}
+
+.kc-form-group {
+    margin-bottom: 1rem;
+}
+
+.kc-form-group label {
+    display: block;
+    margin-bottom: .5rem;
+    color: #333;
+}
+
+.kc-form-group input {
+    width: 100%;
+    padding: .5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.kc-btn {
+    width: 100%;
+    padding: .75rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.kc-btn-primary {
+    background-color: #667eea;
+    color: #fff;
+    transition: background .3s;
+}
+
+.kc-btn-primary:hover {
+    background-color: #5a67d8;
+}

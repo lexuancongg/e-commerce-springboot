@@ -5,7 +5,7 @@ import FeaturedProduct from "@/components/home/featuredProduct";
 export default function Home(){
 
     return (
-        <div className="homepage">
+        <div className="homepage ">
             <Slide/>
             {/*<Banner></Banner>*/}
             <Category></Category>
