@@ -25,6 +25,7 @@
 		<module>customer</module>
 		<module>image</module>
 		<module>oder</module>
+		<module>search</module>
 	</modules>
 
 	<properties>
