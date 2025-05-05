@@ -8,6 +8,6 @@ public record ProductQueryParams(
         String category,
         String attribute,
         Double minPrice,
-        Double maxPrice,
+        Double maxPrice
 ) {
 }

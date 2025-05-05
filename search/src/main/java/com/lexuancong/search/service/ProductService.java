@@ -1,17 +1,20 @@
 package com.lexuancong.search.service;
 
-import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.lexuancong.search.constant.ProductField;
+import com.lexuancong.search.model.Product;
 import com.lexuancong.search.viewmodel.ProductPagingVm;
+import com.lexuancong.search.viewmodel.ProductPreviewVm;
 import com.lexuancong.search.viewmodel.ProductQueryParams;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.*;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class ProductService {
@@ -47,6 +50,7 @@ public class ProductService {
                 .bool(boolQueryBuilder -> {
                             this.applyTermsFilter(productQueryParams.brand(), ProductField.BRAND, boolQueryBuilder);
                             this.applyTermsFilter(productQueryParams.category(), ProductField.CATEGORIES, boolQueryBuilder);
+                            this.applyRangeFilter(productQueryParams.minPrice() , productQueryParams.minPrice() , boolQueryBuilder);
                             boolQueryBuilder.must(mustQueryBuilder -> mustQueryBuilder
                                     .term(termQueryBuilder -> termQueryBuilder
                                             .field(ProductField.IS_PUBLISHED)
@@ -57,14 +61,31 @@ public class ProductService {
                         }
                 )
         );
+        org.springframework.data.elasticsearch.core.query.Query query = nativeQueryBuilder.build();
+        // ds keets quả trả ve
+        SearchHits<Product> searchHitsProduct = this.elasticsearchOperations.search(query, Product.class);
+        // chuyển đổi ds kết quả thành  phân trang page
+        SearchPage<Product> searchPageProduct = SearchHitSupport.searchPageFor(searchHitsProduct , nativeQueryBuilder.getPageable());
+        List<ProductPreviewVm> productPreviewVms = searchHitsProduct.stream()
+                .map(productSearchHit -> {
+                    Product product = productSearchHit.getContent();
+                    return ProductPreviewVm.fromModel(product);
+                })
+                .toList();
+        return new ProductPagingVm(
+                productPreviewVms,
+                searchPageProduct.getNumber(),
+                searchPageProduct.getSize(),
+                (int) searchPageProduct.getTotalElements(),
+                searchPageProduct.getTotalPages(),
+                searchPageProduct.isLast()
 
-
-
+        );
 
 
     }
 
-    public void applyTermsFilter(String fieldValues, String fieldName, BoolQuery.Builder boolQueryBuilder) {
+    private void applyTermsFilter(String fieldValues, String fieldName, BoolQuery.Builder boolQueryBuilder) {
         if (fieldValues.isBlank()) return;
         String[] values = fieldValues.split(",");
         // phải ít nhất đúng một trong các value này theo fieldname
@@ -87,6 +108,20 @@ public class ProductService {
 
 
     }
+
+    private void applyRangeFilter(Double min,Double max , BoolQuery.Builder boolQueryBuilder) {
+        if(min!= null || max!= null){
+            boolQueryBuilder.must(mustQueryBuilder -> mustQueryBuilder
+                    .range(rangeQueryBuilder -> rangeQueryBuilder
+                            .field(ProductField.PRICE)
+                            .from(min!=null ? min.toString() : null)
+                            .to(max!=null ? max.toString() : null)
+                    )
+
+            );
+        }
+    }
+
 }
 
 /// / doc
