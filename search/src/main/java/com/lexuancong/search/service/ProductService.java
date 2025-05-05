@@ -1,57 +1,95 @@
 package com.lexuancong.search.service;
 
-import co.elastic.clients.elasticsearch._types.aggregations.Aggregation;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.lexuancong.search.constant.ProductField;
 import com.lexuancong.search.viewmodel.ProductPagingVm;
 import com.lexuancong.search.viewmodel.ProductQueryParams;
 import org.elasticsearch.common.unit.Fuzziness;
-import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ProductService {
     // tuong tac voi elasticsearch
     private final ElasticsearchOperations elasticsearchOperations;
+
     public ProductService(ElasticsearchOperations elasticsearchOperations) {
         this.elasticsearchOperations = elasticsearchOperations;
     }
 
-    private ProductPagingVm findProductsByCriteria(ProductQueryParams productQueryParams){
-        NativeQueryBuilder  nativeQueryBuilder = NativeQuery.builder()
+    private ProductPagingVm findProductsByCriteria(ProductQueryParams productQueryParams) {
+        NativeQueryBuilder nativeQueryBuilder = NativeQuery.builder()
                 // theem cacs điều kiện vào truy vaans
-                .withQuery(query ->  query
+                .withQuery(queryBuilder -> queryBuilder
                         // truy vấn kết hợp nhiều dk
-                                .bool(boolQuery -> boolQuery
-                                        // như or , khớp thì tốt -> tăng điểm cho docoment thỏa mản
-                                        .should(shouldQuery -> shouldQuery
-                                                // tìm kiếm trên nhiều trường
-                                                .multiMatch(multiMatchQuery -> multiMatchQuery
-                                                        .fields(ProductField.NAME , ProductField.BRAND , ProductField.CATEGORIES)
-                                                        .query(productQueryParams.keyword())
-                                                        // tìm kieems gần đúng
-                                                        .fuzziness(Fuzziness.ONE.toString())
-                                                )
+                        .bool(boolQueryBuilder -> boolQueryBuilder
+                                // như or , khớp thì tốt -> tăng điểm cho docoment thỏa mản
+                                .should(shouldQueryBuilder -> shouldQueryBuilder
+                                        // tìm kiếm trên nhiều trường
+                                        .multiMatch(multiMatchQueryBuilder -> multiMatchQueryBuilder
+                                                .fields(ProductField.NAME, ProductField.BRAND, ProductField.CATEGORIES)
+                                                .query(productQueryParams.keyword())
+                                                // tìm kieems gần đúng
+                                                .fuzziness(Fuzziness.ONE.toString())
                                         )
                                 )
+                        )
                 )
                 .withPageable(PageRequest.of(productQueryParams.pageIndex(), productQueryParams.pageSize()));
 
         // thêm bộ lọc vào truy vấn => không ảnh hưởng điểm , chỉ quyết định xem document đó có đc đưa vào kq không thôi
-        nativeQueryBuilder.withFilter(filterQuery -> filterQuery
-                .bool(boolQuery -> boolQuery
-                ))
+        nativeQueryBuilder.withFilter(filterQueryBuilder -> filterQueryBuilder
+                .bool(boolQueryBuilder -> {
+                            this.applyTermsFilter(productQueryParams.brand(), ProductField.BRAND, boolQueryBuilder);
+                            this.applyTermsFilter(productQueryParams.category(), ProductField.CATEGORIES, boolQueryBuilder);
+                            boolQueryBuilder.must(mustQueryBuilder -> mustQueryBuilder
+                                    .term(termQueryBuilder -> termQueryBuilder
+                                            .field(ProductField.IS_PUBLISHED)
+                                            .value(true)
+                                    )
+                            );
+                            return boolQueryBuilder;
+                        }
+                )
+        );
+
+
+
+
+
+    }
+
+    public void applyTermsFilter(String fieldValues, String fieldName, BoolQuery.Builder boolQueryBuilder) {
+        if (fieldValues.isBlank()) return;
+        String[] values = fieldValues.split(",");
+        // phải ít nhất đúng một trong các value này theo fieldname
+        boolQueryBuilder.must(mustQueryBuilder -> {
+                    BoolQuery.Builder boolQuery = new BoolQuery.Builder();
+                    for (String value : values) {
+                        boolQuery.should(shouldQuery -> shouldQuery
+                                .term(termQueryBuilder -> termQueryBuilder
+                                        .field(ProductField.BRAND)
+                                        .value(value)
+                                        .caseInsensitive(true)
+                                )
+                        );
+
+                    }
+                    return new Query.Builder().bool(boolQuery.build());
+                }
+
+        );
 
 
     }
 }
 
-//// doc
+/// / doc
 //Query là đối tượng đại diện cho truy vấn thực tế trong Elasticsearch. Mỗi truy vấn trong Elasticsearch có thể là một loại truy vấn khác nhau như match, term, range, bool, v.v.
 // Query bao gồm các thông tin về loại truy vấn và các điều kiện tìm kiếm.
 
@@ -59,7 +97,6 @@ public class ProductService {
 //Match Query: Tìm kiếm các tài liệu có chứa từ khóa trong một trường nhất định.
 //Term Query: Tìm kiếm các tài liệu có giá trị chính xác cho một trường cụ thể.
 //Range Query: Tìm kiếm các tài liệu có giá trị trong một khoảng.
-
 
 
 //2. QueryBuilder
@@ -72,16 +109,6 @@ public class ProductService {
 //NativeQueryBuilder: Dùng trong Spring Data Elasticsearch để xây dựng các truy vấn tùy chỉnh.
 //
 //SearchRequest và SearchSourceBuilder: Dùng trong Elasticsearch Java Client để xây dựng và gửi các yêu cầu tìm kiếm.
-
-
-
-
-
-
-
-
-
-
 
 
 //🧱 1. Các đối tượng cốt lõi
@@ -128,7 +155,6 @@ public class ProductService {
 //SearchHits<Product> hits = elasticsearchOperations.search(searchQuery, Product.class);
 //
 //
-
 
 
 //
