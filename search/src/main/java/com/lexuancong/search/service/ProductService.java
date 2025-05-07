@@ -25,7 +25,7 @@ public class ProductService {
         this.elasticsearchOperations = elasticsearchOperations;
     }
 
-    private ProductPagingVm findProductsByCriteria(ProductQueryParams productQueryParams) {
+    public ProductPagingVm findProductsByCriteria(ProductQueryParams productQueryParams) {
         NativeQueryBuilder nativeQueryBuilder = NativeQuery.builder()
                 // theem cacs điều kiện vào truy vaans
                 .withQuery(queryBuilder -> queryBuilder
@@ -79,10 +79,7 @@ public class ProductService {
                 (int) searchPageProduct.getTotalElements(),
                 searchPageProduct.getTotalPages(),
                 searchPageProduct.isLast()
-
         );
-
-
     }
 
     private void applyTermsFilter(String fieldValues, String fieldName, BoolQuery.Builder boolQueryBuilder) {
@@ -94,7 +91,7 @@ public class ProductService {
                     for (String value : values) {
                         boolQuery.should(shouldQuery -> shouldQuery
                                 .term(termQueryBuilder -> termQueryBuilder
-                                        .field(ProductField.BRAND)
+                                        .field(fieldName)
                                         .value(value)
                                         .caseInsensitive(true)
                                 )
