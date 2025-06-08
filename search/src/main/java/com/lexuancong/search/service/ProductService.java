@@ -50,7 +50,7 @@ public class ProductService {
                 .bool(boolQueryBuilder -> {
                             this.applyTermsFilter(productQueryParams.brand(), ProductField.BRAND, boolQueryBuilder);
                             this.applyTermsFilter(productQueryParams.category(), ProductField.CATEGORIES, boolQueryBuilder);
-                            this.applyRangeFilter(productQueryParams.minPrice() , productQueryParams.minPrice() , boolQueryBuilder);
+                            this.applyRangeFilter(productQueryParams.minPrice(), productQueryParams.minPrice(), boolQueryBuilder);
                             boolQueryBuilder.must(mustQueryBuilder -> mustQueryBuilder
                                     .term(termQueryBuilder -> termQueryBuilder
                                             .field(ProductField.IS_PUBLISHED)
@@ -65,7 +65,7 @@ public class ProductService {
         // ds keets quả trả ve
         SearchHits<Product> searchHitsProduct = this.elasticsearchOperations.search(query, Product.class);
         // chuyển đổi ds kết quả thành  phân trang page
-        SearchPage<Product> searchPageProduct = SearchHitSupport.searchPageFor(searchHitsProduct , nativeQueryBuilder.getPageable());
+        SearchPage<Product> searchPageProduct = SearchHitSupport.searchPageFor(searchHitsProduct, nativeQueryBuilder.getPageable());
         List<ProductPreviewVm> productPreviewVms = searchHitsProduct.stream()
                 .map(productSearchHit -> {
                     Product product = productSearchHit.getContent();
@@ -89,12 +89,13 @@ public class ProductService {
         boolQueryBuilder.must(mustQueryBuilder -> {
                     BoolQuery.Builder boolQuery = new BoolQuery.Builder();
                     for (String value : values) {
-                        boolQuery.should(shouldQuery -> shouldQuery
-                                .term(termQueryBuilder -> termQueryBuilder
-                                        .field(fieldName)
-                                        .value(value)
-                                        .caseInsensitive(true)
-                                )
+                        boolQuery.should(shouldQuery ->
+                                shouldQuery
+                                        .term(termQueryBuilder -> termQueryBuilder
+                                                .field(fieldName)
+                                                .value(value)
+                                                .caseInsensitive(true)
+                                        )
                         );
 
                     }
@@ -106,13 +107,13 @@ public class ProductService {
 
     }
 
-    private void applyRangeFilter(Double min,Double max , BoolQuery.Builder boolQueryBuilder) {
-        if(min!= null || max!= null){
+    private void applyRangeFilter(Double min, Double max, BoolQuery.Builder boolQueryBuilder) {
+        if (min != null || max != null) {
             boolQueryBuilder.must(mustQueryBuilder -> mustQueryBuilder
                     .range(rangeQueryBuilder -> rangeQueryBuilder
                             .field(ProductField.PRICE)
-                            .from(min!=null ? min.toString() : null)
-                            .to(max!=null ? max.toString() : null)
+                            .from(min != null ? min.toString() : null)
+                            .to(max != null ? max.toString() : null)
                     )
 
             );

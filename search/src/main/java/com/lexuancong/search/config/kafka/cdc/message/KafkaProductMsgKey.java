@@ -1,4 +1,4 @@
-package com.lexuancong.search.kafka.cdc.message;
+package com.lexuancong.search.config.kafka.cdc.message;
 
 public class KafkaProductMsgKey {
     private Long id;

@@ -8,7 +8,7 @@ services:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     volumes:
 #      - ./docker/postgres/postgresql.conf.sample:/usr/share/postgresql/postgresql.conf.sample
-#      - ./docker/postgres/postgres_init.sql://docker-entrypoint-initdb.d/postgres_init.sql
+      - ./docker/postgres/postgres_init.sql://docker-entrypoint-initdb.d/postgres_init.sql
       - postgres:/var/lib/postgresql/data
 #    command: postgres -c 'max_connections=500'
     environment:
@@ -36,8 +36,8 @@ services:
 #    chạy ở môi trường dev , không yêu cầu cao như mt product
     command: 'start-dev --import-realm'
     environment:
-      KEYCLOAK_ADMIN: xuancong
-      KEYCLOAK_ADMIN_PASSWORD: xuancong
+      KEYCLOAK_ADMIN: lexuancong
+      KEYCLOAK_ADMIN_PASSWORD: lexuancong
 #      kết nối tới db để lưu thông tin đăng nhập như phiên , token
       KC_DB: postgres
 #      khi image này chạy thì nó là container như 1 mt riêng biệt , nếu localhost thay cho post.. thì localhost ở đây là chính nó nên sai
@@ -57,17 +57,6 @@ services:
 
 
 
-#  ngrok : ho tro dua web ra internet
-  ngrok:
-    image: wernight/ngrok:latest
-    command: "ngrok http 3000"
-    ports:
-      - "4040:4040"
-    environment:
-        - NGROK_AUTHTOKEN=2TFlYWHy56f25xT1fzSYnARTUUu_2RsvyvGfZb1wxexmCJQ2G  # Token ngrok của bạn (có thể cần đăng ký tài khoản ngrok)
-    restart: unless-stopped
-
-
 
 networks:
 #  các service có cùng mạng thì cos thể kết nối với nhau
@@ -79,5 +68,8 @@ volumes:
   postgres:
   pgadmin:
   redis:
+
+
+
 
 

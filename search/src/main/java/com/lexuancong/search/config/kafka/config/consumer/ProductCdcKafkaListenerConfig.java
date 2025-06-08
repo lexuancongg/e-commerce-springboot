@@ -1,7 +1,7 @@
-package com.lexuancong.search.kafka.config.consumer;
+package com.lexuancong.search.config.kafka.config.consumer;
 
-import com.lexuancong.search.kafka.cdc.message.KafkaProductCdcMessageValue;
-import com.lexuancong.search.kafka.cdc.message.KafkaProductMsgKey;
+import com.lexuancong.search.config.kafka.cdc.message.KafkaProductCdcMessageValue;
+import com.lexuancong.search.config.kafka.cdc.message.KafkaProductMsgKey;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,16 +12,15 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 @EnableKafka
 @Configuration
+// config khi dữ liệu product thay đổi => cập nhật lại
 public class ProductCdcKafkaListenerConfig {
 
-    // KafkaProperties được kafka inject cho
-    @Bean
+    // KafkaProperties được inject vào từ bean do mapper từ file properties
+    @Bean(name = "productCdcListenerContainerFactory")
     public ConcurrentKafkaListenerContainerFactory<KafkaProductMsgKey, KafkaProductCdcMessageValue> kafkaListenerContainerFactory(KafkaProperties properties) {
         var factory = new ConcurrentKafkaListenerContainerFactory<KafkaProductMsgKey,KafkaProductCdcMessageValue>();
         factory.setConsumerFactory(this.consumerFactory(KafkaProductMsgKey.class, KafkaProductCdcMessageValue.class, properties));
@@ -53,8 +52,7 @@ public class ProductCdcKafkaListenerConfig {
 
 // doc
 
-
-//ConcurrentKafkaListenerContainerFactory là bean dùng để cấu hình cách mà @KafkaListener hoạt động. Nó tạo ra các “container” để lắng nghe message từ Kafka.
+//ConcurrentKafkaListenerContainerFactory là bean dùng để cấu hình cách mà @KafkaListener hoạt động. Nó là nhaf máy tạo ra các “ Kafka listener container ”  theo config để lắng nghe message từ Kafka.
 //
 //  Công dụng chính:
 //Thiết lập:

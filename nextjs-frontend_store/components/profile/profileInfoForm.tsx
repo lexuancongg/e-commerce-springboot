@@ -27,7 +27,7 @@ const ProfileInfoForm : FC<Props> = ({
                     <Input
                         labelText="userName"
                         register={register}
-                        fieldName="userName"
+                        fieldName="username"
                         disabled={true}
                         defaultValue={profileInfo?.username}
                         registerOptions={{

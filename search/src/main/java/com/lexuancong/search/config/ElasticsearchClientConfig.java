@@ -19,4 +19,5 @@ public class ElasticsearchClientConfig  extends ElasticsearchConfiguration {
                 .withBasicAuth(elasticsearchConfig.getUsername(), elasticsearchConfig.getPassword())
                 .build();
     }
+
 }
