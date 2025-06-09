@@ -1,5 +1,14 @@
 package com.lexuancong.search.kafka.cdc.message;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
+@lombok.Getter
+@lombok.Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class KafkaProductMsgKey {
-    private Long id;
+    private Long productId;
 }
