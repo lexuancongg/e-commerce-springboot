@@ -1,4 +1,4 @@
-package com.lexuancong.search.config.kafka.config.consumer;
+package com.lexuancong.search.kafka.config.consumer;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -17,6 +17,7 @@ public class KafkaListenerConfigurerCustom implements KafkaListenerConfigurer {
         this.validator = localValidatorFactoryBean;
     }
 
+
     @Override
     public void configureKafkaListeners(KafkaListenerEndpointRegistrar registrar) {
         // bật tính năng  validator payload của @KafkaListener
@@ -26,9 +27,12 @@ public class KafkaListenerConfigurerCustom implements KafkaListenerConfigurer {
 }
 
 
-// docs :
+// docs : https://docs.spring.io/spring-kafka/docs/3.3.6/api/org/springframework/kafka/config/package-summary.html
 // KafkaListenerEndpointRegistrar :  quản lý và  cấu hình kaffka listenter ,
-// Quản lý các endpoint của listener (ví dụ: các method đánh dấu @KafkaListener)
+// Quản l
+////Cho phép bạn tùy chỉnh hành vi của listener,
+//// KafkaListenerConfigurer : interface để cấu hình kaffka trong spring một cách tùy chỉnhý các endpoint của listener (ví dụ: các method đánh dấu @KafkaListener)
+// cấu hình cách listener được đăng ký : => chỉ ảnh hưởng mỗi listener được đăng ký thủ công ở đây
+//   KafkaListenerConfigurer = config đăng ký listener (ai, khi nào, cách thêm listener vào hệ thống).
 //
-//Cho phép bạn tùy chỉnh hành vi của listener,
-// KafkaListenerConfigurer : interface để cấu hình kaffka trong spring một cách tùy chỉnh
+//  Còn config hoạt động chi tiết của listener (cách nhận message, xử lý...) nằm ở KafkaListenerContainerFactory.

@@ -6,6 +6,7 @@ public record ProductQueryParams(
         Integer pageSize,
         String category,
         Double minPrice,
-        Double maxPrice
+        Double maxPrice,
+        String brand
 ) {
 }

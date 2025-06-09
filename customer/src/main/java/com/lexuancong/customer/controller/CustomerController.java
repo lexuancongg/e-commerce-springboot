@@ -23,6 +23,7 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.getCustomerProfile());
     }
 
+    // sửa lại sau vì keycloak tự tạo user cho
     @PostMapping("/customer/customer")
     public ResponseEntity<CustomerVm> createCustomer(@RequestBody @Valid CustomerPostVm customerPostVm,
                                                      UriComponentsBuilder uriComponentsBuilder) {

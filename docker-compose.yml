@@ -56,7 +56,8 @@ services:
     networks:
       - lexuancong-network
     volumes:
-      - ./login-keycloak-custom/themes:/opt/jboss/keycloak/themes
+      - ./custom-theme-keycloak/themes/e-commerce/theme:/opt/keycloak/themes
+      - ./docker/keycloak/realm/realm-config-export.json:/opt/keycloak/data/import/realm-export.json
 
 
 

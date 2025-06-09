@@ -24,10 +24,11 @@ public class ProductController {
             @RequestParam(name = "pageSize" , defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE) int pageSize,
             @RequestParam(required = false) Double minPrice,
             @RequestParam(required = false) Double maxPrice,
-            @RequestParam(required = false) String category
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String brand
 
     ){
-        ProductQueryParams  criteria = new ProductQueryParams(keyword,pageIndex,pageSize,category,minPrice,maxPrice);
+        ProductQueryParams  criteria = new ProductQueryParams(keyword,pageIndex,pageSize,category,minPrice,maxPrice,brand);
         return ResponseEntity.ok(
                 this.productService.findProductsByCriteria(criteria)
         );

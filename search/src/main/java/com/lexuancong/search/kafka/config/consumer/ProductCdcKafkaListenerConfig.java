@@ -1,7 +1,8 @@
-package com.lexuancong.search.config.kafka.config.consumer;
+package com.lexuancong.search.kafka.config.consumer;
 
-import com.lexuancong.search.config.kafka.cdc.message.KafkaProductCdcMessageValue;
-import com.lexuancong.search.config.kafka.cdc.message.KafkaProductMsgKey;
+import com.lexuancong.search.kafka.cdc.message.KafkaProductCdcMessageValue;
+import com.lexuancong.search.kafka.cdc.message.KafkaProductMsgKey;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +18,7 @@ import java.util.Map;
 @EnableKafka
 @Configuration
 // config khi dữ liệu product thay đổi => cập nhật lại
+// config kafka => chủ yếu config cách cho containerfactory để tạo ra container cho các listener dùng để hoạt động
 public class ProductCdcKafkaListenerConfig {
 
     // KafkaProperties được inject vào từ bean do mapper từ file properties
@@ -27,32 +29,37 @@ public class ProductCdcKafkaListenerConfig {
         return factory;
     }
 
+    //nhà máy tạo ra consumer =>nhận data từ kafka
     private ConsumerFactory<KafkaProductMsgKey,KafkaProductCdcMessageValue> consumerFactory(Class<KafkaProductMsgKey>  keyclass ,
                                                                                             Class<KafkaProductCdcMessageValue> valueclass ,
                                                                                             KafkaProperties kafkaProperties) {
         Map<String, Object> props = this.buildConsumerProperties(kafkaProperties);
-        var keyDeserialize = new ErrorHandlingDeserializer<>(gettJsonDeserializer(keyclass));
-        var valueDeserialize = new ErrorHandlingDeserializer<>(gettJsonDeserializer(valueclass));
+        // ErrorHandlingDeserializer : khi kafka send message json sai format => JsonDeserializer=> ném lỗi => app crash và listener bị dung
+        // => nos bọc lôĩ vào DeserializationException => cho phép :
+//        1.Gửi message lỗi sang Dead Letter Topic (DLT)
+//        2.Bỏ qua message lỗi mà vẫn tiếp tục xử lý các message khác hoặc log lỗi
+        var keyDeserialize = new ErrorHandlingDeserializer<>(this.gettJsonDeserializer(keyclass));
+        var valueDeserialize = new ErrorHandlingDeserializer<>(this.gettJsonDeserializer(valueclass));
         return new DefaultKafkaConsumerFactory<>(props, keyDeserialize, valueDeserialize);
-
     }
 
     private Map<String, Object> buildConsumerProperties(KafkaProperties kafkaProperties) {
+        // không custom clientId
         return kafkaProperties.buildConsumerProperties(null);
     }
 
     private <T>JsonDeserializer<T> gettJsonDeserializer(Class<T> tClass){
         var jsonDeserializer = new JsonDeserializer<>(tClass);
+        // deserialize  : cho phép deserialize  tất cả các class ở các package
         jsonDeserializer.addTrustedPackages("*");
         return jsonDeserializer;
     }
-
 
 }
 
 // doc
 
-//ConcurrentKafkaListenerContainerFactory là bean dùng để cấu hình cách mà @KafkaListener hoạt động. Nó là nhaf máy tạo ra các “ Kafka listener container ”  theo config để lắng nghe message từ Kafka.
+//ConcurrentKafkaListenerContainerFactory là bean dùng để cấu hình cách mà @KafkaListener hoạt động. Nó là nhaf máy tạo ra các “ Kafka listener container ”  theo config để hoạt động như lắng nghe message từ Kafka.
 //
 //  Công dụng chính:
 //Thiết lập:
