@@ -10,9 +10,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-// phải biết đc action , thông tin sp sau thay đổi , sản phẩm trước khi bị thay đổi như edit
+//Debezium : luôn gởi nhwunxg giá key này vào kafka
 public class KafkaProductCdcMessageValue {
-    private Operation operation;
-    private Product productBefore;
-    private Product productAfter;
+    private Operation op;
+    private Product after;
+    private Product before;
+    private Object source;
+    private  String ts_ms;
+    private Object transaction;
 }

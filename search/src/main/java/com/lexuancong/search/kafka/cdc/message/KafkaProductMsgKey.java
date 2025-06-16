@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class KafkaProductMsgKey {
-    private Long productId;
+    private Long id;
 }
