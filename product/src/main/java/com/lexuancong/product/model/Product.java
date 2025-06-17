@@ -36,7 +36,6 @@ public class Product extends AuditEntity{
     private boolean isOrderEnable;
     // hiển thị hay không
     private boolean isPublic;
-
     private boolean isFeature;
     // xác định cho các biến thể , chỉ có sp chính hiển thị đôc lập trên web
     private boolean isShownSeparately;

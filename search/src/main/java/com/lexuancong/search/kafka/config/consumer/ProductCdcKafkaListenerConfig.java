@@ -1,8 +1,7 @@
 package com.lexuancong.search.kafka.config.consumer;
 
 import com.lexuancong.search.kafka.cdc.message.KafkaProductCdcMessageValue;
-import com.lexuancong.search.kafka.cdc.message.KafkaProductMsgKey;
-import org.apache.kafka.clients.producer.ProducerRecord;
+import com.lexuancong.search.kafka.cdc.message.KafkaProductMessageKey;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,16 +22,16 @@ public class ProductCdcKafkaListenerConfig {
 
     // KafkaProperties được inject vào từ bean do mapper từ file properties
     @Bean(name = "productCdcListenerContainerFactory")
-    public ConcurrentKafkaListenerContainerFactory<KafkaProductMsgKey, KafkaProductCdcMessageValue> kafkaListenerContainerFactory(KafkaProperties properties) {
-        var factory = new ConcurrentKafkaListenerContainerFactory<KafkaProductMsgKey,KafkaProductCdcMessageValue>();
-        factory.setConsumerFactory(this.consumerFactory(KafkaProductMsgKey.class, KafkaProductCdcMessageValue.class, properties));
+    public ConcurrentKafkaListenerContainerFactory<KafkaProductMessageKey, KafkaProductCdcMessageValue> kafkaListenerContainerFactory(KafkaProperties properties) {
+        var factory = new ConcurrentKafkaListenerContainerFactory<KafkaProductMessageKey,KafkaProductCdcMessageValue>();
+        factory.setConsumerFactory(this.consumerFactory(KafkaProductMessageKey.class, KafkaProductCdcMessageValue.class, properties));
         return factory;
     }
 
     //nhà máy tạo ra consumer =>nhận data từ kafka
-    private ConsumerFactory<KafkaProductMsgKey,KafkaProductCdcMessageValue> consumerFactory(Class<KafkaProductMsgKey>  keyclass ,
-                                                                                            Class<KafkaProductCdcMessageValue> valueclass ,
-                                                                                            KafkaProperties kafkaProperties) {
+    private ConsumerFactory<KafkaProductMessageKey,KafkaProductCdcMessageValue> consumerFactory(Class<KafkaProductMessageKey>  keyclass ,
+                                                                                                Class<KafkaProductCdcMessageValue> valueclass ,
+                                                                                                KafkaProperties kafkaProperties) {
         Map<String, Object> props = this.buildConsumerProperties(kafkaProperties);
         // ErrorHandlingDeserializer : khi kafka send message json sai format => JsonDeserializer=> ném lỗi => app crash và listener bị dung
         // => nos bọc lôĩ vào DeserializationException => cho phép :

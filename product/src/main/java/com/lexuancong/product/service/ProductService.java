@@ -37,8 +37,8 @@ public class ProductService {
     private final ProductOptionValueRepository productOptionValueRepository;
     private final ProductOptionCombinationRepository productOptionCombinationRepository;
     private final ImageService imageService;
-
     public ProductSummaryVm createProduct(ProductPostVm productPostVm){
+
         this.validateProduct(productPostVm);
         Product product = productPostVm.toModel();
         this.setBrandForProduct(product, productPostVm.brandId());
@@ -244,9 +244,8 @@ public class ProductService {
     //  cả update và create và update đều validate => gộp chung hàm
     private <T extends ProductVariationPropertiesRequire> void validateProduct(ProductPropertiesRequire<T> productVmToSave, Product existingProduct){
         this.validateLengthMustGreaterThanWidth(productVmToSave);
-        this.validateExistingProductProperties(productVmToSave,existingProduct);
+        this.validateUniqueProductProperties(productVmToSave,existingProduct);
         this.validateDuplicateProductPropertiesBetweenVariations(productVmToSave);
-
 
         // valid datete thuộc tính của varian cos bị trùng lặp trong db không
         List<Long> variationIds = productVmToSave.variations().stream()
@@ -261,7 +260,7 @@ public class ProductService {
 
         for(BaseProductPropertiesRequire variation : productVmToSave.variations()){
             Product variantExitedInDb = mapVariationsSaved.get(variation.id());
-            this.validateExistingProductProperties(variation,variantExitedInDb);
+            this.validateUniqueProductProperties(variation,variantExitedInDb);
         }
 
     }
@@ -275,7 +274,7 @@ public class ProductService {
     }
 
     // check xem các thuộc tinhs của sp có bị trùng lặp trong db không
-    private void validateExistingProductProperties(BaseProductPropertiesRequire baseProductProperties,Product existingProduct){
+    private void validateUniqueProductProperties(BaseProductPropertiesRequire baseProductProperties, Product existingProduct){
         this.checkPropertyExisted(baseProductProperties.slug().toLowerCase(),this.productRepository::findBySlug,existingProduct);
         if (StringUtils.isNotEmpty(baseProductProperties.gtin())){
             this.checkPropertyExisted(baseProductProperties.gtin(),this.productRepository::findByGtin,existingProduct);
@@ -283,9 +282,9 @@ public class ProductService {
         this.checkPropertyExisted(baseProductProperties.sku(),this.productRepository::findBySku,existingProduct);
     }
 
-    // cách thức check các thuộc tính tuương tự nhau (cần tên thuộc tính , đưa method từ jpa) => hàm
     private void checkPropertyExisted(String propertyValue, Function<String, Optional<Product>> finder ,Product existingProduct){
         finder.apply(propertyValue).ifPresent(product -> {
+            // nếu create hoặc update mà product khác có slug này thì chưnng tỏ trùng
             if(existingProduct == null || !product.getId().equals(existingProduct.getId()) ){
                 // throw exception
             }
@@ -312,8 +311,6 @@ public class ProductService {
 
             }
         }
-
-
     }
 
     public void updateProduct(Long id, ProductPostVm productPostVm){

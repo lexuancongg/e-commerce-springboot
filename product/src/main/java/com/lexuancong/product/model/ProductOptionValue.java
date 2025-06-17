@@ -10,7 +10,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-// 1sp có nhiều option , 1 option c nhiều sp => bảng trung gian
+// 1sp có nhiều option , 1 option c nhiều sp => bảng trung gian, 5 : 2 : "vàng"  , 5:2:"đỏ"
 public class ProductOptionValue {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

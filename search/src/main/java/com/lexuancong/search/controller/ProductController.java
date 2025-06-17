@@ -1,6 +1,6 @@
 package com.lexuancong.search.controller;
 
-import com.lexuancong.search.service.ProductService;
+import com.lexuancong.search.service.SearchProductService;
 import com.lexuancong.search.viewmodel.ProductPagingVm;
 import com.lexuancong.search.viewmodel.ProductQueryParams;
 import com.lexuancong.share.utils.Constants;
@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 // tìm kiếm sp
 @RestController
 public class ProductController {
-    private final ProductService productService;
+    private final SearchProductService searchProductService;
 
-    public ProductController(ProductService productService) {
-        this.productService = productService;
+    public ProductController(SearchProductService searchProductService) {
+        this.searchProductService = searchProductService;
     }
     @GetMapping("/customer/search")
     public ResponseEntity<ProductPagingVm> searchProduct(
@@ -30,7 +30,7 @@ public class ProductController {
     ){
         ProductQueryParams  criteria = new ProductQueryParams(keyword,pageIndex,pageSize,category,minPrice,maxPrice,brand);
         return ResponseEntity.ok(
-                this.productService.findProductsByCriteria(criteria)
+                this.searchProductService.findProductsByCriteria(criteria)
         );
 
     }

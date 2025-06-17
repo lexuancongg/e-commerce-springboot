@@ -7,6 +7,7 @@ import com.lexuancong.search.model.Product;
 import com.lexuancong.search.viewmodel.ProductPagingVm;
 import com.lexuancong.search.viewmodel.ProductPreviewVm;
 import com.lexuancong.search.viewmodel.ProductQueryParams;
+import org.apache.lucene.queryparser.xml.builders.BooleanQueryBuilder;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -17,11 +18,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class ProductService {
-    // tuong tac voi elasticsearch
+public class SearchProductService {
+    //  đối tượng tuong tac voi elasticsearch
     private final ElasticsearchOperations elasticsearchOperations;
 
-    public ProductService(ElasticsearchOperations elasticsearchOperations) {
+    public SearchProductService(ElasticsearchOperations elasticsearchOperations) {
         this.elasticsearchOperations = elasticsearchOperations;
     }
 
@@ -45,7 +46,7 @@ public class ProductService {
                 )
                 .withPageable(PageRequest.of(productQueryParams.pageIndex(), productQueryParams.pageSize()));
 
-        // thêm bộ lọc vào truy vấn => không ảnh hưởng điểm , chỉ quyết định xem document đó có đc đưa vào kq không thôi
+        // thêm bộ lọc vào truy vấn => không ảnh hưởng điểm , chỉ quyết định xem document đó có đc đưa vào kq không thôi => giống như where
         nativeQueryBuilder.withFilter(filterQueryBuilder -> filterQueryBuilder
                 .bool(boolQueryBuilder -> {
                             this.applyTermsFilter(productQueryParams.brand(), ProductField.BRAND, boolQueryBuilder);

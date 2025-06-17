@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ProductSyncDataService {
+public class ProductSyncDataElasticsearchService {
     private final ProductRepository productRepository;
     public void createProductSyncData(Long productId , Product newProduct) {
         // cách 1 => dùng id gọi http tới service product lấy thông tin => mapper vào rồi lưu

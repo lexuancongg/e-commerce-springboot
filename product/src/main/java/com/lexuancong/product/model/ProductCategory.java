@@ -24,7 +24,7 @@ public class ProductCategory {
 
     private Short displayIndex;
 
-    private boolean isFeaturedProduct;
+//    private boolean isFeaturedProduct;
     
 
 }

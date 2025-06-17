@@ -41,6 +41,7 @@ public class imageService {
         // tạo object đại diện cho thư mục
         File directory = new File(filesystemConfig.getDirectory());
         this.checkIsExitedDirectory(directory);
+        this.validateFileName(fileName);
         Path filePath = this.buildFilePath(fileName);
         try {
             Files.write(filePath, contentFile);
@@ -53,7 +54,6 @@ public class imageService {
     }
 
     private Path buildFilePath(String fileName) {
-        this.validateFileName(fileName);
         Path path = Paths.get(filesystemConfig.getDirectory(), fileName).toAbsolutePath().normalize();
         return path;
     }
