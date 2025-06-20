@@ -1,0 +1,33 @@
+server:
+  port: 8085
+spring:
+  application:
+    name: api-gateway
+  threads:
+    virtual:
+      enabled: true
+  cloud:
+    gateway:
+      default-filters:
+      routes:
+        - id: api
+        - uri: http://nginx
+        - predicates:
+          - Path=/api/**
+        - filters:
+          - TokenRelay=
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri:  http://keycloak/realms/ecommerce
+        registration:
+          keycloak:
+            provider: keycloak
+            client-id:
+            client-secret:
+            scope: openid, roles
+
+
+
