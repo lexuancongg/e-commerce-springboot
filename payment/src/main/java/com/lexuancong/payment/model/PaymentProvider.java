@@ -12,14 +12,14 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-// xác định các nha thanh toan duoc tich hop vaf app sau nay
+
 public class PaymentProvider {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private boolean isEnabled;
     private String name;
+    private boolean isEnabled;
+
     private String configureUrl;
+    // mỗi provider có những thông tin khác nhau
     private String properties;
 
 }

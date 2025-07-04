@@ -35,7 +35,7 @@ public class PaymentService {
     }
 
     public InitPaymentResponse initPayment(InitPaymentRequest initPaymentRequest){
-        // xacs định xem chọn thanh toán banwgf gì
+      // xác định loại provider thanh toán
         ProviderPaymentHandler providerPaymentHandler = this.getProviderPaymentHandler(initPaymentRequest.paymentMethod());
         InitiatedPayment initiatedPayment = providerPaymentHandler.initPayment(initPaymentRequest);
         return new InitPaymentResponse(null , initiatedPayment.paymentId() , initiatedPayment.redirectUrl());

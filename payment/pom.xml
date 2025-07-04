@@ -51,6 +51,11 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>com.lexuancong</groupId>
+            <artifactId>vnpay-payment</artifactId>
+            <version>${revision}</version>
+        </dependency>
 
 
     </dependencies>
