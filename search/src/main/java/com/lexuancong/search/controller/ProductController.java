@@ -3,7 +3,7 @@ package com.lexuancong.search.controller;
 import com.lexuancong.search.service.SearchProductService;
 import com.lexuancong.search.viewmodel.ProductPagingVm;
 import com.lexuancong.search.viewmodel.ProductQueryParams;
-import com.lexuancong.share.utils.Constants;
+import com.lexuancong.share.constants.Constants;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;

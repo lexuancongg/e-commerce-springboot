@@ -45,6 +45,13 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>com.lexuancong</groupId>
+            <artifactId>share</artifactId>
+            <version>${revision}</version>
+
+        </dependency>
+
     </dependencies>
 
     <build>

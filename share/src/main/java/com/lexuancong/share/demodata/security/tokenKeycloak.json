@@ -1,0 +1,31 @@
+{
+  "exp": 1719999999,
+  "iat": 1719996399,
+  "jti": "123e4567-e89b-12d3-a456-426614174000",
+  "iss": "http://localhost:8080/realms/my-realm",
+  "sub": "7acb29a1-b93c-49e1-bb44-bc6e2ec9d2e1",
+  "typ": "Bearer",
+  "azp": "my-client",
+  "session_state": "f3c3f3a1-89b7-4ad2-8df2-b1ffdf22a441",
+  "scope": "openid email profile",
+  "email_verified": true,
+  "preferred_username": "bu.dev",
+  "given_name": "Bạn",
+  "family_name": "Bu",
+  "email": "bu.dev@example.com",
+  "realm_access": {
+    "roles": [
+      "offline_access",
+      "user",
+      "admin"
+    ]
+  },
+  "resource_access": {
+    "my-client": {
+      "roles": [
+        "read",
+        "write"
+      ]
+    }
+  }
+}

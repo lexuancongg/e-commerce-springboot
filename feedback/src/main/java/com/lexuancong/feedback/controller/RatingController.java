@@ -4,7 +4,7 @@ import com.lexuancong.feedback.service.RatingService;
 import com.lexuancong.feedback.viewmodel.rating.RatingPagingVm;
 import com.lexuancong.feedback.viewmodel.rating.RatingPostVm;
 import com.lexuancong.feedback.viewmodel.rating.RatingVm;
-import com.lexuancong.share.utils.Constants;
+import com.lexuancong.share.constants.Constants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
