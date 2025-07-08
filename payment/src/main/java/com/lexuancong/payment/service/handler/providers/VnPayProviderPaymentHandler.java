@@ -34,8 +34,15 @@ public class VnPayProviderPaymentHandler extends AbstractPaymentProviderSupport 
             );
 
             String vnp_paymentUrl = vnpayService.createPaymentUrl(vnpayCreatePaymentUrlRequest);
-        }catch (Exception e){
+            return  InitiatedPayment.builder()
+                    .paymentId(null)
+                    .provider("VNPAY")
+                    .redirectUrl(vnp_paymentUrl)
+                    .status("PENDING")
+                    .build();
 
+        }catch (Exception e){
+            System.out.println("error");
         }
     }
 }

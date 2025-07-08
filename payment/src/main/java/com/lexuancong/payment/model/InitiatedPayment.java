@@ -1,12 +1,15 @@
 package com.lexuancong.payment.model;
 
-import java.time.LocalDateTime;
+import lombok.Builder;
 
+import java.time.LocalDateTime;
+@Builder
 public record InitiatedPayment(
         String redirectUrl,  String transactionId,
          String orderId,
          LocalDateTime expiredTime,
          String qrCode,
+         String status,
          String provider,
          String signature,
         String paymentId

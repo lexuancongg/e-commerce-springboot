@@ -38,7 +38,8 @@ public class PaymentService {
       // xác định loại provider thanh toán
         ProviderPaymentHandler providerPaymentHandler = this.getProviderPaymentHandler(initPaymentRequest.paymentMethod());
         InitiatedPayment initiatedPayment = providerPaymentHandler.initPayment(initPaymentRequest);
-        return new InitPaymentResponse(null , initiatedPayment.paymentId() , initiatedPayment.redirectUrl());
+
+        return new InitPaymentResponse(initiatedPayment.status() , initiatedPayment.paymentId() , initiatedPayment.redirectUrl());
     }
 
     private ProviderPaymentHandler getProviderPaymentHandler(String providerName){
