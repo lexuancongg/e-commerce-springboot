@@ -12,6 +12,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
+@RequestMapping("/address")
 @RestController
 public class CountryController {
 
@@ -36,7 +37,7 @@ public class CountryController {
         return ResponseEntity.ok(countryService.getCountries());
     }
 
-    @PostMapping("/management/country")
+    @PostMapping("/management/countries")
     public ResponseEntity<CountryGetVm> createCountry(
             @RequestBody @Valid final CountryPostVm countryPostVm,
             final UriComponentsBuilder uriComponentsBuilder
@@ -50,14 +51,15 @@ public class CountryController {
                 .body(countrySaved);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/management/countries/{id}")
     public ResponseEntity<Void> updateCountry(@PathVariable Long id,
                                               @RequestBody @Valid final CountryPostVm countryPostVm){
         countryService.updateCountry(id,countryPostVm);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/management/country/{id}")
+
+    @DeleteMapping("/management/countries/{id}")
     public ResponseEntity<Void> deleteCountry(@PathVariable Long id){
         countryService.deleteCountry(id);
         return ResponseEntity.noContent().build();
