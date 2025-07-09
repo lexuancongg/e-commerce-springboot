@@ -1,5 +1,6 @@
 package com.lexuancong.address.service;
 
+import com.lexuancong.address.constants.Constants;
 import com.lexuancong.address.model.Province;
 import com.lexuancong.address.repository.CountryRepository;
 import com.lexuancong.address.repository.ProvinceRepository;
@@ -7,17 +8,21 @@ import com.lexuancong.address.specification.ProvinceSpecification;
 import com.lexuancong.address.viewmodel.province.ProvincePagingVm;
 import com.lexuancong.address.viewmodel.province.ProvincePostVm;
 import com.lexuancong.address.viewmodel.province.ProvinceGetVm;
+import com.lexuancong.share.exception.DuplicatedException;
+import com.lexuancong.share.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ProvinceService {
     private final ProvinceRepository provinceRepository;
     private final CountryRepository countryRepository;
@@ -54,11 +59,11 @@ public class ProvinceService {
         Long countryId = provincePostVm.countryId();
         boolean isExistCountryId = countryRepository.existsById(countryId);
         if(!isExistCountryId){
-            // throw  exception
+             throw new NotFoundException(Constants.ErrorKey.Country.COUNTRY_NOT_FOUND,provincePostVm.countryId());
         }
         // nếu cùng quốc gia mà trùng tên thì lỗi
         if(provinceRepository.existsByNameIgnoreCaseAndCountryId(provincePostVm.name(),countryId)){
-            // throw exception
+            throw new DuplicatedException(Constants.ErrorKey.NAME_ALREADY_EXITED,provincePostVm.name());
         }
         Province province = provincePostVm.toModel(countryRepository.getReferenceById(countryId));
         return ProvinceGetVm.fromModel(provinceRepository.save(province));
@@ -66,13 +71,12 @@ public class ProvinceService {
 
     public void updateProvince(Long id,ProvincePostVm provincePostVm){
         Province province = provinceRepository.findById(id)
-                // throw exception here
-                .orElseThrow(()->null);
+                .orElseThrow(()-> new NotFoundException(Constants.ErrorKey.Province.PROVINCE_NOT_FOUND,id));
         // chỉ cho phép trùng tên với cái id chỉnh sửa hiện tại
         if(provinceRepository.existsByNameIgnoreCaseAndCountryIdAndIdNot(
                 provincePostVm.name(), provincePostVm.countryId(), id)
         ){
-            // throw exception
+            throw  new DuplicatedException(Constants.ErrorKey.NAME_ALREADY_EXITED,provincePostVm.name());
         }
         province.setName(provincePostVm.name());
         province.setType(provincePostVm.type());
@@ -80,9 +84,9 @@ public class ProvinceService {
 
     }
     public void deleteProvince(Long id){
-        boolean isExistCountryId = countryRepository.existsById(id);
-        if(!isExistCountryId){
-            // throw exception
+        boolean isExistedProvince = this.provinceRepository.existsById(id);
+        if(!isExistedProvince){
+            throw  new NotFoundException(Constants.ErrorKey.Province.PROVINCE_NOT_FOUND,id);
         }
         provinceRepository.deleteById(id);
     }

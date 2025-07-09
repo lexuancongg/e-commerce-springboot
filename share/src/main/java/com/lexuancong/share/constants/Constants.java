@@ -10,4 +10,5 @@ public final class Constants {
         public static final String REALM_ACCESS = "realm_access";
         public static final String ROLES = "roles";
     }
+
 }

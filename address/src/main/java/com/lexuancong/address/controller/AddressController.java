@@ -27,14 +27,12 @@ public class AddressController{
         return ResponseEntity.ok().build();
     }
 
-    // api cho service customer call get default address
     @GetMapping("customer/address/{id}")
     public ResponseEntity<AddressDetailVm> getAddress(@PathVariable Long id){
         AddressDetailVm addressDetailVm = addressService.getAddressById(id);
         return ResponseEntity.ok(addressDetailVm);
     }
 
-    // api lấy ds address hiển thị giao diện
     @GetMapping("/customer/addresses")
     public ResponseEntity<List<AddressDetailVm>> getAddresses(@RequestParam List<Long> ids){
         return ResponseEntity.ok(addressService.getAddresses(ids));

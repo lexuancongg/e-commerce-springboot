@@ -1,10 +1,13 @@
 package com.lexuancong.address.service;
 
+import com.lexuancong.address.constants.Constants;
 import com.lexuancong.address.model.Country;
 import com.lexuancong.address.repository.CountryRepository;
 import com.lexuancong.address.viewmodel.country.CountryPagingVm;
 import com.lexuancong.address.viewmodel.country.CountryPostVm;
 import com.lexuancong.address.viewmodel.country.CountryGetVm;
+import com.lexuancong.share.exception.DuplicatedException;
+import com.lexuancong.share.exception.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -53,13 +56,14 @@ public class CountryService {
 
     public CountryGetVm createCountry(CountryPostVm countryPostVm){
         if(countryRepository.existsByNameIgnoreCase(countryPostVm.name())){
-            // throw exception
+            throw new DuplicatedException(Constants.ErrorKey.NAME_ALREADY_EXITED);
         }
         return CountryGetVm.fromModel(countryRepository.save(countryPostVm.toModel()));
     }
 
     public void updateCountry(Long id,CountryPostVm countryPostVm){
-       Country country = countryRepository.findById(id).orElseThrow(()->null);
+       Country country = countryRepository.findById(id)
+               .orElseThrow(()-> new NotFoundException(Constants.ErrorKey.Country.COUNTRY_NOT_FOUND, id));
        country.setName(countryPostVm.name());
        if(this.countryRepository.existsByNameIgnoreCaseAndIdNot(countryPostVm.name(),id)){
            // throw exception
@@ -68,9 +72,9 @@ public class CountryService {
 
     }
     public void deleteCountry(Long id){
-        boolean isExistCountry = countryRepository.existsById(id);
-        if(!isExistCountry){
-            // throw exception
+        boolean isExistedCountry = countryRepository.existsById(id);
+        if(!isExistedCountry){
+            throw new NotFoundException(Constants.ErrorKey.Country.COUNTRY_NOT_FOUND, id);
         }
         countryRepository.deleteById(id);
     }

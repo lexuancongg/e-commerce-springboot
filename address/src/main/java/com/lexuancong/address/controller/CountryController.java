@@ -12,7 +12,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
-@RequestMapping("/address")
+@RequestMapping(com.lexuancong.address.constants.Constants.ApiConstants.ADDRESS_BASE_URL)
 @RestController
 public class CountryController {
 
