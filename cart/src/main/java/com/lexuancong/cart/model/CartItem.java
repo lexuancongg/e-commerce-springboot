@@ -16,7 +16,7 @@ import lombok.*;
 @Setter
 @Builder
 // lưu ý : trùng với tên và dữ liệu của trg class làm id phức hợp
-public class CartItem extends AuditEntity{
+public class CartItem extends BaseAuditEntity {
     @Id
     private String customerId;
     @Id

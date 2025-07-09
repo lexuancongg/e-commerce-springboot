@@ -1,8 +1,8 @@
 package com.lexuancong.cart.mapper;
 
 import com.lexuancong.cart.model.CartItem;
-import com.lexuancong.cart.viewmodel.CartItemVm;
-import com.lexuancong.cart.viewmodel.CartItemPostVm;
+import com.lexuancong.cart.viewmodel.cartitem.CartItemGetVm;
+import com.lexuancong.cart.viewmodel.cartitem.CartItemPostVm;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -19,8 +19,8 @@ public class CartItemMapper {
                 .build();
     }
     // return for frontend
-    public CartItemVm toCartItemGetVm(CartItem cartItem){
-        return CartItemVm.builder()
+    public CartItemGetVm toCartItemGetVm(CartItem cartItem){
+        return CartItemGetVm.builder()
                 .customerId(cartItem.getCustomerId())
                 .quantity(cartItem.getQuantity())
                 .productId(cartItem.getProductId())
@@ -37,7 +37,7 @@ public class CartItemMapper {
     }
 
     // convert for list
-    public List<CartItemVm> toCartItemGetVmList(List<CartItem> cartItemList){
+    public List<CartItemGetVm> toCartItemGetVmList(List<CartItem> cartItemList){
         return cartItemList.stream().map(this::toCartItemGetVm).collect(Collectors.toList());
     }
 

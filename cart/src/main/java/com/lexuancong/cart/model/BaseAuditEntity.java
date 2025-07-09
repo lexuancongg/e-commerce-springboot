@@ -16,9 +16,9 @@ import java.time.ZonedDateTime;
 @Getter
 @Setter
 @EntityListeners({CustomAuditingEntityListener.class})
-public class AuditEntity {
+public abstract class BaseAuditEntity {
     @CreationTimestamp
-    // no change value when saved in db
+    // không cho update
     @Column(updatable = false)
     private ZonedDateTime createdAt;
 

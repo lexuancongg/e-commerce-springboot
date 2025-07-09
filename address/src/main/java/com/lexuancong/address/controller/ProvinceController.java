@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
-@RequestMapping(Constants.ApiConstants.ADDRESS_BASE_URL)
+@RequestMapping(com.lexuancong.address.constants.Constants.ApiConstants.ADDRESS_BASE_URL)
 @RestController
 public class ProvinceController {
     private final ProvinceService provinceService;

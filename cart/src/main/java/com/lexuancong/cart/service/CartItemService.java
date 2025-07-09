@@ -3,10 +3,11 @@ package com.lexuancong.cart.service;
 import com.lexuancong.cart.mapper.CartItemMapper;
 import com.lexuancong.cart.model.CartItem;
 import com.lexuancong.cart.repository.CartItemRepository;
-import com.lexuancong.cart.utils.AuthenticationUtils;
-import com.lexuancong.cart.viewmodel.CartItemVm;
-import com.lexuancong.cart.viewmodel.CartItemPostVm;
-import com.lexuancong.cart.viewmodel.CartItemPutVm;
+import com.lexuancong.cart.service.internal.ProductService;
+import com.lexuancong.cart.viewmodel.cartitem.CartItemGetVm;
+import com.lexuancong.cart.viewmodel.cartitem.CartItemPostVm;
+import com.lexuancong.cart.viewmodel.cartitem.CartItemPutVm;
+import com.lexuancong.share.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.PessimisticLockingFailureException;
@@ -22,16 +23,16 @@ public class CartItemService {
     private final CartItemRepository cartItemRepository;
     private final CartItemMapper cartItemMapper;
     private final ProductService productService;
-    public CartItemVm addCartItem(CartItemPostVm cartItemPostVm){
-        this.validateproduct(cartItemPostVm.productId());
+    public CartItemGetVm addCartItem(CartItemPostVm cartItemPostVm){
+        this.validateProduct(cartItemPostVm.productId());
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         CartItem cartItem = performAddCartItem(cartItemPostVm,customerId);
         return cartItemMapper.toCartItemGetVm(cartItem);
 
     }
-    private void validateproduct(Long productId){
+    private void validateProduct(Long productId){
         if(!productService.checkExistById(productId)){
-            // ban ra ngoai le
+
 
         }
     }
@@ -65,7 +66,7 @@ public class CartItemService {
 
 
     // api put cartItem about quantity
-    public CartItemVm updateCartItem(Long productId, CartItemPutVm cartItemPutVm){
+    public CartItemGetVm updateCartItem(Long productId, CartItemPutVm cartItemPutVm){
         this.validateproduct(productId);
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         CartItem cartItem = cartItemMapper.toCartItem(customerId,productId, cartItemPutVm.quantity());
@@ -76,7 +77,7 @@ public class CartItemService {
 
 
     // api get cartItem
-    public List<CartItemVm> getCartItems(){
+    public List<CartItemGetVm> getCartItems(){
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         List<CartItem> cartItems = cartItemRepository.findByCustomerIdOrderByCreatedAtDesc(customerId);
         return cartItemMapper.toCartItemGetVmList(cartItems);

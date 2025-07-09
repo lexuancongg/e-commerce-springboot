@@ -1,4 +1,4 @@
-package com.lexuancong.cart.viewmodel;
+package com.lexuancong.cart.viewmodel.cartitem;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
