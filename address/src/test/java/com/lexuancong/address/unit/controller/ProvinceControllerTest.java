@@ -7,6 +7,7 @@ import com.lexuancong.address.service.ProvinceService;
 import com.lexuancong.address.viewmodel.country.CountryPagingVm;
 import com.lexuancong.address.viewmodel.province.ProvinceGetVm;
 import com.lexuancong.address.viewmodel.province.ProvincePagingVm;
+import com.lexuancong.address.viewmodel.province.ProvincePostVm;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
@@ -58,6 +60,25 @@ public class ProvinceControllerTest {
         mockMvc.perform(get("/address/management/provinces/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void TestCreateProvince_whenValidRequest_thenReturnOk() throws Exception {
+        ProvincePostVm provincePostVm = ProvincePostVm.builder()
+                .type("country")
+                .countryId(1L)
+                .name("Quang Tri")
+                .build();
+        String requestBody = this.objectWriter.writeValueAsString(provincePostVm);
+        ProvinceGetVm provinceGetVm =ProvinceGetVm.builder()
+                .countryId(1L)
+                .build();
+        given(this.provinceService.createProvince(provincePostVm)).willReturn(provinceGetVm);
+        this.mockMvc.perform(post("/address/management/provinces")
+        .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(status().isCreated());
+
     }
 
 

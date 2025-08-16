@@ -6,8 +6,8 @@ public enum Operation {
     DELETE("d"),
     READ("r");
 
-    private String actionName;
-    private Operation(String actionName) {
-        this.actionName = actionName;
+    private String action;
+    private Operation(String action) {
+        this.action = action;
     }
 }
