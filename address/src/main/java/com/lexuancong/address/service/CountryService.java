@@ -56,7 +56,7 @@ public class CountryService {
 
     public CountryGetVm createCountry(CountryPostVm countryPostVm){
         if(countryRepository.existsByNameIgnoreCase(countryPostVm.name())){
-            throw new DuplicatedException(Constants.ErrorKey.NAME_ALREADY_EXITED);
+            throw new DuplicatedException(Constants.ErrorKey.NAME_ALREADY_EXITED, countryPostVm.name());
         }
         return CountryGetVm.fromModel(countryRepository.save(countryPostVm.toModel()));
     }
@@ -66,7 +66,7 @@ public class CountryService {
                .orElseThrow(()-> new NotFoundException(Constants.ErrorKey.Country.COUNTRY_NOT_FOUND, id));
        country.setName(countryPostVm.name());
        if(this.countryRepository.existsByNameIgnoreCaseAndIdNot(countryPostVm.name(),id)){
-           // throw exception
+           throw new DuplicatedException(Constants.ErrorKey.NAME_ALREADY_EXITED, countryPostVm.name());
        }
        countryRepository.save(country);
 

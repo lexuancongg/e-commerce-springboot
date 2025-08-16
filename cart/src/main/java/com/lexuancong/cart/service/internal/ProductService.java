@@ -5,6 +5,7 @@ import com.lexuancong.cart.viewmodel.product.ProductPreviewVm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -22,7 +23,11 @@ public class ProductService {
     }
 
     private ProductPreviewVm getProductById(Long id){
-
+        List<ProductPreviewVm> productPreviewVm = this.getProductListByIds(List.of(id));
+        if(CollectionUtils.isEmpty(productPreviewVm)){
+            return null;
+        }
+        return productPreviewVm.getFirst();
     }
 
 

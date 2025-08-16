@@ -1,0 +1,26 @@
+{
+  "sessionId": "A1B2C3D4E5F6G7H8",
+  "creationTime": "2025-08-16T13:00:00Z",
+  "lastAccessedTime": "2025-08-16T13:10:00Z",
+  "maxInactiveInterval": 1800,
+  "attributes": {
+    "SPRING_SECURITY_CONTEXT": {
+      "authentication": {
+        "principal": {
+          "username": "banbu",
+          "name": "Bạn Bu",
+          "email": "banbu@example.com"
+        },
+        "authorities": ["ROLE_USER", "ROLE_ADMIN"],
+        "credentials": null,
+        "authenticated": true,
+        "details": null,
+        "token": {
+          "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+          "expiresAt": "2025-08-16T13:50:00Z",
+          "refreshToken": "8sdf7s8df7s8df7s8df7"
+        }
+      }
+    }
+  }
+}

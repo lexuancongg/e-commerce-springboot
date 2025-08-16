@@ -1,7 +1,7 @@
 package com.lexuancong.address.constants;
 
 public final class Constants {
-    public final class ApiConstants {
+    public final class ApiBaseUrl {
         public static final String ADDRESS_BASE_URL = "/address";
     }
     public final class ErrorKey{

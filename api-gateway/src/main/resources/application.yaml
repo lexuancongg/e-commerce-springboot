@@ -9,13 +9,21 @@ spring:
   cloud:
     gateway:
       default-filters:
+#   req kèm theo cookie chứa sessionId => tìm kiếm WebSession trên Gateway. => trong session chứa SecurityContext (user info + token).
+#   => lưu lại => để tokenRelay có thể lấy token
+        - SaveSession
       routes:
         - id: api
+#          url đươợc forward toiyy
         - uri: http://nginx
+#          điều kiện path api phải khớp
         - predicates:
           - Path=/api/**
+#          các bộ lọc áp duụng lên truocs khi forward
         - filters:
+#          lấy token trong session để chuyến tiếp theo req khi được forward
           - TokenRelay=
+
   security:
     oauth2:
       client:
@@ -25,8 +33,8 @@ spring:
         registration:
           keycloak:
             provider: keycloak
-            client-id:
-            client-secret:
+            client-id: 123456
+            client-secret: 123456
             scope: openid, roles
 
 
