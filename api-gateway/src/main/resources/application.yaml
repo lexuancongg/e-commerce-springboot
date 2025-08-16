@@ -23,6 +23,9 @@ spring:
         - filters:
 #          lấy token trong session để chuyến tiếp theo req khi được forward
           - TokenRelay=
+          - StripPrefix=1
+          - DedupeResponseHeader=Origin Access-Control-Request-Method Access-Control-Request-Headers
+
 
   security:
     oauth2:

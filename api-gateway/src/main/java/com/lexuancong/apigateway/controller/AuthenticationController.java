@@ -21,3 +21,20 @@ public class AuthenticationController {
         return ResponseEntity.ok(new AuthenticationInfoVm(true, authenticatedUse));
     }
 }
+//        Login
+// ↓
+//        Authentication -> SecurityContext -> Session (SPRING_SECURITY_CONTEXT)
+//
+//        Request 1
+//        ↓
+//        Filter lấy SecurityContext từ session -> SecurityContextHolder (ThreadLocal)
+// ↓
+//        Controller @AuthenticationPrincipal
+// ↓
+//        Request kết thúc -> SecurityContextHolder.clear()
+//
+//        Request 2 (cùng session)
+//        ↓
+//        Filter lại load SecurityContext từ session -> SecurityContextHolder (ThreadLocal mới)
+// ↓
+//        Controller @AuthenticationPrincipal

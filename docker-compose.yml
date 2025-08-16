@@ -59,6 +59,17 @@ services:
       - ./custom-theme-keycloak/themes/e-commerce/theme:/opt/keycloak/themes
       - ./docker/keycloak/realm/realm-config-export.json:/opt/keycloak/data/import/realm-export.json
 
+  nginx:
+    image: nginx:1.27.2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/config/nginx_api_gateway_config.conf:/etc/nginx/conf.d/custom_proxy_settings.conf
+    networks:
+      - lexuancong-network
+
+
 
 
 
