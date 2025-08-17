@@ -31,11 +31,7 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.lexuancong</groupId>
-            <artifactId>vnpay-payment</artifactId>
-            <version>${revision}</version>
-        </dependency>
+
     </dependencies>
 
     <build>

@@ -56,9 +56,11 @@
             <artifactId>vnpay-payment</artifactId>
             <version>${revision}</version>
         </dependency>
-
-
-
+        <dependency>
+            <groupId>com.lexuancong</groupId>
+            <artifactId>paypal-payment</artifactId>
+            <version>${revision}</version>
+        </dependency>
 
     </dependencies>
 

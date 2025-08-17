@@ -44,6 +44,7 @@ public class VnPayPaymentHandler extends AbstractPaymentProviderSupport implemen
 
         }catch (Exception e){
             System.out.println("error");
+            return null;
         }
 
     }
