@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: paypal-payment
+
+paypal:
+  mode: sandbox
+  client:
+    clientId: xxxxxxxxxxxxxxxxxxYOUR_CLIENT_IDxxxxxxxxxxxxxxxx
+    clientSecret: xxxxxxxxxxxxxxxxxxYOUR_CLIENT_SECRETxxxxxxxxxxxxxxx

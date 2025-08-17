@@ -1,0 +1,6 @@
+https://github.com/masasdani/paypal-springboot/blob/master/src/main/java/com/masasdani/paypal/config/PaypalConfig.java
+= > link github demo theo kiểu v1 của paypal
+
+
+
+https://github.com/almakonde/Checkout-Java-SDK/blob/develop/checkout-sdk/src/main/java/com/paypal/orders/Order.java
