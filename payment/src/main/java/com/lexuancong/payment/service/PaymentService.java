@@ -1,6 +1,6 @@
 package com.lexuancong.payment.service;
 
-import com.lexuancong.payment.model.InitiatedPayment;
+import com.lexuancong.payment.model.InitiatedPaymentVm;
 import com.lexuancong.payment.repository.PaymentRepository;
 import com.lexuancong.payment.service.handler.providers.ProviderPaymentHandler;
 import com.lexuancong.payment.viewmodel.InitPaymentRequest;
@@ -37,9 +37,9 @@ public class PaymentService {
     public InitPaymentResponse initPayment(InitPaymentRequest initPaymentRequest){
       // xác định loại provider thanh toán
         ProviderPaymentHandler providerPaymentHandler = this.getProviderPaymentHandler(initPaymentRequest.paymentMethod());
-        InitiatedPayment initiatedPayment = providerPaymentHandler.initPayment(initPaymentRequest);
+        InitiatedPaymentVm initiatedPaymentVm = providerPaymentHandler.initPayment(initPaymentRequest);
 
-        return new InitPaymentResponse(initiatedPayment.status() , initiatedPayment.paymentId() , initiatedPayment.redirectUrl());
+        return new InitPaymentResponse(initiatedPaymentVm.status() , initiatedPaymentVm.paymentId() , initiatedPaymentVm.redirectUrl());
     }
 
     private ProviderPaymentHandler getProviderPaymentHandler(String providerName){

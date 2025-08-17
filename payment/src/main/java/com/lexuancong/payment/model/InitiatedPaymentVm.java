@@ -4,7 +4,7 @@ import lombok.Builder;
 
 import java.time.LocalDateTime;
 @Builder
-public record InitiatedPayment(
+public record InitiatedPaymentVm(
         String redirectUrl,  String transactionId,
          String orderId,
          LocalDateTime expiredTime,

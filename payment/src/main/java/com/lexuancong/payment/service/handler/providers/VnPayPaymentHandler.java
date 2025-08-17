@@ -1,6 +1,6 @@
 package com.lexuancong.payment.service.handler.providers;
 
-import com.lexuancong.payment.model.InitiatedPayment;
+import com.lexuancong.payment.model.InitiatedPaymentVm;
 import com.lexuancong.payment.model.enumeration.PaymentMethod;
 import com.lexuancong.payment.repository.PaymentProviderRepository;
 import com.lexuancong.payment.viewmodel.InitPaymentRequest;
@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 // vnpay provider
-public class VnPayProviderPaymentHandler extends AbstractPaymentProviderSupport implements ProviderPaymentHandler  {
+public class VnPayPaymentHandler extends AbstractPaymentProviderSupport implements ProviderPaymentHandler  {
     private final VnpayService vnpayService;
 
-    public VnPayProviderPaymentHandler(VnpayService vnpayService , PaymentProviderRepository paymentProviderRepository) {
+    public VnPayPaymentHandler(VnpayService vnpayService , PaymentProviderRepository paymentProviderRepository) {
         super(paymentProviderRepository);
         this.vnpayService = vnpayService;
     }
@@ -25,18 +25,19 @@ public class VnPayProviderPaymentHandler extends AbstractPaymentProviderSupport 
 
     // đoạn code xử lý dành cho vn pay
     @Override
-    public InitiatedPayment initPayment(InitPaymentRequest initPaymentRequest) {
+    public InitiatedPaymentVm initPayment(InitPaymentRequest initPaymentRequest) {
         try {
             VnpayCreatePaymentUrlRequest vnpayCreatePaymentUrlRequest = new VnpayCreatePaymentUrlRequest(
                     initPaymentRequest.totalPrice(),
                     initPaymentRequest.paymentMethod(),
-                    this.getConfigurationProperties(this.getNameProvider())
+                    this.getConfigurationProperties(this.getNameProvider()),
+                    initPaymentRequest.description()
             );
 
             String vnp_paymentUrl = vnpayService.createPaymentUrl(vnpayCreatePaymentUrlRequest);
-            return  InitiatedPayment.builder()
+            return  InitiatedPaymentVm.builder()
                     .paymentId(null)
-                    .provider("VNPAY")
+                    .provider(PaymentMethod.VNPAY.name())
                     .redirectUrl(vnp_paymentUrl)
                     .status("PENDING")
                     .build();
@@ -44,5 +45,6 @@ public class VnPayProviderPaymentHandler extends AbstractPaymentProviderSupport 
         }catch (Exception e){
             System.out.println("error");
         }
+
     }
 }
