@@ -16,6 +16,9 @@
     <properties>
         <java.version>17</java.version>
     </properties>
+
+
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -55,6 +58,13 @@
             <artifactId>checkout-sdk</artifactId>
             <version>2.0.0</version>
         </dependency>
+<!--         https://mvnrepository.com/artifact/com.paypal.sdk/paypal-server-sdk-->
+        <dependency>
+            <groupId>com.paypal.sdk</groupId>
+            <artifactId>paypal-server-sdk</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+
 
 
         <dependency>
