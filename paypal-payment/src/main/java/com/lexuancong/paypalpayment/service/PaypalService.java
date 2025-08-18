@@ -2,15 +2,18 @@ package com.lexuancong.paypalpayment.service;
 
 import com.lexuancong.paypalpayment.viewmodel.PaypalCreatePaymentRequest;
 import com.lexuancong.paypalpayment.viewmodel.PaypalCreatePaymentResponse;
+import com.lexuancong.share.exception.NotFoundException;
 import com.paypal.core.PayPalHttpClient;
-import com.paypal.orders.AmountWithBreakdown;
-import com.paypal.orders.OrderRequest;
-import com.paypal.orders.PurchaseUnitRequest;
+import com.paypal.http.HttpResponse;
+import com.paypal.orders.*;
 import com.paypal.sdk.PaypalServerSdkClient;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.stylesheets.LinkStyle;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,13 +23,16 @@ import java.util.List;
 public class PaypalService {
     private final PayPalHttpClient payPalHttpClient;
     private final PaypalServerSdkClient paypalServerSdkClient;
+    @Value("${}")
+    private  String returnUrl;
+    @Value("${}")
+    private  String cancelUrl;
+
+    private final String brandName = "lexuancong";
 
     private final BigDecimal maxPay = new BigDecimal(100);
 
     public PaypalCreatePaymentResponse createPayment(PaypalCreatePaymentRequest paypalCreatePaymentRequest) {
-        // đại diện cho data body trong req
-        OrderRequest orderRequest = new OrderRequest();
-        orderRequest.checkoutPaymentIntent("CAPTURE");
         BigDecimal totalPrice = paypalCreatePaymentRequest.totalPrice();
         // chia transaction ra nếu viwotj quá maxPay
         List<BigDecimal> transactions = new ArrayList<>();
@@ -41,16 +47,58 @@ public class PaypalService {
 
         }
 
-        for (BigDecimal transaction : transactions) {
+        List<String> redirectUrls = new ArrayList<>();
+
+        for (BigDecimal amount : transactions) {
             PurchaseUnitRequest purchaseUnitRequest = new PurchaseUnitRequest()
                     .amountWithBreakdown(
                             new AmountWithBreakdown()
                                     .currencyCode("USD")
+                                    .value(amount.toString())
                     );
+            // đại diện cho data body trong req
+            OrderRequest orderRequest = new OrderRequest();
+            orderRequest.checkoutPaymentIntent("CAPTURE");
+            orderRequest.purchaseUnits(List.of(purchaseUnitRequest));
+            // câu hiình giao diện khi thanh toán treen paypal
+            ApplicationContext applicationContext = new ApplicationContext()
+                    .returnUrl(this.returnUrl)
+                    .cancelUrl(this.cancelUrl)
+                    .brandName(this.brandName)
+                    .landingPage("BILLING")
+                    .userAction("PAY_NOW")
+                    .shippingPreference("NO_SHIPPING");
+
+            orderRequest.applicationContext(applicationContext);
+            OrdersCreateRequest request = (OrdersCreateRequest) new OrdersCreateRequest()
+                    .header("perfer","return=representation")
+                    .requestBody(orderRequest);
+            try {
+                HttpResponse<Order> orderHttpResponse = this.payPalHttpClient.execute(request);
+                Order order = orderHttpResponse.result();
+                String redirectUrl  = order.links().stream()
+                        .filter(link -> "approve".equals(link))
+                        .findFirst()
+                        .orElseThrow(()-> new NotFoundException(""))
+                        .href();
+
+                redirectUrls.add(redirectUrl);
+                return new PaypalCreatePaymentResponse(HttpStatus.OK.name(),paypalCreatePaymentRequest.orderId(),redirectUrl);
+
+            }catch (IOException exception){
+                exception.printStackTrace();
+                return new PaypalCreatePaymentResponse(HttpStatus.INTERNAL_SERVER_ERROR.name(),paypalCreatePaymentRequest.orderId(),null);
+            }
+
+
+
 
         }
-
-
+        return new PaypalCreatePaymentResponse(
+                HttpStatus.OK.name(),
+                paypalCreatePaymentRequest.orderId(),
+                String.join(",", redirectUrls)
+        );
 
     }
 
