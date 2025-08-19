@@ -103,3 +103,9 @@ public class PaypalService {
     }
 
 }
+
+
+// docs
+// https://developer.paypal.com/studio/checkout/standard/integrate
+// https://developer.paypal.com/serversdk/java/api-endpoints/orders/create-order
+//  https://developer.paypal.com/docs/api/orders/sdk/v2/#orders_create

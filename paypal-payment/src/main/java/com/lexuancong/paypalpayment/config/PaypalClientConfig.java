@@ -49,15 +49,15 @@ public class PaypalClientConfig {
                         .timeout(0))
                 .environment(Environment.SANDBOX)
                 .clientCredentialsAuth(new ClientCredentialsAuthModel.Builder(this.clientId, this.clientSecret)
-                                .oAuthTokenProvider((lastOAuthToken, credentialsManager) -> {
-                                    // Add the callback handler to provide a new OAuth token
-                                    // It will be triggered whenever the lastOAuthToken is undefined or expired
-                                    OAuthToken oAuthToken = loadTokenFromDatabase();
-                                    if (oAuthToken != null && !credentialsManager.isTokenExpired(oAuthToken)) {
-                                        return oAuthToken;
-                                    }
-                                    return credentialsManager.fetchToken();
-                                })
+//                                .oAuthTokenProvider((lastOAuthToken, credentialsManager) -> {
+//                                    // Add the callback handler to provide a new OAuth token
+//                                    // It will be triggered whenever the lastOAuthToken is undefined or expired
+//                                    OAuthToken oAuthToken = loadTokenFromDatabase();
+//                                    if (oAuthToken != null && !credentialsManager.isTokenExpired(oAuthToken)) {
+//                                        return oAuthToken;
+//                                    }
+//                                    return credentialsManager.fetchToken();
+//                                })
                                 .build()
                 )
                 .build();

@@ -1,6 +1,8 @@
 package com.lexuancong.paypalpayment.viewmodel;
 
-import java.math.BigDecimal;
+import lombok.Builder;
 
+import java.math.BigDecimal;
+@Builder
 public record PaypalCreatePaymentRequest(BigDecimal totalPrice,String orderId,String providerPaymentSetting) {
 }
