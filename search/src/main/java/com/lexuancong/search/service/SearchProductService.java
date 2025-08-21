@@ -46,6 +46,9 @@ public class SearchProductService {
                 )
                 .withPageable(PageRequest.of(productQueryParams.pageIndex(), productQueryParams.pageSize()));
 
+
+
+
         // thêm bộ lọc vào truy vấn => không ảnh hưởng điểm , chỉ quyết định xem document đó có đc đưa vào kq không thôi => giống như where
         nativeQueryBuilder.withFilter(filterQueryBuilder -> filterQueryBuilder
                 .bool(boolQueryBuilder -> {
@@ -62,6 +65,7 @@ public class SearchProductService {
                         }
                 )
         );
+
         org.springframework.data.elasticsearch.core.query.Query query = nativeQueryBuilder.build();
         // ds keets quả trả ve
         SearchHits<Product> searchHitsProduct = this.elasticsearchOperations.search(query, Product.class);
@@ -88,6 +92,7 @@ public class SearchProductService {
         String[] values = fieldValues.split(",");
         // phải ít nhất đúng một trong các value này theo fieldname
         boolQueryBuilder.must(mustQueryBuilder -> {
+
                     BoolQuery.Builder boolQuery = new BoolQuery.Builder();
                     for (String value : values) {
                         boolQuery.should(shouldQuery ->

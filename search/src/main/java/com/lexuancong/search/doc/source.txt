@@ -1,0 +1,4 @@
+https://viblo.asia/p/spring-data-elasticsearch-tan-dung-elasticsearch-trong-ung-dung-spring-boot-oK9VyxeALQR?utm_source=chatgpt.com
+
+spring data es ,
+ElasticsearchOperations : Nó wrapper cho RestHighLevelClient, cung cấp API Spring-y kiểu familiar:

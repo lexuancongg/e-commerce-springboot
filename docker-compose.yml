@@ -1,13 +1,12 @@
-version: "3.9"
+#version: "3.9"
 services:
   postgres:
     image: debezium/postgres:16-alpine
 #    tìm file docker file trong thư mục postgres để build
-    build: ./docker/postgres
+#    build: ./docker/postgres
     ports:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     volumes:
-#      - ./docker/postgres/postgresql.conf.sample:/usr/share/postgresql/postgresql.conf.sample
       - ./docker/postgres/postgres_init.sql:/docker-entrypoint-initdb.d/postgres_init.sql
       - postgres:/var/lib/postgresql/data
 #    command: postgres -c 'max_connections=500'
@@ -42,13 +41,12 @@ services:
       KC_DB: postgres
 #      khi image này chạy thì nó là container như 1 mt riêng biệt , nếu localhost thay cho post.. thì localhost ở đây là chính nó nên sai
       KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
-      KC_DB_USERNAME: admin
-      KC_DB_PASSWORD: admin
+      KC_DB_USERNAME: xuancong
+      KC_DB_PASSWORD: xuancong
       JAVA_OPTS: "-Dkeycloak.profile=preview"
 
       #      cho nó chạy cổng 80 trong container
       KC_HTTP_PORT: 80
-#      đảm bảo postGres được khởi dộng trước keycloak
     ports:
       - "8080:80"
     depends_on:
@@ -63,7 +61,7 @@ services:
     image: nginx:1.27.2
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "8081:80"
     volumes:
       - ./docker/nginx/config/nginx_api_gateway_config.conf:/etc/nginx/conf.d/custom_proxy_settings.conf
     networks:

@@ -38,7 +38,7 @@ const  Header  = ({children}:React.PropsWithChildren) =>{
             <div className="header">
                 <nav className="top-bar">
                     <div className="top-bar-container container">
-                        <div className="left-top-bar">le xuan cong hello</div>
+                        <div className="left-top-bar">le xuan cong</div>
                         <div className="right-top-bar d-flex h-full">
                             {
                                 data_menu.map((item) => (
@@ -62,7 +62,7 @@ const  Header  = ({children}:React.PropsWithChildren) =>{
                 <nav className="limiter-menu-desktop container">
                     {/* <!-- Logo desktop --> */}
                     <Link href="/" className="header-logo me-3">
-                        <h3 className="text-black">LE XUAN CONG HÊLO</h3>
+                        <h3 className="text-black">LE XUAN CONG</h3>
                     </Link>
 
                     {/* <!-- Search --> */}

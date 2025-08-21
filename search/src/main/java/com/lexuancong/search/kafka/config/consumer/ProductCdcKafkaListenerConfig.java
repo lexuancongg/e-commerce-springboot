@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
@@ -23,15 +24,18 @@ public class ProductCdcKafkaListenerConfig {
     // KafkaProperties được inject vào từ bean do mapper từ file properties
     @Bean(name = "productCdcListenerContainerFactory")
     public ConcurrentKafkaListenerContainerFactory<KafkaProductMessageKey, KafkaProductCdcMessageValue> kafkaListenerContainerFactory(KafkaProperties properties) {
-        var factory = new ConcurrentKafkaListenerContainerFactory<KafkaProductMessageKey,KafkaProductCdcMessageValue>();
+        var factory = new ConcurrentKafkaListenerContainerFactory<KafkaProductMessageKey, KafkaProductCdcMessageValue>();
         factory.setConsumerFactory(this.consumerFactory(KafkaProductMessageKey.class, KafkaProductCdcMessageValue.class, properties));
         return factory;
     }
 
-    //nhà máy tạo ra consumer =>nhận data từ kafka
-    private ConsumerFactory<KafkaProductMessageKey,KafkaProductCdcMessageValue> consumerFactory(Class<KafkaProductMessageKey>  keyclass ,
-                                                                                                Class<KafkaProductCdcMessageValue> valueclass ,
-                                                                                                KafkaProperties kafkaProperties) {
+//Consumer là cái thực sự nhận message từ Kafka topic.
+//Nó biết cách connect Kafka, deserialize key/value, group id, v.v…
+//ConsumerFactory làm gì?
+//consumerFactory tạo ra các consumer instance theo config bạn định nghĩa.
+    private ConsumerFactory<KafkaProductMessageKey, KafkaProductCdcMessageValue> consumerFactory(Class<KafkaProductMessageKey> keyclass,
+                                                                                                 Class<KafkaProductCdcMessageValue> valueclass,
+                                                                                                 KafkaProperties kafkaProperties) {
         Map<String, Object> props = this.buildConsumerProperties(kafkaProperties);
         // ErrorHandlingDeserializer : khi kafka send message json sai format => JsonDeserializer=> ném lỗi => app crash và listener bị dung
         // => nos bọc lôĩ vào DeserializationException => cho phép :
@@ -47,7 +51,7 @@ public class ProductCdcKafkaListenerConfig {
         return kafkaProperties.buildConsumerProperties(null);
     }
 
-    private <T>JsonDeserializer<T> gettJsonDeserializer(Class<T> tClass){
+    private <T> JsonDeserializer<T> gettJsonDeserializer(Class<T> tClass) {
         var jsonDeserializer = new JsonDeserializer<>(tClass);
         // deserialize  : cho phép deserialize  tất cả các class ở các package
         jsonDeserializer.addTrustedPackages("*");
@@ -58,7 +62,7 @@ public class ProductCdcKafkaListenerConfig {
 
 // doc
 
-//ConcurrentKafkaListenerContainerFactory là bean dùng để cấu hình cách mà @KafkaListener hoạt động. Nó là nhaf máy tạo ra các “ Kafka listener container ”  theo config để hoạt động như lắng nghe message từ Kafka.
+//ConcurrentKafkaListenerContainerFactory là bean dùng để cấu hình cách mà @KafkaListener hoạt động. Nó là công thức tạo ra các “ Kafka listener container ”  theo config để hoạt động như lắng nghe message từ Kafka.
 //
 //  Công dụng chính:
 //Thiết lập:
@@ -80,8 +84,6 @@ public class ProductCdcKafkaListenerConfig {
 //
 //        “Khi nào tạo consumer để lắng nghe message, thì dùng cái factory này để config cách deserialize, groupId, auto-offset,...”
 //→ setConsumerFactory(...) chính là cái "cầu nối" giữa Spring và Kafka client lib. Nếu không set, thì listener sẽ không biết tạo consumer kiểu gì.
-
-
 
 
 // factory.setConsumerFactory(new DefaultKafkaConsumerFactory<>(props));

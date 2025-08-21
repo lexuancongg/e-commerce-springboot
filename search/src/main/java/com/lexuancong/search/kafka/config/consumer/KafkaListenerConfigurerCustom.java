@@ -1,10 +1,12 @@
 package com.lexuancong.search.kafka.config.consumer;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.elasticsearch.client.ClientConfiguration;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.annotation.KafkaListenerConfigurer;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistrar;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-// KafkaListenerConfigurer : bean custom cách kaffka handle listener
+// KafkaListenerConfigurer : bean custom  kaffka listener container sau khi đc spring tạo bởi ConcurrentKafkaListenerContainerFactory => setup thêm cấu hình, (đầu bếp nấu món ăn xong , phụ bếp decor theem phần sau),
+// nó chỉ áp dụng cho ConcurrentKafkaListenerContainerFactory mặc định, hoặc ConcurrentKafkaListenerContainerFactory nào đó được đki trong hàm overight kia
 @EnableKafka
 @Configuration
 public class KafkaListenerConfigurerCustom implements KafkaListenerConfigurer {
@@ -28,8 +30,6 @@ public class KafkaListenerConfigurerCustom implements KafkaListenerConfigurer {
 // KafkaListenerEndpointRegistrar :  quản lý và  cấu hình kaffka listenter ,
 // Quản l
 ////Cho phép bạn tùy chỉnh hành vi của listener,
-//// KafkaListenerConfigurer : interface để cấu hình kaffka trong spring một cách tùy chỉnhý các endpoint của listener (ví dụ: các method đánh dấu @KafkaListener)
-// cấu hình cách listener được đăng ký : => chỉ ảnh hưởng mỗi listener được đăng ký thủ công ở đây
 //   KafkaListenerConfigurer = config đăng ký listener (ai, khi nào, cách thêm listener vào hệ thống).
 //
 //  Còn config hoạt động chi tiết của listener (cách nhận message, xử lý...) nằm ở KafkaListenerContainerFactory.
