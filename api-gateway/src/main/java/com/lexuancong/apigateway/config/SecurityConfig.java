@@ -2,6 +2,7 @@ package com.lexuancong.apigateway.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.PriorityOrdered;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -17,7 +18,9 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2UserAuthority;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.logout.ServerLogoutSuccessHandler;
+import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,10 +41,11 @@ public class SecurityConfig {
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         return  http
                 .authorizeExchange(auth -> auth
-                        .pathMatchers("/").authenticated()
+                        .pathMatchers("/authentication").authenticated()
                         .anyExchange().permitAll())
                 // dùng oauth2 mặc định , spring tự động cấu hình url , đổi code để lấy accesstoken....
                 .oauth2Login(Customizer.withDefaults())
+
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
@@ -50,6 +54,7 @@ public class SecurityConfig {
                 )
                 .build();
     }
+
 
     private ServerLogoutSuccessHandler serverLogoutSuccessHandler() {
         // hủy seasion bên keycloak đi nữa
@@ -62,17 +67,22 @@ public class SecurityConfig {
     // mapper sang quyền từ oauth2loggin() , còn đối tượng authentication được tạo theo mặc định sub=>name
     @Bean
   // bean này mapper quyền ở tầng cuối cùng , nhận lại các quyền trong authentication rồi map lại
-    public GrantedAuthoritiesMapper grantedAuthoritiesMapper(){
+    public GrantedAuthoritiesMapper grantedAuthoritiesMapper( ){
         // tham số ds quyền mặc định chk phải là quyền thực , mà là chua một trong hai đối tượng check instant dưới chứa thông tin cả idtoken hoặc access token
         return  (authorities)->{
             Set<GrantedAuthority> grantedAuthoritySet = new HashSet<>();
             GrantedAuthority authority = authorities.iterator().next();
             boolean isOidc = authority instanceof OidcUserAuthority;
+
             if(isOidc){
+                System.out.println("this is oidc");
+                System.out.println("authority " + authority);
                 OidcUserAuthority oidcUserAuthority = (OidcUserAuthority)authority;
                 OidcUserInfo oidcUserInfo = oidcUserAuthority.getUserInfo();
+                System.out.println("oidcUserInfo " + oidcUserInfo);
                 if(oidcUserInfo.hasClaim(this.REALM_ACCESS_CLAIM)){
                     Map<String, Object> realmAccessClaim = oidcUserInfo.getClaimAsMap(this.REALM_ACCESS_CLAIM);
+                    System.out.println("realmAccessClaim " + realmAccessClaim);
                     Collection<String> roles = (Collection<String>) realmAccessClaim.get(this.ROLES_CLAIM);
                     grantedAuthoritySet.addAll(this.buildAuthoritiesFromClaimRoles(roles));
                 }

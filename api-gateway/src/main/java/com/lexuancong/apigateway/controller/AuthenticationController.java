@@ -7,6 +7,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.WebSession;
+
+import java.security.Principal;
 
 // api lấy thông tin tên user để hiển thị trên thanh header
 @RestController
@@ -16,10 +19,26 @@ public class AuthenticationController {
         if(principal == null) {
             return ResponseEntity.ok(new AuthenticationInfoVm(false, null));
         }
+        System.out.println(
+                principal
+        );
         String username = principal.getAttribute("preferred_username");
         AuthenticatedUserVm authenticatedUse = new AuthenticatedUserVm(username);
         return ResponseEntity.ok(new AuthenticationInfoVm(true, authenticatedUse));
     }
+
+    @GetMapping("/session-data")
+    public void getSessionData(WebSession session, Principal principal) {
+        // session id
+        String sessionId = session.getId();
+
+        System.out.println(session);
+        System.out.println(principal);
+        // tất cả attribute trong session
+        session.getAttributes().forEach((k,v) -> System.out.println(k + " : " + v));
+
+    }
+
 }
 //        Login
 // ↓

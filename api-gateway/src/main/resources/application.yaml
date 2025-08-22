@@ -15,24 +15,25 @@ spring:
       routes:
         - id: api
 #          url đươợc forward toiyy
-        - uri: http://nginx
+          uri: http://nginx
 #          điều kiện path api phải khớp
-        - predicates:
-          - Path=/api/**
+          predicates:
+            - Path=/api/**
 #          các bộ lọc áp duụng lên truocs khi forward
-        - filters:
+          filters:
 #          lấy token trong session để chuyến tiếp theo req khi được forward
-          - TokenRelay=
-          - StripPrefix=1
-          - DedupeResponseHeader=Origin Access-Control-Request-Method Access-Control-Request-Headers
+            - TokenRelay=
+            - StripPrefix=1
+            - DedupeResponseHeader=Origin Access-Control-Request-Method Access-Control-Request-Headers
 
 # lưu session trong redis thay vì mặc định trong memory
-  data:
-    redis:
-      host: redis
-      port: 6379
-  session:
-    store-type: redis
+#  data:
+#    redis:
+#      host: redis
+#      port: 6379
+#  session:
+#    redis:
+#      repository-type: default
 
 
 
@@ -41,13 +42,14 @@ spring:
       client:
         provider:
           keycloak:
-            issuer-uri:  http://keycloak/realms/ecommerce
+            issuer-uri: http://localhost:8080/realms/ecommerce
         registration:
           ecommerce:
             provider: keycloak
             client-id: xuancong-ecommerce
             client-secret: ewnxcHBHo3mKveUS6Fq0DmunI6vQiSXA
-            redirect-uri: http://api-gateway:8000/login/oauth2/code/ecommerce
+            redirect-uri: http://localhost:8000/login/oauth2/code/ecommerce
+
             scope: openid, roles
 management:
   metrics:
