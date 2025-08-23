@@ -67,7 +67,7 @@ public class CartItemService {
 
     // api put cartItem about quantity
     public CartItemGetVm updateCartItem(Long productId, CartItemPutVm cartItemPutVm){
-        this.validateproduct(productId);
+        this.validateProduct(productId);
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         CartItem cartItem = cartItemMapper.toCartItem(customerId,productId, cartItemPutVm.quantity());
         CartItem cartItemSaved = cartItemRepository.save(cartItem);
@@ -87,7 +87,7 @@ public class CartItemService {
 
     // api delete
     public void deleteCartItem(Long productId){
-        this.validateproduct(productId);
+        this.validateProduct(productId);
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         cartItemRepository.deleteByCustomerIdAndProductId(customerId,productId);
     }

@@ -7,10 +7,12 @@ import com.lexuancong.product.validation.ValidateProductPrice;
 import com.lexuancong.product.viewmodel.product.databinding.ProductPropertiesRequire;
 import com.lexuancong.product.viewmodel.product.productoptions.ProductOptionValuePostVm;
 import com.lexuancong.product.viewmodel.product.variants.ProductVariationPostVm;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.util.CollectionUtils;
 
 
+import java.math.BigDecimal;
 import java.util.List;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 // dùng để tùy chỉnh quá trình Serialization
@@ -25,7 +27,9 @@ public record ProductPostVm(
         String specification,
         String sku,
         String gtin,
-        @ValidateProductPrice Double price,
+//        @ValidateProductPrice Double price,
+        @DecimalMin(value = "0.0", inclusive = false, message = "Price phải lớn hơn 0")
+        BigDecimal price,
         boolean isPublic,
         boolean isFeature,
         boolean isOrderEnable,

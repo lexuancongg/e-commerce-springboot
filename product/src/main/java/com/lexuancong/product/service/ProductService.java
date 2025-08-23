@@ -1,5 +1,6 @@
 package com.lexuancong.product.service;
 
+import com.lexuancong.product.constant.Constants;
 import com.lexuancong.product.model.*;
 import com.lexuancong.product.model.attribute.ProductAttributeGroup;
 import com.lexuancong.product.repository.*;
@@ -13,6 +14,8 @@ import com.lexuancong.product.viewmodel.product.databinding.ProductVariationProp
 import com.lexuancong.product.viewmodel.product.variants.ProductVariantVm;
 import com.lexuancong.product.viewmodel.productattribute.AttributeGroupValueVm;
 import com.lexuancong.product.viewmodel.productattribute.AttributeValueVm;
+import com.lexuancong.share.exception.BadRequestException;
+import com.lexuancong.share.exception.DuplicatedException;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -269,24 +272,39 @@ public class ProductService {
     // check xem chieeuf dài và chiều rộng đươc nhập hhowpjp lệ không => tính toán tiền vận chuyển sau nay
     private <T extends ProductVariationPropertiesRequire> void validateLengthMustGreaterThanWidth(ProductPropertiesRequire<T> productVmToSave){
         if(productVmToSave.length() < productVmToSave.width()) {
-            // bắn ra ngoại lệ
+            throw  new BadRequestException(Constants.ErrorKey.LENGTH_MUST_EXCEED_WIDTH);
         }
     }
 
     // check xem các thuộc tinhs của sp có bị trùng lặp trong db không
     private void validateUniqueProductProperties(BaseProductPropertiesRequire baseProductProperties, Product existingProduct){
-        this.checkPropertyExisted(baseProductProperties.slug().toLowerCase(),this.productRepository::findBySlug,existingProduct);
+        this.ensurePropertyNotExists(baseProductProperties.slug().toLowerCase(),this.productRepository::findBySlug,
+                existingProduct,Constants.ErrorKey.SLUG_ALREADY_EXISTED);
         if (StringUtils.isNotEmpty(baseProductProperties.gtin())){
-            this.checkPropertyExisted(baseProductProperties.gtin(),this.productRepository::findByGtin,existingProduct);
+            this.ensurePropertyNotExists(baseProductProperties.gtin(),this.productRepository::findByGtin,
+                    existingProduct,Constants.ErrorKey.GTIN_ALREADY_EXISTED);
         }
-        this.checkPropertyExisted(baseProductProperties.sku(),this.productRepository::findBySku,existingProduct);
+        this.ensurePropertyNotExists(baseProductProperties.sku(),this.productRepository::findBySku,
+                existingProduct,Constants.ErrorKey.SKU_ALREADY_EXISTED);
+
     }
 
-    private void checkPropertyExisted(String propertyValue, Function<String, Optional<Product>> finder ,Product existingProduct){
+    private <T extends ProductVariationPropertiesRequire> void validateUniqueProductProperties(ProductPropertiesRequire<T> productTosave, Product existingProduct){
+        List<T> variations = productTosave.variations();
+        List<BaseProductPropertiesRequire> baseProductPropertiesRequires =variations;
+        for (BaseProductPropertiesRequire baseProductProperty : baseProductProperties){
+            this.validateUniqueProductProperties(baseProductProperty,existingProduct);
+        }
+
+    }
+
+
+
+    private void ensurePropertyNotExists(String propertyValue, Function<String, Optional<Product>> finder , Product existingProduct, String errorKey){
         finder.apply(propertyValue).ifPresent(product -> {
             // nếu create hoặc update mà product khác có slug này thì chưnng tỏ trùng
             if(existingProduct == null || !product.getId().equals(existingProduct.getId()) ){
-                // throw exception
+                 throw new DuplicatedException(errorKey);
             }
         });
     }

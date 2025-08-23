@@ -1,7 +1,7 @@
 package com.lexuancong.product.controller;
 
 import com.lexuancong.product.service.ProductService;
-import com.lexuancong.product.utils.Constants;
+import com.lexuancong.product.constant.Constants;
 import com.lexuancong.product.viewmodel.product.*;
 import com.lexuancong.product.viewmodel.product.variants.ProductVariantVm;
 import jakarta.validation.Valid;

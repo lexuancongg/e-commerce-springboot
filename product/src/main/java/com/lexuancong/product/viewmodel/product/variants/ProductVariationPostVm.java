@@ -3,6 +3,7 @@ package com.lexuancong.product.viewmodel.product.variants;
 import com.lexuancong.product.model.Product;
 import com.lexuancong.product.viewmodel.product.databinding.ProductVariationPropertiesRequire;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +14,7 @@ public record ProductVariationPostVm(
         String slug,
         String sku,
         String gtin,
-        Double price,
+        BigDecimal price,
         Long avatarImageId,
         List<Long> imageIds,
         Map<Long, String> valueOfOptionByOptionId

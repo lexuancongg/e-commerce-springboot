@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class Product extends AuditEntity{
     private String slug;
     // mã vạch quốc tế
     private String gtin;
-    private Double price;
+    private BigDecimal price;
     // cs biến thể hay không
     private boolean hasOptions;
     // cho phép oder hay không
@@ -43,12 +44,12 @@ public class Product extends AuditEntity{
     private boolean isInventoryTracked;
     // số luownjng tồn kho
     private Long inventoryQuantity;
+
+    // SEO
     private String metaTitle;
     private String metaDescription;
-    private String metaKeywords;
     // hình id hình ảnh đại diện
     private Long avatarImageId;
-
 
     // thuoojc tính để xác định phí vận chuyển cho sau này
     private Double length;

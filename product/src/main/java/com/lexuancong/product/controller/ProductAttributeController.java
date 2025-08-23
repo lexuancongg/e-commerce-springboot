@@ -2,7 +2,7 @@ package com.lexuancong.product.controller;
 
 import com.lexuancong.product.model.attribute.ProductAttribute;
 import com.lexuancong.product.service.ProductAttributeService;
-import com.lexuancong.product.utils.Constants;
+import com.lexuancong.product.constant.Constants;
 import com.lexuancong.product.viewmodel.attribute.ProductAttributePagingVm;
 import com.lexuancong.product.viewmodel.attribute.ProductAttributePostVm;
 import com.lexuancong.product.viewmodel.attribute.ProductAttributeVm;
@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.security.Principal;
 import java.util.List;
 
 @RestController
