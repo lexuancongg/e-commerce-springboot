@@ -250,6 +250,7 @@ public class ProductService {
         this.validateUniqueProductProperties(productVmToSave,existingProduct);
         this.validateDuplicateProductPropertiesBetweenVariations(productVmToSave);
 
+
         // valid datete thuộc tính của varian cos bị trùng lặp trong db không
         List<Long> variationIds = productVmToSave.variations().stream()
                 .map(BaseProductPropertiesRequire::id)
@@ -289,14 +290,6 @@ public class ProductService {
 
     }
 
-    private <T extends ProductVariationPropertiesRequire> void validateUniqueProductProperties(ProductPropertiesRequire<T> productTosave, Product existingProduct){
-        List<T> variations = productTosave.variations();
-        List<BaseProductPropertiesRequire> baseProductPropertiesRequires =variations;
-        for (BaseProductPropertiesRequire baseProductProperty : baseProductProperties){
-            this.validateUniqueProductProperties(baseProductProperty,existingProduct);
-        }
-
-    }
 
 
 
@@ -319,13 +312,15 @@ public class ProductService {
         Set<String> setSlugs = new HashSet<>(Collections.singletonList(productVmToSave.slug()));
         for (BaseProductPropertiesRequire variation : productVmToSave.variations()) {
             if(!setSkus.add(variation.sku().toLowerCase())){
-                // throw exception
+                throw new DuplicatedException(Constants.ErrorKey.SKU_ALREADY_EXISTED);
             }
             if(!setSlugs.add(variation.slug().toLowerCase())){
                 // throw exception
+                throw new DuplicatedException(Constants.ErrorKey.SLUG_ALREADY_EXISTED);
             }
             if(StringUtils.isNotEmpty(variation.gtin()) && !setGtins.add(variation.gtin())){
                 // throw exception
+                throw new DuplicatedException(Constants.ErrorKey.GTIN_ALREADY_EXISTED);
 
             }
         }
