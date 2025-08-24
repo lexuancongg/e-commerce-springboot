@@ -67,6 +67,7 @@ public record ProductPostVm(
         product.setInventoryTracked(isInventoryTracked);
         product.setShownSeparately(isShownSeparately);
         product.setHasOptions(!CollectionUtils.isEmpty(variations) && !this.productOptionValues.isEmpty());
+
         return product;
     }
 

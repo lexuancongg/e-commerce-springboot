@@ -16,6 +16,7 @@ import com.lexuancong.product.viewmodel.productattribute.AttributeGroupValueVm;
 import com.lexuancong.product.viewmodel.productattribute.AttributeValueVm;
 import com.lexuancong.share.exception.BadRequestException;
 import com.lexuancong.share.exception.DuplicatedException;
+import com.lexuancong.share.exception.NotFoundException;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -44,11 +45,13 @@ public class ProductService {
 
         this.validateProduct(productPostVm);
         Product product = productPostVm.toModel();
+
         this.setBrandForProduct(product, productPostVm.brandId());
         Product productSaved =  this.productRepository.save(product);
 
-        List<ProductCategory> productCategoryList = this.setProductCategories(productSaved,productPostVm.categoryIds());
-        List<ProductImage> productImageList = this.setProductImages(productSaved,productPostVm.imageIds());
+
+        List<ProductCategory> productCategoryList = this.buildProductCategories(productSaved,productPostVm.categoryIds());
+        List<ProductImage> productImageList = this.buildProductImages(productSaved,productPostVm.imageIds());
 
         this.productCategoryRepository.saveAll(productCategoryList);
         this.productImageRepository.saveAll(productImageList);
@@ -156,7 +159,7 @@ public class ProductService {
                     Product productVariation  = this.buildProductVariationFormVm(variationVm, mainProduct);
                     // quay lại lưu hình ảnh như sản phẩm chính
                     List<ProductImage> variationImages =
-                            this.setProductImages(productVariation,variationVm.imageIds());
+                            this.buildProductImages(productVariation,variationVm.imageIds());
                     allProductImages.addAll(variationImages);
 
                     return productVariation;
@@ -190,8 +193,8 @@ public class ProductService {
 
     }
 
-    // ds productImage lưu lại khi theem sp
-    private List<ProductImage> setProductImages(Product product , List<Long> imageIds){
+    // cũng dần cho cả create cả update
+    private List<ProductImage> buildProductImages(Product product , List<Long> imageIds){
         List<ProductImage> productImages = new ArrayList<>();
         if(CollectionUtils.isEmpty(imageIds)){
             return productImages;
@@ -203,24 +206,52 @@ public class ProductService {
         return productImages;
     }
 
-    private List<ProductCategory> setProductCategories(Product product,List<Long> categoryIds){
-        if(CollectionUtils.isEmpty(categoryIds)){
+
+    // cho  cả update và create dùng chung
+    private List<ProductCategory> buildProductCategories(Product product, List<Long> categoryIdsVm){
+        if(CollectionUtils.isEmpty(categoryIdsVm)){
             return Collections.emptyList();
         }
         List<ProductCategory> productCategoryList = new ArrayList<>();
-        List<Category> categories = categoryRepository.findAllById(categoryIds);
-        if(categories.isEmpty()){
-            // throw exception
-        }else {
-            for (Category category : categories){
-                productCategoryList.add(
-                        ProductCategory.builder().category(category)
-                                .product(product)
-                                .build()
-                );
 
+        // product có thể là cái mới save , có thể là cái lấy trong db ra nếu update
+        List<Long> categoryIds = product.getProductCategories().stream()
+                .map(productCategory -> productCategory.getCategory().getId())
+                .sorted()
+                .toList();
+        // nếu có thay đổi thì mới thực hiện
+        if(!org.apache.commons.collections4.CollectionUtils.isEqualCollection(categoryIds,categoryIdsVm)){
+            List<Category> categories = categoryRepository.findAllById(categoryIdsVm);
+            if(categories.isEmpty()){
+                throw new BadRequestException(Constants.ErrorKey.CATEGORY_NOT_FOUND,categoryIdsVm);
+            }else if (categoryIdsVm.size() > categories.size()){
+                List<Long> categoryIdsValid = categories.stream().map(Category::getId).toList();
+                categoryIdsVm.removeAll(categoryIdsValid);
+                throw new BadRequestException(Constants.ErrorKey.CATEGORY_NOT_FOUND, categoryIdsVm);
+            }else {
+                //  hợp lệ
+                for (Category category : categories) {
+                    productCategoryList.add(ProductCategory.builder()
+                            .product(product)
+                            .category(category).build());
+                }
             }
         }
+
+//
+//        if(categories.isEmpty()){
+//            // throw exception
+//        }else {
+//            for (Category category : categories){
+//                productCategoryList.add(
+//                        ProductCategory.builder().category(category)
+//                                .product(product)
+//                                .build()
+//                );
+//
+//            }
+//        }
+        // nếu create thì save còn update => xử lý cái cũ và lưu cái mới
         return productCategoryList;
 
 
@@ -230,7 +261,7 @@ public class ProductService {
     private void setBrandForProduct(Product product , Long brandId){
         if(brandId != null){
             Brand brand = this.brandRepository.findById(brandId)
-                    .orElseThrow(()-> new RuntimeException());
+                    .orElseThrow(()-> new NotFoundException(Constants.ErrorKey.BRAND_NOT_FOUND));
             product.setBrand(brand);
         }
     }
@@ -455,7 +486,7 @@ public class ProductService {
         List<Long> imageIdsToAdd =  imageIdsNew.stream()
                 .filter(imageId -> !setImageIdsOld.contains(imageId))
                 .toList();
-        List<ProductImage> productImages = this.setProductImages(product,imageIdsToAdd);
+        List<ProductImage> productImages = this.buildProductImages(product,imageIdsToAdd);
         this.productImageRepository.deleteAllInBatch(productImagesToRemove);
         this.productImageRepository.saveAll(productImages);
 
@@ -501,7 +532,7 @@ public class ProductService {
                 .filter(productCategory -> !setCategoryIdsNew.contains(productCategory.getCategory().getId()))
                 .toList();
 
-        List<ProductCategory> productCategoriesNew = this.setProductCategories(product,categoryIdsToAdd);
+        List<ProductCategory> productCategoriesNew = this.buildProductCategories(product,categoryIdsToAdd);
         this.productCategoryRepository.deleteAllInBatch(productCategoriesToRemove);
         this.productCategoryRepository.saveAll(productCategoriesNew);
 

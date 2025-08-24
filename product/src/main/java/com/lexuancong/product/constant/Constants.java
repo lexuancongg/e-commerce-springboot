@@ -10,7 +10,9 @@ public final class Constants {
         public static final String LENGTH_MUST_EXCEED_WIDTH = "LENGTH_MUST_EXCEED_WIDTH";
         public static final String SLUG_ALREADY_EXISTED = "SLUG_ALREADY_EXISTED";
         public static final String SKU_ALREADY_EXISTED = "SKU_ALREADY_EXISTED";
-        public static final String GTIN_ALREADY_EXISTED = "GTIN_ALREADY_EXISTED";
+
+        public static final String BRAND_NOT_FOUND = "BRAND_NOT_FOUND";
+        public static final String CATEGORY_NOT_FOUND = "CATEGORY_NOT_FOUND";
 
 
     }
