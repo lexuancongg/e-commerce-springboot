@@ -51,7 +51,7 @@ public class ProductService {
 
 
         List<ProductCategory> productCategoryList = this.buildProductCategories(productSaved,productPostVm.categoryIds());
-        List<ProductImage> productImageList = this.buildProductImages(productSaved,productPostVm.imageIds());
+        List<ProductImage> productImageList = this.syncProductImages(productSaved,productPostVm.imageIds());
 
         this.productCategoryRepository.saveAll(productCategoryList);
         this.productImageRepository.saveAll(productImageList);
@@ -159,7 +159,7 @@ public class ProductService {
                     Product productVariation  = this.buildProductVariationFormVm(variationVm, mainProduct);
                     // quay lại lưu hình ảnh như sản phẩm chính
                     List<ProductImage> variationImages =
-                            this.buildProductImages(productVariation,variationVm.imageIds());
+                            this.syncProductImages(productVariation,variationVm.imageIds());
                     allProductImages.addAll(variationImages);
 
                     return productVariation;
@@ -194,15 +194,51 @@ public class ProductService {
     }
 
     // cũng dần cho cả create cả update
-    private List<ProductImage> buildProductImages(Product product , List<Long> imageIds){
+    private List<ProductImage> syncProductImages(Product product , List<Long> imageIds){
         List<ProductImage> productImages = new ArrayList<>();
+
         if(CollectionUtils.isEmpty(imageIds)){
+            // xóa các cái cũ đi
+            this.productImageRepository.deleteByProductId(product.getId());
             return productImages;
         }
-        productImages = imageIds.stream()
-                .map(imageId -> ProductImage.builder().imageId(imageId).product(product)
-                        .build())
-                .toList();
+        // trường hợp product chưa có category => chỉ cần thêm vào để lưu vào
+        if(product.getProductImages().isEmpty()){
+            productImages.addAll(
+                    imageIds.stream().map(imageId ->
+                            ProductImage.builder().imageId(imageId).product(product).build()
+                    ).toList()
+            );
+
+            // nếu đã có trc , => xóa cái cũ, thêm cái mới
+        }else {
+            List<Long> imageIdsOfProductInDb = product.getProductImages().stream()
+                    .map(ProductImage::getImageId)
+                    .sorted()
+                    .toList();
+            if(!org.apache.commons.collections4.CollectionUtils.isEqualCollection(imageIds, imageIdsOfProductInDb)){
+                List<Long> newImageIds = imageIds.stream()
+                        .filter(imageId->  !imageIdsOfProductInDb.contains(imageId))
+                        .toList();
+                List<Long> imageIdsToDelete = imageIdsOfProductInDb.stream()
+                        .filter( imageId->  !imageIds.contains(imageId))
+                        .toList();
+                if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(imageIdsToDelete)){
+                    this.productImageRepository.deleteByImageIdInAndProductId(imageIdsToDelete, product.getId());
+
+                }
+                if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(newImageIds)){
+                    productImages.addAll(
+                            newImageIds.stream()
+                                    .map(newImageId ->ProductImage.builder().imageId(newImageId).product(product).build())
+                                    .toList()
+                    );
+                }
+            }
+
+        }
+
+
         return productImages;
     }
 
@@ -486,7 +522,7 @@ public class ProductService {
         List<Long> imageIdsToAdd =  imageIdsNew.stream()
                 .filter(imageId -> !setImageIdsOld.contains(imageId))
                 .toList();
-        List<ProductImage> productImages = this.buildProductImages(product,imageIdsToAdd);
+        List<ProductImage> productImages = this.syncProductImages(product,imageIdsToAdd);
         this.productImageRepository.deleteAllInBatch(productImagesToRemove);
         this.productImageRepository.saveAll(productImages);
 
