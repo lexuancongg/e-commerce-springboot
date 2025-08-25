@@ -12,4 +12,6 @@ public interface ProductCategoryRepository extends JpaRepository<ProductCategory
     List<ProductCategory> findAllByProductId(Long productId);
 
     Page<ProductCategory> findAllByCategory(Category category, Pageable pageable);
+    void deleteByProductId(Long productId);
+    void deleteByCategoryIdInAndProductId(List<Long> categoryIds, Long productId);
 }

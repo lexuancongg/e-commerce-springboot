@@ -47,6 +47,7 @@ public class ProductService {
         Product product = productPostVm.toModel();
 
         this.setBrandForProduct(product, productPostVm.brandId());
+
         Product productSaved =  this.productRepository.save(product);
 
 
@@ -243,6 +244,47 @@ public class ProductService {
     }
 
 
+    private List<ProductCategory> syncProductCategories(Product product ,List<Long> categoryIdsVm ){
+        List<ProductCategory> productCategoryList = this.buildProductCategories(product,categoryIdsVm);
+        List<ProductCategory> productCategories = new ArrayList<>();
+        if(productCategoryList.isEmpty()){
+            if(categoryIdsVm.isEmpty()){
+               this.productCategoryRepository.deleteByProductId(product.getId());
+            }
+        }else{
+            List<Long> categoryIdsOfProductInDb = product.getProductCategories().stream()
+                    .map(productCategory -> productCategory.getCategory().getId())
+                    .toList();
+            List<Long> categoryIdsToDelete =  categoryIdsOfProductInDb.stream()
+                    .filter(categoryId-> !categoryIdsVm.contains(categoryId))
+                    .toList();
+            List<Long> newCategoryIds = categoryIdsVm.stream()
+                    .filter(categoryId-> !categoryIdsOfProductInDb.contains(categoryId))
+                    .toList();
+
+            if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(categoryIdsToDelete)){
+                this.productCategoryRepository.deleteByCategoryIdInAndProductId(categoryIdsToDelete ,product.getId());
+            }
+            if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(newCategoryIds)){
+                productCategories.addAll(
+                        newCategoryIds.stream().map(categoryId -> ProductCategory
+                                .builder()
+                                .category(productCategoryList.stream()
+                                        .filter(productCategory -> productCategory.getCategory().getId().equals(categoryId))
+                                        .findFirst()
+                                        .orElse(null).getCategory()
+                                )
+                                .product(product)
+                                .build()
+                        ).toList()
+                );
+            }
+        }
+        return productCategories;
+
+    }
+
+
     // cho  cả update và create dùng chung
     private List<ProductCategory> buildProductCategories(Product product, List<Long> categoryIdsVm){
         if(CollectionUtils.isEmpty(categoryIdsVm)){
@@ -261,7 +303,7 @@ public class ProductService {
             if(categories.isEmpty()){
                 throw new BadRequestException(Constants.ErrorKey.CATEGORY_NOT_FOUND,categoryIdsVm);
             }else if (categoryIdsVm.size() > categories.size()){
-                List<Long> categoryIdsValid = categories.stream().map(Category::getId).toList();
+                List<Long> categoryIdsValid = categories.stream().map(Category::getId).toList();1
                 categoryIdsVm.removeAll(categoryIdsValid);
                 throw new BadRequestException(Constants.ErrorKey.CATEGORY_NOT_FOUND, categoryIdsVm);
             }else {
@@ -274,24 +316,14 @@ public class ProductService {
             }
         }
 
-//
-//        if(categories.isEmpty()){
-//            // throw exception
-//        }else {
-//            for (Category category : categories){
-//                productCategoryList.add(
-//                        ProductCategory.builder().category(category)
-//                                .product(product)
-//                                .build()
-//                );
-//
-//            }
-//        }
-        // nếu create thì save còn update => xử lý cái cũ và lưu cái mới
         return productCategoryList;
 
 
     }
+
+
+
+
 
 
     private void setBrandForProduct(Product product , Long brandId){
