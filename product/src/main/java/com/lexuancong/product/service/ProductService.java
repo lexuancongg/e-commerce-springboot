@@ -11,7 +11,9 @@ import com.lexuancong.product.viewmodel.product.databinding.BaseProductPropertie
 import com.lexuancong.product.viewmodel.product.databinding.ProductOptionPropertyRequire;
 import com.lexuancong.product.viewmodel.product.databinding.ProductPropertiesRequire;
 import com.lexuancong.product.viewmodel.product.databinding.ProductVariationPropertiesRequire;
+import com.lexuancong.product.viewmodel.product.productoptions.ProductOptionValuePostVm;
 import com.lexuancong.product.viewmodel.product.variants.ProductVariantVm;
+import com.lexuancong.product.viewmodel.product.variants.ProductVariationPostVm;
 import com.lexuancong.product.viewmodel.productattribute.AttributeGroupValueVm;
 import com.lexuancong.product.viewmodel.productattribute.AttributeValueVm;
 import com.lexuancong.share.exception.BadRequestException;
@@ -48,11 +50,11 @@ public class ProductService {
 
         this.setBrandForProduct(product, productPostVm.brandId());
 
-        Product productSaved =  this.productRepository.save(product);
+        Product parentProductSaved =  this.productRepository.save(product);
 
 
-        List<ProductCategory> productCategoryList = this.buildProductCategories(productSaved,productPostVm.categoryIds());
-        List<ProductImage> productImageList = this.syncProductImages(productSaved,productPostVm.imageIds());
+        List<ProductCategory> productCategoryList = this.buildProductCategories(parentProductSaved,productPostVm.categoryIds());
+        List<ProductImage> productImageList = this.syncProductImages(parentProductSaved,productPostVm.imageIds());
 
         this.productCategoryRepository.saveAll(productCategoryList);
         this.productImageRepository.saveAll(productImageList);
@@ -63,31 +65,29 @@ public class ProductService {
         }
 
         // xử lý các biến thể
-        List<Product> variationSaved = this.createVariationsFromVm(productPostVm.variations(),productSaved);
+        List<Product> variationSaved = this.createVariationsFromVm(productPostVm.variations(),parentProductSaved);
 
         // lưu dữ liệu bảng product optionValue cho  product => cần lấy đuược product otion tương ứng từng id => Map
         List<ProductOption> productOptions = this.getProductOption(productPostVm.productOptionValues());
         Map<Long,ProductOption> mapOptionById =  productOptions.stream()
                 .collect(Collectors.toMap(ProductOption::getId, Function.identity()));
         List<ProductOptionValue> productOptionValues =
-                this.createProductOptionValue(productPostVm,productSaved,mapOptionById);
+                this.createProductOptionValue(productPostVm,parentProductSaved,mapOptionById);
         this.createProductOptionCombination(variationSaved,productOptionValues,productPostVm.variations(),mapOptionById);
-        return ProductSummaryVm.fromModel(productSaved);
-
-
+        return ProductSummaryVm.fromModel(parentProductSaved);
     }
 
     // cần có product và ProductOption
     private void createProductOptionCombination(List<Product> variationsSaved,
                                                 List<ProductOptionValue> productOptionValues,
-                                                List<? extends ProductVariationPropertiesRequire> variationVms,
+                                                List<ProductVariationPostVm> variationVms,
                                                 Map<Long,ProductOption> mapOptionById){
         List<SpecificProductVariant> specificProductVariants = new ArrayList<>();
         // variationSave rồi nhưng chưa bt nó ứng với productOption Id nào và value gì => dua vao variationVm
         // variantSaved và variantVm có cùng slug => dựa vào slug để lấy
         Map<String,Product> mapProductBySlug = variationsSaved.stream()
                 .collect(Collectors.toMap(Product::getSlug,Function.identity()));
-        for(ProductVariationPropertiesRequire variationVm : variationVms){
+        for(ProductVariationPostVm variationVm : variationVms){
             String slugVariant = variationVm.slug().toLowerCase();
             Product variantSaved = mapProductBySlug.get(slugVariant);
             if(variantSaved == null){
@@ -116,6 +116,8 @@ public class ProductService {
         }
         this.productOptionCombinationRepository.saveAll(specificProductVariants);
     }
+
+
     private List<ProductOptionValue> createProductOptionValue(ProductPostVm productPostVm ,
                                                               Product mainProduct ,Map<Long,ProductOption> productOptionMapById){
         List<ProductOptionValue> productOptionValues = new ArrayList<>();
@@ -133,13 +135,11 @@ public class ProductService {
         });
         this.productOptionValueRepository.saveAll(productOptionValues);
         return productOptionValues;
-
-
     }
 
-    private List<ProductOption> getProductOption(List<? extends ProductOptionPropertyRequire> productOptionValueVms){
+    private List<ProductOption> getProductOption(List<ProductOptionValuePostVm> productOptionValueVms){
         List<Long> optionIds  = productOptionValueVms.stream()
-                .map(ProductOptionPropertyRequire::productOptionId)
+                .map(ProductOptionValuePostVm::productOptionId)
                 .toList();
         if(CollectionUtils.isEmpty(optionIds)) return Collections.emptyList();
         List<ProductOption> productOptions = this.productOptionRepository.findAllById(optionIds);
@@ -150,7 +150,7 @@ public class ProductService {
 
 
 
-    private List<Product> createVariationsFromVm(List<? extends ProductVariationPropertiesRequire> variationPostVmList,
+    private List<Product> createVariationsFromVm(List<ProductVariationPostVm> variationPostVmList,
                                                  Product mainProduct) {
 
         // đầu tiên sử lý hình ảnh
@@ -161,6 +161,7 @@ public class ProductService {
                     // quay lại lưu hình ảnh như sản phẩm chính
                     List<ProductImage> variationImages =
                             this.syncProductImages(productVariation,variationVm.imageIds());
+
                     allProductImages.addAll(variationImages);
 
                     return productVariation;
@@ -179,7 +180,7 @@ public class ProductService {
     }
 
 
-    private Product buildProductVariationFormVm(ProductVariationPropertiesRequire variationPropertiesVm,
+    private Product buildProductVariationFormVm(ProductVariationPostVm variationPropertiesVm,
                                                 Product mainProduct){
         return Product.builder()
                 .name(variationPropertiesVm.name())
@@ -303,7 +304,7 @@ public class ProductService {
             if(categories.isEmpty()){
                 throw new BadRequestException(Constants.ErrorKey.CATEGORY_NOT_FOUND,categoryIdsVm);
             }else if (categoryIdsVm.size() > categories.size()){
-                List<Long> categoryIdsValid = categories.stream().map(Category::getId).toList();1
+                List<Long> categoryIdsValid = categories.stream().map(Category::getId).toList();
                 categoryIdsVm.removeAll(categoryIdsValid);
                 throw new BadRequestException(Constants.ErrorKey.CATEGORY_NOT_FOUND, categoryIdsVm);
             }else {
@@ -338,13 +339,13 @@ public class ProductService {
 
 
     // dành cho create
-    private <T extends ProductVariationPropertiesRequire > void validateProduct(ProductPropertiesRequire<T> productVmToSave){
+    private  void validateProduct(ProductPostVm productVmToSave){
         this.validateProduct(productVmToSave,null);
     }
 
 
     //  cả update và create và update đều validate => gộp chung hàm
-    private <T extends ProductVariationPropertiesRequire> void validateProduct(ProductPropertiesRequire<T> productVmToSave, Product existingProduct){
+    private  void validateProduct(ProductPostVm productVmToSave, Product existingProduct){
         this.validateLengthMustGreaterThanWidth(productVmToSave);
         this.validateUniqueProductProperties(productVmToSave,existingProduct);
         this.validateDuplicateProductPropertiesBetweenVariations(productVmToSave);
@@ -352,7 +353,7 @@ public class ProductService {
 
         // valid datete thuộc tính của varian cos bị trùng lặp trong db không
         List<Long> variationIds = productVmToSave.variations().stream()
-                .map(BaseProductPropertiesRequire::id)
+                .map(ProductVariationPostVm::id)
                 .filter(Objects::nonNull)
                 .toList();
 
@@ -361,7 +362,7 @@ public class ProductService {
                 .stream()
                 .collect(Collectors.toMap(Product::getId, Function.identity(),(product1, product2) -> new Product() ));
 
-        for(BaseProductPropertiesRequire variation : productVmToSave.variations()){
+        for(ProductVariationPostVm variation : productVmToSave.variations()){
             Product variantExitedInDb = mapVariationsSaved.get(variation.id());
             this.validateUniqueProductProperties(variation,variantExitedInDb);
         }
@@ -370,14 +371,14 @@ public class ProductService {
 
 
     // check xem chieeuf dài và chiều rộng đươc nhập hhowpjp lệ không => tính toán tiền vận chuyển sau nay
-    private <T extends ProductVariationPropertiesRequire> void validateLengthMustGreaterThanWidth(ProductPropertiesRequire<T> productVmToSave){
+    private void validateLengthMustGreaterThanWidth(ProductPostVm productVmToSave){
         if(productVmToSave.length() < productVmToSave.width()) {
             throw  new BadRequestException(Constants.ErrorKey.LENGTH_MUST_EXCEED_WIDTH);
         }
     }
 
     // check xem các thuộc tinhs của sp có bị trùng lặp trong db không
-    private void validateUniqueProductProperties(BaseProductPropertiesRequire baseProductProperties, Product existingProduct){
+    private void validateUniqueProductProperties(ProductPostVm baseProductProperties, Product existingProduct){
         this.ensurePropertyNotExists(baseProductProperties.slug().toLowerCase(),this.productRepository::findBySlug,
                 existingProduct,Constants.ErrorKey.SLUG_ALREADY_EXISTED);
         if (StringUtils.isNotEmpty(baseProductProperties.gtin())){
@@ -404,12 +405,12 @@ public class ProductService {
 
 
     // chưa check trùng lặp các thuộc tính con trong db => làm sau
-    private <T extends ProductVariationPropertiesRequire> void validateDuplicateProductPropertiesBetweenVariations(ProductPropertiesRequire<T> productVmToSave){
+    private  void validateDuplicateProductPropertiesBetweenVariations(ProductPostVm productVmToSave){
         // check trùng lặp slug , sku, gtins cho các biến thể con
         Set<String> setSkus = new HashSet<>(Collections.singletonList(productVmToSave.sku()));
         Set<String> setGtins = new HashSet<>(Collections.singletonList(productVmToSave.gtin()));
         Set<String> setSlugs = new HashSet<>(Collections.singletonList(productVmToSave.slug()));
-        for (BaseProductPropertiesRequire variation : productVmToSave.variations()) {
+        for (ProductVariationPostVm variation : productVmToSave.variations()) {
             if(!setSkus.add(variation.sku().toLowerCase())){
                 throw new DuplicatedException(Constants.ErrorKey.SKU_ALREADY_EXISTED);
             }
@@ -446,7 +447,7 @@ public class ProductService {
                 .collect(Collectors.toMap(ProductOption::getId, Function.identity()));
 
         // cái thêm mới
-        List<? extends ProductVariationPropertiesRequire>  variationVmsNew = productPostVm.variations().stream()
+        List<ProductVariationPostVm>  variationVmsNew = productPostVm.variations().stream()
                 .filter(variationVm -> variationVm.id() == null )
                 .toList();
 
@@ -468,7 +469,7 @@ public class ProductService {
 
 
     }
-    private void updateProductOptionCombination(List<? extends ProductVariationPropertiesRequire> variationVms,
+    private void updateProductOptionCombination(List<ProductVariationPostVm> variationVms,
                                                 List<Product> variationChill,
                                                 List<Product> variantUpdated,
                                                 List<ProductOptionValue> productOptionValues,
@@ -487,7 +488,7 @@ public class ProductService {
 
     }
 
-    private void updateProductImage(Product product , BaseProductPropertiesRequire productPostVm){
+    private void updateProductImage(Product product , ProductPostVm productPostVm){
         List<ProductImage> productImages = product.getProductImages();
         List<Long> imageIdsOld = productImages.stream()
                 .map(ProductImage::getImageId)
