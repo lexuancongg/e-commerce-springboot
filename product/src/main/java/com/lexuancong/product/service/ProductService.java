@@ -8,9 +8,6 @@ import com.lexuancong.product.service.internal.ImageService;
 import com.lexuancong.product.viewmodel.image.ImageVm;
 import com.lexuancong.product.viewmodel.product.*;
 import com.lexuancong.product.viewmodel.product.databinding.BaseProductPropertiesRequire;
-import com.lexuancong.product.viewmodel.product.databinding.ProductOptionPropertyRequire;
-import com.lexuancong.product.viewmodel.product.databinding.ProductPropertiesRequire;
-import com.lexuancong.product.viewmodel.product.databinding.ProductVariationPropertiesRequire;
 import com.lexuancong.product.viewmodel.product.productoptions.ProductOptionValuePostVm;
 import com.lexuancong.product.viewmodel.product.variants.ProductVariantVm;
 import com.lexuancong.product.viewmodel.product.variants.ProductVariationPostVm;
@@ -45,19 +42,16 @@ public class ProductService {
     private final ImageService imageService;
     public ProductSummaryVm createProduct(ProductPostVm productPostVm){
 
-        this.validateProduct(productPostVm);
+        this.validateProduct(productPostVm,null);
         Product product = productPostVm.toModel();
 
         this.setBrandForProduct(product, productPostVm.brandId());
 
         Product parentProductSaved =  this.productRepository.save(product);
 
+        this.syncProductCategories(parentProductSaved,productPostVm.categoryIds());
+        this.syncProductImages(parentProductSaved,productPostVm.imageIds());
 
-        List<ProductCategory> productCategoryList = this.buildProductCategories(parentProductSaved,productPostVm.categoryIds());
-        List<ProductImage> productImageList = this.syncProductImages(parentProductSaved,productPostVm.imageIds());
-
-        this.productCategoryRepository.saveAll(productCategoryList);
-        this.productImageRepository.saveAll(productImageList);
 
 
         if(CollectionUtils.isEmpty(productPostVm.variations()) || CollectionUtils.isEmpty(productPostVm.productOptionValues())){
@@ -67,8 +61,9 @@ public class ProductService {
         // xử lý các biến thể
         List<Product> variationSaved = this.createVariationsFromVm(productPostVm.variations(),parentProductSaved);
 
-        // lưu dữ liệu bảng product optionValue cho  product => cần lấy đuược product otion tương ứng từng id => Map
+
         List<ProductOption> productOptions = this.getProductOption(productPostVm.productOptionValues());
+
         Map<Long,ProductOption> mapOptionById =  productOptions.stream()
                 .collect(Collectors.toMap(ProductOption::getId, Function.identity()));
         List<ProductOptionValue> productOptionValues =
@@ -98,11 +93,11 @@ public class ProductService {
             variationVm.valueOfOptionByOptionId().forEach((optionId,optionValue)->{
                 ProductOption productOption = mapOptionById.get(optionId);
                 // check xem giá trị của từng option có nằm trong productOptionValues khong
-                boolean  isExitOptionValue = productOptionValues.stream()
+                boolean isExitOptionValue = productOptionValues.stream()
                         .anyMatch(productOptionValue -> productOptionValue.getProductOption()
                                 .getId().equals(optionId) && productOptionValue.getValue().equals(optionValue));
                 if(!isExitOptionValue){
-                    throw new RuntimeException();
+                    throw new BadRequestException(Constants.ErrorKey.PRODUCT_OPTION_VALUE_IS_NOT_FOUND);
                 }
                 SpecificProductVariant specificProductVariant = SpecificProductVariant.builder()
                         .productOption(productOption)
@@ -157,10 +152,10 @@ public class ProductService {
         List<ProductImage> allProductImages = new ArrayList<>();
         List<Product> variations = variationPostVmList.stream()
                 .map(variationVm ->{
-                    Product productVariation  = this.buildProductVariationFormVm(variationVm, mainProduct);
+                    Product productVariation  = this.buildProductVariationFormVm(variationVm, mainProduct ,new Product());
                     // quay lại lưu hình ảnh như sản phẩm chính
                     List<ProductImage> variationImages =
-                            this.syncProductImages(productVariation,variationVm.imageIds());
+                            this.updateProductImagesForSave(productVariation,variationVm.imageIds());
 
                     allProductImages.addAll(variationImages);
 
@@ -169,7 +164,7 @@ public class ProductService {
                 }  )
                 .toList();
 
-        // lưu lại các bieens thể sp
+//        allProductImages cùng tham chiếu tới các product trong list product variations
         List<Product> variationsSaved = this.productRepository.saveAll(variations);
 
         // lưu cho bảng productImage
@@ -180,32 +175,22 @@ public class ProductService {
     }
 
 
-    private Product buildProductVariationFormVm(ProductVariationPostVm variationPropertiesVm,
-                                                Product mainProduct){
-        return Product.builder()
-                .name(variationPropertiesVm.name())
-                .avatarImageId(variationPropertiesVm.avatarImageId())
-                .slug(variationPropertiesVm.slug().toLowerCase())
-                .sku(variationPropertiesVm.sku())
-                .gtin(variationPropertiesVm.gtin())
-                .price(variationPropertiesVm.price())
-                .isPublic(mainProduct.isPublic())
-                .parent(mainProduct)
-                .build();
-
+    private void  syncProductImages(Product product, List<Long> imageIds){
+        List<ProductImage> productImageNew = this.updateProductImagesForSave(product,imageIds);
+        this.productImageRepository.saveAll(productImageNew);
     }
 
     // cũng dần cho cả create cả update
-    private List<ProductImage> syncProductImages(Product product , List<Long> imageIds){
+    private List<ProductImage>  updateProductImagesForSave(Product product , List<Long> imageIds){
         List<ProductImage> productImages = new ArrayList<>();
 
         if(CollectionUtils.isEmpty(imageIds)){
             // xóa các cái cũ đi
             this.productImageRepository.deleteByProductId(product.getId());
-            return productImages;
+
         }
         // trường hợp product chưa có category => chỉ cần thêm vào để lưu vào
-        if(product.getProductImages().isEmpty()){
+        else if(product.getProductImages().isEmpty()){
             productImages.addAll(
                     imageIds.stream().map(imageId ->
                             ProductImage.builder().imageId(imageId).product(product).build()
@@ -239,15 +224,15 @@ public class ProductService {
             }
 
         }
-
-
         return productImages;
+
     }
 
 
-    private List<ProductCategory> syncProductCategories(Product product ,List<Long> categoryIdsVm ){
+    private void syncProductCategories(Product product ,List<Long> categoryIdsVm ){
         List<ProductCategory> productCategoryList = this.buildProductCategories(product,categoryIdsVm);
         List<ProductCategory> productCategories = new ArrayList<>();
+
         if(productCategoryList.isEmpty()){
             if(categoryIdsVm.isEmpty()){
                this.productCategoryRepository.deleteByProductId(product.getId());
@@ -273,7 +258,8 @@ public class ProductService {
                                 .category(productCategoryList.stream()
                                         .filter(productCategory -> productCategory.getCategory().getId().equals(categoryId))
                                         .findFirst()
-                                        .orElse(null).getCategory()
+                                        .get()
+                                        .getCategory()
                                 )
                                 .product(product)
                                 .build()
@@ -281,7 +267,8 @@ public class ProductService {
                 );
             }
         }
-        return productCategories;
+        this.productCategoryRepository.saveAll(productCategories);
+
 
     }
 
@@ -338,10 +325,6 @@ public class ProductService {
 
 
 
-    // dành cho create
-    private  void validateProduct(ProductPostVm productVmToSave){
-        this.validateProduct(productVmToSave,null);
-    }
 
 
     //  cả update và create và update đều validate => gộp chung hàm
@@ -378,7 +361,7 @@ public class ProductService {
     }
 
     // check xem các thuộc tinhs của sp có bị trùng lặp trong db không
-    private void validateUniqueProductProperties(ProductPostVm baseProductProperties, Product existingProduct){
+    private void validateUniqueProductProperties(BaseProductPropertiesRequire baseProductProperties, Product existingProduct){
         this.ensurePropertyNotExists(baseProductProperties.slug().toLowerCase(),this.productRepository::findBySlug,
                 existingProduct,Constants.ErrorKey.SLUG_ALREADY_EXISTED);
         if (StringUtils.isNotEmpty(baseProductProperties.gtin())){
@@ -395,7 +378,6 @@ public class ProductService {
 
     private void ensurePropertyNotExists(String propertyValue, Function<String, Optional<Product>> finder , Product existingProduct, String errorKey){
         finder.apply(propertyValue).ifPresent(product -> {
-            // nếu create hoặc update mà product khác có slug này thì chưnng tỏ trùng
             if(existingProduct == null || !product.getId().equals(existingProduct.getId()) ){
                  throw new DuplicatedException(errorKey);
             }
@@ -426,24 +408,34 @@ public class ProductService {
         }
     }
 
+
+
     public void updateProduct(Long id, ProductPostVm productPostVm){
         Product product = this.productRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException());
+                .orElseThrow(()-> new NotFoundException(Constants.ErrorKey.PRODUCT_NOT_FOUND,id));
+
         this.validateProduct(productPostVm,product);
         this.setBrandForProduct(product,productPostVm.brandId());
-        // chỉnh sửa lại productCategory
-        this.updateProductCategories(product,productPostVm);
-
         this.updatePropertiesProductFromVm(product,productPostVm);
 
-        this.updateProductImage(product,productPostVm );
+        // chỉnh sửa lại productCategory
+//        this.updateProductCategories(product,productPostVm);
+        this.syncProductCategories(product,productPostVm.categoryIds());
+
+
+//        this.updateProductImage(product,productPostVm );
+        this.syncProductImages(product,productPostVm.imageIds());
+
         List<Product> variationChillInDb = product.getChild();
-        this.updateValueVariationChillInDb(productPostVm, variationChillInDb);
+        this.updateVariationInDb(productPostVm, variationChillInDb , product);
+        // variationChillInDb được cập nhật do tham chiếu các phần tử
         List<Product> variantUpdated = this.productRepository.saveAll(variationChillInDb);
 
-        // tiếp theo sử lý phần productOptionValues cho ProductOptionValue
-        List<ProductOption> productOptions = this.getProductOption(productPostVm.productOptionValues());
-        Map<Long,ProductOption> productOptionMapById = productOptions.stream()
+
+        // update laại product option
+        List<ProductOption> productOptionsNew = this.getProductOption(productPostVm.productOptionValues());
+
+        Map<Long,ProductOption> productOptionMapById = productOptionsNew.stream()
                 .collect(Collectors.toMap(ProductOption::getId, Function.identity()));
 
         // cái thêm mới
@@ -500,12 +492,15 @@ public class ProductService {
 
     }
 
+
+
     private void updateProductCategories(Product product , ProductPostVm productPostVm){
         List<ProductCategory> productCategoriesOld = product.getProductCategories();
         List<Long> categoryIdsOld = productCategoriesOld.stream()
                 .map(productCategoryOld ->productCategoryOld.getCategory().getId() )
+                .sorted()
                 .toList();
-        List<Long> categoryIdsNew = productPostVm.categoryIds();
+        List<Long> categoryIdsNew = productPostVm.categoryIds().stream().sorted().toList();
         if(!org.apache.commons.collections4.CollectionUtils.isEqualCollection(categoryIdsOld,categoryIdsNew)){
             this.perFormUpdateProductCategories(product,categoryIdsNew,productCategoriesOld,categoryIdsOld);
         }
@@ -513,34 +508,53 @@ public class ProductService {
 
     }
 
-    private  void updateValueVariationChillInDb(ProductPostVm productPostVm,  List<Product> variationChillInDbs ){
+
+    private Product buildProductVariationFormVm(ProductVariationPostVm productVariationPostVm,
+                                                Product mainProduct , Product variationInit){
+        variationInit.setName(productVariationPostVm.name());
+        variationInit.setAvatarImageId(productVariationPostVm.avatarImageId());
+        variationInit.setSlug(productVariationPostVm.slug());
+        variationInit.setSku(productVariationPostVm.sku());
+        variationInit.setGtin(productVariationPostVm.gtin());
+        variationInit.setPrice(productVariationPostVm.price());
+        variationInit.setPublic(mainProduct.isPublic());
+        // khi create
+        if(variationInit.getId() == null){
+            variationInit.setParent(mainProduct);
+        }
+        return variationInit;
+
+
+
+    }
+
+
+    private void perFormUpdateValueForVariation(Product mainProduct, ProductVariationPostVm variationPutVm , Product variationInit ){
+      this.buildProductVariationFormVm(variationPutVm,mainProduct,variationInit);
+
+    }
+
+    private  void updateVariationInDb(ProductPostVm productPostVm, List<Product> variationInDbs , Product mainProduct){
+        Map<Long,Product> mapVariationSaved = variationInDbs.stream()
+                .collect(Collectors.toMap(Product::getId, Function.identity()));
         productPostVm.variations().forEach(variationVm->{
-            for(Product variationChill : variationChillInDbs){
-                if(variationChill.getId().equals(variationVm.id())){
-                    this.perFormUpdateValueForVariation(variationChill,variationVm);
-                    break;
-                }
+//            for(Product variationChill : variationChillInDbs){
+//                if(variationChill.getId().equals(variationVm.id())){
+//                    this.perFormUpdateValueForVariation(variationChill,variationVm);
+//                    break;
+//                }
+//            }
+            Product variation = mapVariationSaved.get(variationVm.id());
+            if(variation!=null){
+                this.perFormUpdateValueForVariation(mainProduct,variationVm,variation);
+                this.syncProductImages(variation,variationVm.imageIds());
             }
+
+
         });
 
     }
 
-    private void perFormUpdateValueForVariation(Product variation, ProductVariationPropertiesRequire variationPutVm ){
-        variation.setName(variationPutVm.name());
-        variation.setSlug(variationPutVm.slug());
-        variation.setSku(variationPutVm.sku());
-        variation.setGtin(variationPutVm.gtin());
-        variation.setPrice(variationPutVm.price());
-        variation.setAvatarImageId(variationPutVm.avatarImageId());
-        // nếu mà insert vào mỗi for thì hiệu xuất giảm
-        this.updateProductImage(variation,variationPutVm);
-
-
-
-
-
-
-    }
 
 
     private void perFormUpdateProductImage(Product product,List<Long> imageIdsNew,
@@ -600,6 +614,8 @@ public class ProductService {
         List<ProductCategory> productCategoriesToRemove  = productCategoriesOld.stream()
                 .filter(productCategory -> !setCategoryIdsNew.contains(productCategory.getCategory().getId()))
                 .toList();
+
+        // tối ưu ở đây
 
         List<ProductCategory> productCategoriesNew = this.buildProductCategories(product,categoryIdsToAdd);
         this.productCategoryRepository.deleteAllInBatch(productCategoriesToRemove);

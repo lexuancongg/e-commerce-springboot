@@ -14,6 +14,9 @@ public final class Constants {
 
         public static final String BRAND_NOT_FOUND = "BRAND_NOT_FOUND";
         public static final String CATEGORY_NOT_FOUND = "CATEGORY_NOT_FOUND";
+        public static final String PRODUCT_OPTION_VALUE_IS_NOT_FOUND = "PRODUCT_OPTION_VALUE_IS_NOT_FOUND";
+
+        public static final String PRODUCT_NOT_FOUND = "PRODUCT_NOT_FOUND";
 
 
     }
