@@ -18,13 +18,15 @@ public class ProductController {
         this.productService = productService;
     }
 
-    // create
+    // create => đã check
     @PostMapping({"/management/products"})
     public ResponseEntity<ProductSummaryVm> createProduct(@Valid @RequestBody ProductPostVm productPostVm) {
         ProductSummaryVm productSummaryVm = this.productService.createProduct(productPostVm);
         return new ResponseEntity<>(productSummaryVm, HttpStatus.CREATED);
 
     }
+
+    // update // đã check
     @PutMapping(path = "/management/products/{id}")
     public ResponseEntity<Void> updateProduct(@PathVariable("id") Long id,
                                               @Valid @RequestBody ProductPostVm productPostVm) {
@@ -33,7 +35,7 @@ public class ProductController {
 
     }
 
-    // lấy danh sách nổi bật hiển thị đầu tiên
+    // ds nổi bật => đã check
     @GetMapping("/customer/products/featured")
     public ResponseEntity<ProductFeaturePagingVm> getFeaturedProductsPaging(
             @RequestParam(value = "pageIndex", defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER) int pageIndex,
@@ -43,14 +45,14 @@ public class ProductController {
     }
 
 
-    // xem chi tiết sp
+    // xem chi tiết sp => đã check
     @GetMapping("/customer/products/{slug}")
     public ResponseEntity<ProductDetailVm> getProductDetail(@PathVariable("slug") String slug) {
         return ResponseEntity.ok(this.productService.getProductDetailBySlug(slug));
 
     }
 
-    // xóa sp
+    // xóa sp => đã check
     @DeleteMapping("/management/products/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable("id") Long id) {
         this.productService.deleteProduct(id);
@@ -61,36 +63,38 @@ public class ProductController {
 
 
 
-    // lây ra ds sp
-    @GetMapping({"/customer/products"})
-    public ResponseEntity<ProductPagingVm> getProductsPaging(
-            @RequestParam(value = "pageIndex", defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER,required = false) int pageIndex,
-            @RequestParam(value = "pageSize",defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE ,required = false) int pageSize
-    ){
-        return ResponseEntity.ok(this.productService.getProductsPaging(pageIndex,pageSize));
+//    // lây ra ds sp
+//    @GetMapping({"/customer/products"})
+//    public ResponseEntity<ProductPagingVm> getProductsPaging(
+//            @RequestParam(value = "pageIndex", defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER,required = false) int pageIndex,
+//            @RequestParam(value = "pageSize",defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE ,required = false) int pageSize
+//    ){
+//        return ResponseEntity.ok(this.productService.getProductsPaging(pageIndex,pageSize));
+//
+//    }
 
-    }
 
 
-
-    // lấy ra ds sp trong category
-    @GetMapping({"/customer/category/{categoryId}/products"})
+    // lấy ra ds sp trong category dựa vào slug => đã check
+    @GetMapping({"/customer/category/{categorySlug}/products"})
     public ResponseEntity<ProductPagingVm> getProductsFromCategoryPaging(
             @RequestParam(value = "pageIndex",defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER,required = false) int pageIndex,
             @RequestParam(value = "pageSize",defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE,required = false) int pageSize,
-            @PathVariable Long categoryId
+            @PathVariable String categorySlug
     ){
-        return ResponseEntity.ok(this.productService.getProductsFromCategoryPaging(pageIndex,pageSize,categoryId));
+        return ResponseEntity.ok(this.productService.getProductsByCategorySlug(pageIndex,pageSize,categorySlug));
     }
 
 
-    // api lấy ngẫu nhiên ds sp nôổi bật lam slide
+    //  lấy ngaaux nhiên sp làm slide => đã check
     @GetMapping({"/customer/products/featured/slide"})
     public ResponseEntity<List<ProductPreviewVm>> getProductFeaturedMakeSlide(){
         List<ProductPreviewVm> productPreviewVms =  productService.getProductFeaturedMakeSlide();
         return new ResponseEntity<>(productPreviewVms, HttpStatus.OK);
     }
 
+
+    // đã check
     @GetMapping("/customer/products")
     public ResponseEntity<List<ProductPreviewVm>> getProductsByIds (
             @RequestParam("productIds") List<Long> productIds
@@ -100,7 +104,7 @@ public class ProductController {
 
 
 
-    // GET DS SP BY FILTER
+    //
     @GetMapping("/customer/products")
     public ResponseEntity<ProductPagingVm> getProductByMultiParams(
             @RequestParam(value = "pageIndex" ,required = false , defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE) int pageIndex,
@@ -117,13 +121,9 @@ public class ProductController {
     }
 
 
-    @GetMapping("/customer/product/{slug}")
-    public ResponseEntity<ProductDetailVm> getProductDetailBySlug(@PathVariable("slug") String slug) {
-        return ResponseEntity.ok(this.productService.getProductDetailBySlug(slug));
-    }
 
 
-    // lay ds bien the
+    // lay ds bien the => đã check
     @GetMapping("/customer/product-variations/{parentId}")
     public ResponseEntity<List<ProductVariantVm>> getProductVariationsByParentId(@PathVariable Long parentId) {
         return new ResponseEntity<>(this.productService.getProductVariationsByParentId(parentId),HttpStatus.OK);
