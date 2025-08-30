@@ -38,7 +38,7 @@ public class ProductService {
     private final ProductImageRepository productImageRepository;
     private final ProductOptionRepository productOptionRepository;
     private final ProductOptionValueRepository productOptionValueRepository;
-    private final ProductOptionCombinationRepository productOptionCombinationRepository;
+    private final SpecificProductVariantRepository specificProductVariantRepository;
     private final ImageService imageService;
 
     public ProductSummaryVm createProduct(ProductPostVm productPostVm) {
@@ -109,7 +109,7 @@ public class ProductService {
 
 
         }
-        this.productOptionCombinationRepository.saveAll(specificProductVariants);
+        this.specificProductVariantRepository.saveAll(specificProductVariants);
     }
 
 
@@ -454,7 +454,7 @@ public class ProductService {
                                                 List<ProductOptionValue> productOptionValues,
                                                 Map<Long, ProductOption> productOptionMapById) {
         List<Long> variationIds = variationChill.stream().map(Product::getId).toList();
-        this.productOptionCombinationRepository.deleteAllByProductIdIn(variationIds);
+        this.specificProductVariantRepository.deleteAllByProductIdIn(variationIds);
         this.createProductOptionCombination(variantUpdated, productOptionValues, variationVms, productOptionMapById);
 
     }
@@ -700,10 +700,10 @@ public class ProductService {
         // check xem có phải là biến thể không
         if (!Objects.isNull(product.getParent())) {
             // xóa các combination của biến thể này
-            List<SpecificProductVariant> combinations = this.productOptionCombinationRepository
+            List<SpecificProductVariant> combinations = this.specificProductVariantRepository
                     .findAllByProduct(product);
             if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(combinations)) {
-                this.productOptionCombinationRepository.deleteAll(combinations);
+                this.specificProductVariantRepository.deleteAll(combinations);
             }
         }
         this.productRepository.save(product);
@@ -830,7 +830,7 @@ public class ProductService {
                     .toList();
             return productVariations.stream()
                     .map(variant -> {
-                        List<SpecificProductVariant> specificProductVariants = this.productOptionCombinationRepository
+                        List<SpecificProductVariant> specificProductVariants = this.specificProductVariantRepository
                                 .findAllByProduct(variant);
                         Map<Long, String> optionsValues = specificProductVariants.stream()
                                 .collect(
