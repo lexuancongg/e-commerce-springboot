@@ -18,6 +18,9 @@ public class CategoryController {
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
+
+
+    // đã check
     @GetMapping({"/management/categories","/customer/categories"})
     public ResponseEntity<List<CategoryVm>> getCategories(
             @RequestParam(required = false , defaultValue = "") String categoryName
@@ -25,11 +28,12 @@ public class CategoryController {
         List<CategoryVm> categoryVms = categoryService.getCategories(categoryName);
         return new ResponseEntity<>(categoryVms, HttpStatus.OK);
     }
+
+    // đã check
     @PostMapping("/management/categories")
     public ResponseEntity<CategoryVm> createCategory(
             @RequestBody @Valid CategoryPostVm categoryPostVm,
-            UriComponentsBuilder uriComponentsBuilder,
-            Principal principal
+            UriComponentsBuilder uriComponentsBuilder
             ){
         CategoryVm categorySaved = categoryService.createCategory(categoryPostVm);
         return ResponseEntity.created(uriComponentsBuilder.replacePath("/categories/{id}")
@@ -38,15 +42,17 @@ public class CategoryController {
         ).body(categorySaved);
     }
 
+    // đã check
     @PutMapping("/management/categories/{id}")
     public ResponseEntity<Void> updateCategory(@PathVariable Long id,
-                                               @RequestBody @Valid CategoryPostVm categoryPostVm,
-                                               Principal principal
+                                               @RequestBody @Valid CategoryPostVm categoryPostVm
     ){
         categoryService.updateCategory(id,categoryPostVm);
         return ResponseEntity.noContent().build();
     }
 
+
+    // đã check
     @DeleteMapping("/management/categories/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);

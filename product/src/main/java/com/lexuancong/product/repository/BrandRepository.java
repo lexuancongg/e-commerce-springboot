@@ -12,6 +12,8 @@ public interface BrandRepository extends JpaRepository<Brand, Long> {
     @Query(value = "select brand " +
             "from  Brand  brand" +
             " where brand.name =?1 and (?2 is null or ?2 != brand.id) ")
-    // cs thể dùng findByNameAndIdNot
+//     cs thể dùng findByNameAndIdNot
     Brand findExistedName(String name,Long id);
+
+
 }

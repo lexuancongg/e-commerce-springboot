@@ -17,6 +17,10 @@ public class BrandController {
     public BrandController(BrandService brandService) {
         this.brandService = brandService;
     }
+
+
+
+    // đã check
     @GetMapping({"/management/brands","/customer/brands"})
     public ResponseEntity<List<BrandVm>> getBrands(
             @RequestParam(name = "brandName" , required = false,defaultValue = "") String brandName
@@ -25,6 +29,8 @@ public class BrandController {
         return new ResponseEntity<>(brandVms, HttpStatus.OK);
     }
 
+
+    // đã check
 
     @PostMapping("/management/brands")
     public ResponseEntity<BrandVm> createBrand(
@@ -37,12 +43,16 @@ public class BrandController {
                 .body(brandSaved);
 
     }
+
+    // đã check
     @PutMapping("/management/brands/{id}")
     public ResponseEntity<Void> updateBrand(@PathVariable Long id, @RequestBody @Valid BrandPostVm brandPostVm) {
         brandService.updateBrand(id,brandPostVm);
         return ResponseEntity.noContent().build();
     }
 
+
+    // đã check
     @DeleteMapping("/management/brands/{id}")
     public ResponseEntity<Void> deleteBrand(@PathVariable Long id) {
         brandService.deleteBrand(id);
