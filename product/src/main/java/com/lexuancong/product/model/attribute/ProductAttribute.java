@@ -23,12 +23,12 @@ public class ProductAttribute extends AuditEntity {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "product_attribute_group_id")
+    @JoinColumn(name = "product_attribute_group_id" )
     private ProductAttributeGroup productAttributeGroup;
 
 
     // mục đích để sau này khi xóa attribute thì có thể get ra xem có chứa gtri chưa , nếu có thì k thể xóa
-    @OneToMany(mappedBy = "productAttribute")
+    @OneToMany(mappedBy = "productAttribute" )
     private List<ProductAttributeValue> productAttributeValues =new ArrayList<>();
 
 

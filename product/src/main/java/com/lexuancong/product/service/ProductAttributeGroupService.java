@@ -1,9 +1,12 @@
 package com.lexuancong.product.service;
 
+import com.lexuancong.product.constant.Constants;
 import com.lexuancong.product.model.attribute.ProductAttributeGroup;
 import com.lexuancong.product.repository.ProductAttributeGroupRepository;
 import com.lexuancong.product.viewmodel.attributegroup.ProductAttributeGroupPostVm;
 import com.lexuancong.product.viewmodel.attributegroup.ProductAttributeGroupVm;
+import com.lexuancong.share.exception.BadRequestException;
+import com.lexuancong.share.exception.NotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +32,7 @@ public class ProductAttributeGroupService {
 
     public ProductAttributeGroupVm createProductAttributeGroup(ProductAttributeGroupPostVm productAttributeGroupPostVm){
         ProductAttributeGroup productAttributeGroup = productAttributeGroupPostVm.toProductAttributeGroup();
-        // valid name exiest
+
         this.validateExistedName(null, productAttributeGroupPostVm.name());
         this.productAttributeGroupRepository.save(productAttributeGroup);
         return ProductAttributeGroupVm.fromModel(productAttributeGroup);
@@ -37,7 +40,7 @@ public class ProductAttributeGroupService {
     }
     public void validateExistedName(Long id,String name){
         if(this.checkExistedName(id,name)){
-            // throw exception
+             throw new BadRequestException(Constants.ErrorKey.NAME_ALREADY_EXITED,name);
         }
     }
     public boolean checkExistedName(Long id,String name){
@@ -48,20 +51,18 @@ public class ProductAttributeGroupService {
     public void updateProductAttributeGroup(Long id,ProductAttributeGroupPostVm productAttributeGroupPostVm){
         ProductAttributeGroup productAttributeGroup = this.productAttributeGroupRepository
                 .findById(id)
-                .orElseThrow(()->new RuntimeException());
+                .orElseThrow(()->new NotFoundException(Constants.ErrorKey.PRODUCT_ATTRIBUTE_GROUP_NOT_FOUND,id));
         productAttributeGroup.setName(productAttributeGroupPostVm.name());
         this.productAttributeGroupRepository.save(productAttributeGroup);
 
 
     }
     public void deleteProductAttributeGroup(long id){
-        this.productAttributeGroupRepository.findById(id)
-                .orElseThrow(()->new RuntimeException());
-        try{
-            this.productAttributeGroupRepository.deleteById(id);
-            // xảy ra khi vi phạm ràng buộc trong db như xóa mất khóa ngoại liên kết
-        }catch (DataIntegrityViolationException exception){
-            // throw ra ngoại lệ
+        ProductAttributeGroup productAttributeGroup = this.productAttributeGroupRepository.findById(id)
+                .orElseThrow(()->new NotFoundException(Constants.ErrorKey.PRODUCT_ATTRIBUTE_GROUP_NOT_FOUND,id));
+        if(!productAttributeGroup.getProductAttributes().isEmpty()){
+            throw new BadRequestException(Constants.ErrorKey.PRODUCT_ATTRIBUTE_GROUP_CONSTANT_ATTRIBUTE,id);
         }
+        this.productAttributeGroupRepository.deleteById(id);
     }
 }

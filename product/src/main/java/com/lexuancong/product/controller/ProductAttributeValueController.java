@@ -19,7 +19,9 @@ public class ProductAttributeValueController {
         this.productAttributeValueService = productAttributeValueService;
     }
 
-    @GetMapping("/management/product-attribute-value/{productId}")
+
+    // đã check
+    @GetMapping("/management/product-attribute-values/{productId}")
     public ResponseEntity<List<ProductAttributeValueVm>> getProductAttributeValueByProductId (
             @PathVariable("productId") Long productId) {
         List<ProductAttributeValueVm> productAttributeValueVms = this.productAttributeValueService
@@ -28,12 +30,12 @@ public class ProductAttributeValueController {
 
     }
 
-    @PostMapping("/management/product-attribute-value")
+
+    // đã check
+    @PostMapping("/management/product-attribute-values")
     public ResponseEntity<ProductAttributeValueVm> createProductAttributeValue(
             @Valid @RequestBody ProductAttributeValuePostVm productAttributeValuePostVm,
-            UriComponentsBuilder uriComponentsBuilder,
-            // đại diện thông tin người dùng xác thực ,được inject vào từ security context
-            Principal principal
+            UriComponentsBuilder uriComponentsBuilder
             ) {
         ProductAttributeValueVm productAttributeValueVm = this.productAttributeValueService
                 .createProductAttributeValue(productAttributeValuePostVm);
@@ -42,13 +44,18 @@ public class ProductAttributeValueController {
                 .body(productAttributeValueVm);
     }
 
-    @DeleteMapping({"/management/product-attribute-value/{id}"})
+
+    // đã check
+
+    @DeleteMapping({"/management/product-attribute-values/{id}"})
     public ResponseEntity<Void> deleteProductAttributeValue(@PathVariable(name = "id") Long id){
         this.productAttributeValueService.deleteProductAttributeValue(id);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping({"/management/product-attribute-value/{id}"})
+
+    // đã check
+    @PutMapping({"/management/product-attribute-values/{id}"})
     public ResponseEntity<Void> updateProductAttributeValue(@PathVariable(value = "id") Long id,
                                                             @Valid @RequestBody ProductAttributeValuePostVm productAttributeValuePostVm){
         this.productAttributeValueService.updateProductAttributeValue(id,productAttributeValuePostVm);

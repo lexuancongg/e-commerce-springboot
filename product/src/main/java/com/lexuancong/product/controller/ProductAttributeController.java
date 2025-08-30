@@ -20,7 +20,8 @@ public class ProductAttributeController {
     private final ProductAttributeService productAttributeService;
 
 
-    @GetMapping({"/management/product-attribute","customer/product-attribute"})
+    // đã check
+    @GetMapping({"/management/product-attributes","customer/product-attributes"})
     public ResponseEntity<List<ProductAttributeVm>> getProductAttributes() {
         return ResponseEntity.ok(this.productAttributeService.getProductAttributes());
     }
@@ -36,25 +37,31 @@ public class ProductAttributeController {
         return ResponseEntity.ok(this.productAttributeService.getProductAttributePaging(pageIndex, pageSize));
     }
 
+    // đã check
 
-    @PostMapping("/management/product-attribute")
+    @PostMapping("/management/product-attributes")
     public ResponseEntity<ProductAttributeVm> createProductAttribute(@RequestBody @Valid ProductAttributePostVm productAttributePostVm,
                                                                      UriComponentsBuilder uriComponentsBuilder ) {
         ProductAttribute productAttribute = this.productAttributeService.createProductAttribute(productAttributePostVm);
         ProductAttributeVm productAttributeVm = ProductAttributeVm.fromModel(productAttribute);
-        return ResponseEntity.created(uriComponentsBuilder.replacePath("/product-attribute/{id}")
+        return ResponseEntity.created(uriComponentsBuilder.replacePath("/product-attributes/{id}")
                         .buildAndExpand(productAttribute.getId()).toUri())
                 .body(productAttributeVm);
     }
 
-    @PutMapping({"/management/product-attribute/{id}"})
+
+    // đã check
+    @PutMapping({"/management/product-attributes/{id}"})
     public ResponseEntity<Void> updateProductAttribute(@PathVariable Long id,
                                                        @Valid @RequestBody ProductAttributePostVm productAttributePostVm) {
         this.productAttributeService.updateProductAttribute(id,productAttributePostVm);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping({"/management/product-attribute/{id}"})
+
+    // đã check
+
+    @DeleteMapping({"/management/product-attributes/{id}"})
     public ResponseEntity<Void> deleteProductAttribute(@PathVariable Long id) {
         this.productAttributeService.deleteProductAttribute(id);
         return ResponseEntity.noContent().build();

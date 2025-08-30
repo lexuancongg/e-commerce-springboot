@@ -8,4 +8,5 @@ public interface ProductAttributeRepository extends JpaRepository<ProductAttribu
     @Query("select productAttribute from ProductAttribute productAttribute " +
             "where productAttribute.name =?1 and (?2 is null or productAttribute.id != ?2)")
     ProductAttribute findExistedName(String name,Long id);
+    ProductAttribute findByNameAndIdNot(String name, Long id);
 }
