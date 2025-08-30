@@ -59,7 +59,7 @@ public class ProductAttributeValueService {
     public void deleteProductAttributeValue(Long id) {
         Optional<ProductAttributeValue> optionalProductAttributeValue = this.productAttributeValueRepository.findById(id);
         if (optionalProductAttributeValue.isEmpty()) {
-            throw new NotFoundException(Constants.ErrorKey.PRODUCT_ATTRIBUTE_NOT_FOUND, id);
+            throw new NotFoundException(Constants.ErrorKey.PRODUCT_ATTRIBUTE_VALUE_NOT_FOUND, id);
         }
         productAttributeRepository.deleteById(id);
     }
@@ -67,7 +67,7 @@ public class ProductAttributeValueService {
     public void updateProductAttributeValue(Long id, ProductAttributeValuePostVm productAttributeValuePostVm) {
         Optional<ProductAttributeValue> optionalProductAttributeValue = this.productAttributeValueRepository.findById(id);
         if (optionalProductAttributeValue.isEmpty()) {
-            throw new RuntimeException();
+            throw new NotFoundException(Constants.ErrorKey.PRODUCT_ATTRIBUTE_VALUE_NOT_FOUND, id);
         }
         ProductAttributeValue productAttributeValue = optionalProductAttributeValue.get();
         productAttributeValue.setValue(productAttributeValuePostVm.value());

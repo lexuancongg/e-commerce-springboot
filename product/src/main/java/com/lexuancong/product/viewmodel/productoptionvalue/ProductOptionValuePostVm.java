@@ -1,4 +1,4 @@
-package com.lexuancong.product.viewmodel.product.productoptions;
+package com.lexuancong.product.viewmodel.productoptionvalue;
 
 import com.lexuancong.product.viewmodel.product.databinding.ProductOptionPropertyRequire;
 

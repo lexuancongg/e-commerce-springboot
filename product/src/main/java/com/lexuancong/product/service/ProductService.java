@@ -8,7 +8,7 @@ import com.lexuancong.product.service.internal.ImageService;
 import com.lexuancong.product.viewmodel.image.ImageVm;
 import com.lexuancong.product.viewmodel.product.*;
 import com.lexuancong.product.viewmodel.product.databinding.BaseProductPropertiesRequire;
-import com.lexuancong.product.viewmodel.product.productoptions.ProductOptionValuePostVm;
+import com.lexuancong.product.viewmodel.productoptionvalue.ProductOptionValuePostVm;
 import com.lexuancong.product.viewmodel.product.variants.ProductVariantVm;
 import com.lexuancong.product.viewmodel.product.variants.ProductVariationPostVm;
 import com.lexuancong.product.viewmodel.productattribute.AttributeGroupValueVm;

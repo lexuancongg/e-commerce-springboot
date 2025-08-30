@@ -5,4 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProductOptionValueRepository extends JpaRepository<ProductOptionValue, Long> {
     void deleteAllByProductId(Long productId);
+
+    boolean existsByProductOption_Id(Long productOptionId);
 }
