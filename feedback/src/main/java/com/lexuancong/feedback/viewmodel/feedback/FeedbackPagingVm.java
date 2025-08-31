@@ -1,9 +1,9 @@
-package com.lexuancong.feedback.viewmodel.rating;
+package com.lexuancong.feedback.viewmodel.feedback;
 
 import java.util.List;
 
-public record RatingPagingVm(
-        List<RatingVm> ratingPayload,
+public record FeedbackPagingVm(
+        List<FeedbackVm> ratingPayload,
         int pageIndex,
         int pageSize,
         int totalElements,

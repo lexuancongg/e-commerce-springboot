@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Rating  extends AuditEntity{
+public class Feedback extends AuditEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,10 +21,11 @@ public class Rating  extends AuditEntity{
 
 
 
-    // hai thuôc tính người dùng  của keycloak
-
-    private String lastName;
-
-    private String firstName;
+//    // hai thuôc tính người dùng  của keycloak =>  nếu lưu như này thì nó cố định k update theo
+//
+//    private String lastName;
+//
+//    private String firstName;
+    private String customerId;
 
 }

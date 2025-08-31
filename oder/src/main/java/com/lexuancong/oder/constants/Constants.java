@@ -1,4 +1,4 @@
-package com.lexuancong.oder.utils;
+package com.lexuancong.oder.constants;
 
 public final  class Constants {
     public final class PagingConstants{

@@ -2,7 +2,7 @@ package com.lexuancong.oder.specification;
 
 import com.lexuancong.oder.model.Order;
 import com.lexuancong.oder.model.enum_status.OrderStatus;
-import com.lexuancong.oder.utils.Constants;
+import com.lexuancong.oder.constants.Constants;
 import org.springframework.data.jpa.domain.Specification;
 
 // dùng trong trường hợp filter động , nhieeuf điều kiện

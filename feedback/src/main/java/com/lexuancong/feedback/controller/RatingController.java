@@ -1,9 +1,9 @@
 package com.lexuancong.feedback.controller;
 
 import com.lexuancong.feedback.service.RatingService;
-import com.lexuancong.feedback.viewmodel.rating.RatingPagingVm;
-import com.lexuancong.feedback.viewmodel.rating.RatingPostVm;
-import com.lexuancong.feedback.viewmodel.rating.RatingVm;
+import com.lexuancong.feedback.viewmodel.feedback.FeedbackPagingVm;
+import com.lexuancong.feedback.viewmodel.feedback.FeedbackPostVm;
+import com.lexuancong.feedback.viewmodel.feedback.FeedbackVm;
 import com.lexuancong.share.constants.Constants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +15,8 @@ public class RatingController {
     private final RatingService ratingService;
 
     @PostMapping("/customer/ratings")
-    public ResponseEntity<RatingVm> createRating(@RequestBody RatingPostVm ratingPostVm) {
-        return ResponseEntity.ok(this.ratingService.createRating(ratingPostVm));
+    public ResponseEntity<FeedbackVm> createRating(@RequestBody FeedbackPostVm feedbackPostVm) {
+        return ResponseEntity.ok(this.ratingService.createRating(feedbackPostVm));
     }
 
     @DeleteMapping("/customer/ratings/{id}")
@@ -27,7 +27,7 @@ public class RatingController {
 
 
     @GetMapping("/customer/ratings/products/{productId}")
-    public ResponseEntity<RatingPagingVm> getRatingByProductId(
+    public ResponseEntity<FeedbackPagingVm> getRatingByProductId(
             @PathVariable(value = "productId") Long productId,
             @RequestParam(value ="pageIndex", defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER , required = false) int pageIndex,
             @RequestParam(value = "pageSize", defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE , required = false) int pageSize

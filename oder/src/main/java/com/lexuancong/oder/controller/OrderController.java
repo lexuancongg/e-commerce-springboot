@@ -2,6 +2,7 @@ package com.lexuancong.oder.controller;
 
 import com.lexuancong.oder.model.enum_status.OrderStatus;
 import com.lexuancong.oder.service.OderService;
+import com.lexuancong.oder.viewmodel.order.CheckUserHasBoughtProductCompletedVm;
 import com.lexuancong.oder.viewmodel.order.OrderDetailVm;
 import com.lexuancong.oder.viewmodel.order.OrderPostVm;
 import com.lexuancong.oder.viewmodel.order.OrderVm;
@@ -28,6 +29,7 @@ public class OrderController {
 
     }
 
+    // có thể tận dụng api này cho check ở feedback nhưng mà không tối ưu về performance vì load ht
     @GetMapping("/customer/orders/my-orders")
     public ResponseEntity<List<OrderDetailVm>> getMyOrders(
             @RequestParam(required = false)OrderStatus orderStatus
@@ -35,6 +37,17 @@ public class OrderController {
         return ResponseEntity.ok(this.orderService.getMyOrders(orderStatus));
 
     }
+
+
+    // api đc gọi bởi feedback check xem đã mua sp này chưa => đã check
+    @GetMapping({"/internal/orders/completed"})
+    public ResponseEntity<CheckUserHasBoughtProductCompletedVm> checkUserHasBoughtProductCompleted(
+            @RequestParam Long productId
+    ){
+        return ResponseEntity.ok(this.orderService.checkUserHasBoughtProductCompleted(productId));
+    }
+
+
 
 
 

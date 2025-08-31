@@ -10,12 +10,12 @@ type Props = {
 const Star:FC<Props> = ({star})=>{
     return (
         <StarRatings
-            rating={star}
+            feedback={star}
             starRatedColor="#fb6e2e"
             numberOfStars={5}
             starDimension="18px"
             starSpacing="0"
-            name="rating-header"
+            name="feedback-header"
         />
     )
 }

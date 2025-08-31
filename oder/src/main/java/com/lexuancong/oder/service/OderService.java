@@ -7,10 +7,12 @@ import com.lexuancong.oder.repository.OderRepository;
 import com.lexuancong.oder.repository.OrderItemRepository;
 import com.lexuancong.oder.service.internal.CartService;
 import com.lexuancong.oder.specification.OrderSpecification;
-import com.lexuancong.oder.utils.Constants;
+import com.lexuancong.oder.constants.Constants;
+import com.lexuancong.oder.viewmodel.order.CheckUserHasBoughtProductCompletedVm;
 import com.lexuancong.oder.viewmodel.order.OrderDetailVm;
 import com.lexuancong.oder.viewmodel.order.OrderPostVm;
 import com.lexuancong.oder.viewmodel.order.OrderVm;
+import com.lexuancong.share.utils.AuthenticationUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -76,6 +78,13 @@ public class OderService {
                     return OrderDetailVm.fromModel(order,orderItems);
                 })
                 .toList();
+
+    }
+
+
+    public CheckUserHasBoughtProductCompletedVm checkUserHasBoughtProductCompleted(Long productId){
+        String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
+
 
     }
 
