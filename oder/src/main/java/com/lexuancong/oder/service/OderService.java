@@ -6,12 +6,14 @@ import com.lexuancong.oder.model.enum_status.OrderStatus;
 import com.lexuancong.oder.repository.OderRepository;
 import com.lexuancong.oder.repository.OrderItemRepository;
 import com.lexuancong.oder.service.internal.CartService;
+import com.lexuancong.oder.service.internal.ProductService;
 import com.lexuancong.oder.specification.OrderSpecification;
 import com.lexuancong.oder.constants.Constants;
 import com.lexuancong.oder.viewmodel.order.CheckUserHasBoughtProductCompletedVm;
 import com.lexuancong.oder.viewmodel.order.OrderDetailVm;
 import com.lexuancong.oder.viewmodel.order.OrderPostVm;
 import com.lexuancong.oder.viewmodel.order.OrderVm;
+import com.lexuancong.oder.viewmodel.product.ProductVariantPreviewVm;
 import com.lexuancong.share.utils.AuthenticationUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -27,12 +29,15 @@ public class OderService {
     private final OderRepository oderRepository;
     private final OrderItemRepository orderItemRepository;
     private final CartService cartService;
+    private final ProductService productService;
     // tự thêm bean cần thieeys vào
-    public OderService(OderRepository oderRepository, OrderItemRepository orderItemRepository, CartService cartService) {
+    public OderService(OderRepository oderRepository, OrderItemRepository orderItemRepository, CartService cartService,ProductService productService) {
         this.oderRepository = oderRepository;
         this.orderItemRepository = orderItemRepository;
         this.cartService = cartService;
+        this.productService = productService;
     }
+
     public OrderVm createOrder(OrderPostVm orderPostVm){
         Order order = orderPostVm.toModel();
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -82,8 +87,22 @@ public class OderService {
     }
 
 
+    // product này là product cha
     public CheckUserHasBoughtProductCompletedVm checkUserHasBoughtProductCompleted(Long productId){
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
+        List<ProductVariantPreviewVm> productVariantPreviewVms =  this.productService.getProductVariantByProductParentId(productId);
+        List<Long> productVariantIds = productVariantPreviewVms.stream()
+                .map(ProductVariantPreviewVm::id)
+                .toList();
+
+
+        Specification<Order> orderSpecification = OrderSpecification
+
+
+
+
+
+
 
 
     }

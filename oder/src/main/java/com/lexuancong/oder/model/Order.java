@@ -22,7 +22,6 @@ public class Order extends AuditEntity{
     private String email;
     // ghi chú đơn hàng
     private String note;
-    // ALL : bất kì thay đổi nào cuũng ảnh hưởng tới Address , khi oder được lưu thì address cũng được lưu
     @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     // 1 địa chỉ có một đơn hàng vì nếu 1 địa chỉ có nhiều đơn hàng thì khi thay đổi địa chỉ 1 đơn hàng thì tất cả đơn hàng b thay đổi
     @JoinColumn(name = "shipping_address_id", referencedColumnName = "id")

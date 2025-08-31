@@ -24,7 +24,8 @@ public enum OrderStatus {
     // Đơn hàng thất bại (ví dụ: lỗi thanh toán).
     FAILED("FAILED"),
 //    Khách yêu cầu trả hàng.
-    RETURN_REQUESTED("RETURN_REQUESTED");
+    RETURN_REQUESTED("RETURN_REQUESTED"),
+    COMPLETED("COMPLETED");
 
 
 

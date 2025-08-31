@@ -10,5 +10,8 @@ public final  class Constants {
         public static final String CREATE_AT_COLUMN = "createdAt";
         public static final String CREATE_BY_COLUMN = "createdBy";
         public static final String ORDER_STATUS_COLUMN ="orderStatus";
+        public static final String ORDER_ID_COLUMN ="orderId";
+        public static final String ID_COLUMN = "id";
+        public static final String PRODUCT_ID_COLUMN ="productId";
     }
 }
