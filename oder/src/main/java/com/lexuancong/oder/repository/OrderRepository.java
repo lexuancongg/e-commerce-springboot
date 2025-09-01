@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.List;
 
-public interface OderRepository extends JpaRepository<Order, Long> , JpaSpecificationExecutor<Order> {
+public interface OrderRepository extends JpaRepository<Order, Long> , JpaSpecificationExecutor<Order> {
     List<Order> findAllByCustomerId(String customerId, Sort sort);
 }

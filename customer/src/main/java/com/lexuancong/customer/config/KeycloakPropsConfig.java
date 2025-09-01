@@ -9,15 +9,13 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @Configuration
-@ConfigurationProperties(value = "keycloak")
+@ConfigurationProperties(prefix = "keycloak")
 public class KeycloakPropsConfig {
-    private String authServerUrl;
+    private  String authServerUrl;
     private String realm;
     private String clientId;
     private Credentials credentials = new Credentials();
-    public KeycloakPropsConfig() {
-        System.out.printf("call");
-    }
+
     @Getter
     @Setter
     public class Credentials {

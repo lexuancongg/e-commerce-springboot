@@ -1,6 +1,7 @@
 package com.lexuancong.feedback.viewmodel.feedback;
 
 import com.lexuancong.feedback.model.Feedback;
+import com.lexuancong.feedback.viewmodel.customer.CustomerVm;
 
 import java.time.ZonedDateTime;
 
@@ -12,7 +13,7 @@ public record FeedbackVm(
                 feedback.getId(),
                 feedback.getContent(),
                 feedback.getStar(),
-                feedback.getFirstName(),
+             feedback.getFirstName(),
                 feedback.getLastName(),
                 feedback.getProductId(),
                 feedback.getCreatedAt()

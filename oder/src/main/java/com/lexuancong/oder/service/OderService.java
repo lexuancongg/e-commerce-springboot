@@ -3,7 +3,7 @@ package com.lexuancong.oder.service;
 import com.lexuancong.oder.model.Order;
 import com.lexuancong.oder.model.OrderItem;
 import com.lexuancong.oder.model.enum_status.OrderStatus;
-import com.lexuancong.oder.repository.OderRepository;
+import com.lexuancong.oder.repository.OrderRepository;
 import com.lexuancong.oder.repository.OrderItemRepository;
 import com.lexuancong.oder.service.internal.CartService;
 import com.lexuancong.oder.service.internal.ProductService;
@@ -26,13 +26,13 @@ import java.util.stream.Collectors;
 
 @Service
 public class OderService {
-    private final OderRepository oderRepository;
+    private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final CartService cartService;
     private final ProductService productService;
     // tự thêm bean cần thieeys vào
-    public OderService(OderRepository oderRepository, OrderItemRepository orderItemRepository, CartService cartService,ProductService productService) {
-        this.oderRepository = oderRepository;
+    public OderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository, CartService cartService, ProductService productService) {
+        this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.cartService = cartService;
         this.productService = productService;
@@ -43,7 +43,7 @@ public class OderService {
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         order.setCustomerId(userId);
 
-        this.oderRepository.save(order); // shipping address đã lưu cùng oder
+        this.orderRepository.save(order); // shipping address đã lưu cùng oder
         Set<OrderItem> orderItemSet = orderPostVm.orderItemPostVms().stream()
                 .map(orderItemPostVm -> orderItemPostVm.toModel(order))
                 .collect(Collectors.toSet());
@@ -65,17 +65,17 @@ public class OderService {
 
     }
     private void updateOderStatus(Long orderId, OrderStatus orderStatus){
-        Order order = this.oderRepository.findById(orderId)
+        Order order = this.orderRepository.findById(orderId)
                 .orElseThrow(()->new RuntimeException("Order not found"));
         order.setOderStatus(orderStatus);
-        this.oderRepository.save(order);
+        this.orderRepository.save(order);
     }
 
     public List<OrderDetailVm> getMyOrders(OrderStatus orderStatus){
         String userId = SecurityContextHolder.getContext().getAuthentication().getName();
         Specification<Order> specification = OrderSpecification.findMyOrders(userId,orderStatus);
         Sort sort = Sort.by(Sort.Direction.DESC, Constants.Column.CREATE_AT_COLUMN);
-        List<Order> orders = this.oderRepository.findAll(specification,sort);
+        List<Order> orders = this.orderRepository.findAll(specification,sort);
         return orders.stream()
                 .map(order -> {
                     Long orderId = order.getId();
@@ -96,7 +96,11 @@ public class OderService {
                 .toList();
 
 
-        Specification<Order> orderSpecification = OrderSpecification
+        Specification<Order> checkUserHasBoughtSpecification =
+                OrderSpecification.checkUserHasBoughtProductCompleted(productVariantIds,customerId);
+        boolean hasPurchased = this.orderRepository.findOne(checkUserHasBoughtSpecification)
+                .isPresent();
+        return new CheckUserHasBoughtProductCompletedVm(hasPurchased);
 
 
 

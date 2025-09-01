@@ -50,6 +50,11 @@
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-admin-client</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.lexuancong</groupId>
+            <artifactId>share</artifactId>
+            <version>${revision}</version>
+        </dependency>
     </dependencies>
 
     <build>

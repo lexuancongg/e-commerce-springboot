@@ -1,11 +1,12 @@
 package com.lexuancong.customer.service;
 
 import com.lexuancong.customer.config.KeycloakPropsConfig;
-import com.lexuancong.customer.mapper.CustomerMapper;
-import com.lexuancong.customer.utils.AuthenticationUtils;
+import com.lexuancong.customer.constants.Constants;
 import com.lexuancong.customer.viewmodel.customer.CustomerPostVm;
 import com.lexuancong.customer.viewmodel.customer.CustomerProfilePutVm;
 import com.lexuancong.customer.viewmodel.customer.CustomerVm;
+import com.lexuancong.share.exception.AccessDeniedException;
+import com.lexuancong.share.utils.AuthenticationUtils;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.Response;
 import org.keycloak.admin.client.CreatedResponseUtil;
@@ -24,24 +25,24 @@ import java.util.List;
 public class CustomerService {
     private final Keycloak keycloak;
     private final KeycloakPropsConfig keycloakPropsConfig;
-    private final CustomerMapper customerMapper;
 
-    public CustomerService(Keycloak keycloak, KeycloakPropsConfig keycloakPropsConfig, CustomerMapper customerMapper) {
+    public CustomerService(Keycloak keycloak, KeycloakPropsConfig keycloakPropsConfig) {
         this.keycloak = keycloak;
         this.keycloakPropsConfig = keycloakPropsConfig;
-        this.customerMapper = customerMapper;
     }
 
     public CustomerVm getCustomerProfile(){
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         try {
-            UserRepresentation userFromKeycloak = keycloak.realm(keycloakPropsConfig.getRealm()).users().get(customerId).toRepresentation();
-            return customerMapper.toCustomerVmFromUserRepresentation(userFromKeycloak);
-            // khi không đủ quyền truy cập
+            UserRepresentation userFromKeycloak = keycloak.realm(keycloakPropsConfig.getRealm())
+                    .users()
+                    .get(customerId)
+                    .toRepresentation();
+            return CustomerVm.fromKeycloakUserRes(userFromKeycloak);
         }catch (ForbiddenException forbiddenException){
-            // throw exception
+            throw new AccessDeniedException(Constants.ErrorKey.ACCESS_DENIED_KEYCLOAK);
         }
-        return  null;
+
     }
 
     public CustomerVm createCustomer(CustomerPostVm customerPostVm){

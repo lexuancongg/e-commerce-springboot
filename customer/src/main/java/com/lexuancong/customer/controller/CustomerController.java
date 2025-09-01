@@ -17,8 +17,8 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
-    // api xem thông tin
-    @GetMapping("/customer/customer/profile")
+    // đã check
+    @GetMapping({"/customer/customers/profile","/internal/customers/profile"})
     public ResponseEntity<CustomerVm> getCustomerProfile() {
         return ResponseEntity.ok(customerService.getCustomerProfile());
     }
