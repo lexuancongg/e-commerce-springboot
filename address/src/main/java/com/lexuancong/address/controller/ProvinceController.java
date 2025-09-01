@@ -44,6 +44,8 @@ public class ProvinceController {
         return ResponseEntity.ok(provinceGetVms);
     }
 
+    // checked
+
     @PostMapping("/management/provinces")
     public ResponseEntity<ProvinceGetVm> createProvince(
             @RequestBody @Valid final ProvincePostVm provincePostVm,
@@ -55,6 +57,8 @@ public class ProvinceController {
                         .buildAndExpand(provinceSaved.id()).toUri()
         ).body(provinceSaved);
     }
+
+
 
     @PutMapping("/management/provinces/{id}")
     public ResponseEntity<Void> updateProvince(@PathVariable Long id ,

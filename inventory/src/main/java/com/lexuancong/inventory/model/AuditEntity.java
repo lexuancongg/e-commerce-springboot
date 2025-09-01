@@ -1,6 +1,7 @@
 package com.lexuancong.inventory.model;
 
-import com.lexuancong.customer.listener.CustomAuditingEntityListener;
+
+import com.lexuancong.inventory.listener.CustomAuditingEntityListener;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;

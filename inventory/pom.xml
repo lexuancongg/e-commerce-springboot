@@ -45,6 +45,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.lexuancong</groupId>
+            <artifactId>share</artifactId>
+            <version>${revision}</version>
+        </dependency>
     </dependencies>
 
     <build>

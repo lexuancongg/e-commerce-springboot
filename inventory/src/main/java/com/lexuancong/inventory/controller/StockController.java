@@ -18,13 +18,16 @@ import java.util.List;
 public class StockController {
     private final StockService stockService;
 
-    // api thêm sp vào kho hàng để quán lý
+
+    // checked
     @PostMapping
-    public ResponseEntity<Void> addProductInStock(@RequestBody @NotEmpty @Valid List<StockPostVm> stockPostVmList) {
-        this.stockService.addProductInStock(stockPostVmList);
+    public ResponseEntity<Void> addProductIntoStock(@RequestBody @NotEmpty @Valid List<StockPostVm> stockPostVmList) {
+        this.stockService.addProductIntoStock(stockPostVmList);
         return ResponseEntity.ok().build();
     }
 
+
+    // checked
 
     @PutMapping
     private ResponseEntity<Void> updateQuantityProductInStock(@RequestBody @Valid List<StockPutQuantityVm> stockPutQuantityVms) {
@@ -32,5 +35,9 @@ public class StockController {
         return ResponseEntity.noContent().build();
 
     }
+
+
+
+
 
 }

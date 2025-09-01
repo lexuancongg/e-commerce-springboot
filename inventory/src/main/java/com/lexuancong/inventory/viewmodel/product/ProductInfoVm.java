@@ -1,4 +1,4 @@
 package com.lexuancong.inventory.viewmodel.product;
 
-public record ProductInfoVm(Long id, String slug) {
+public record ProductInfoVm(Long id, String name) {
 }
