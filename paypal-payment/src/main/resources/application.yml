@@ -2,6 +2,7 @@ spring:
   application:
     name: paypal-payment
 
+
 paypal:
   mode: sandbox
   client:

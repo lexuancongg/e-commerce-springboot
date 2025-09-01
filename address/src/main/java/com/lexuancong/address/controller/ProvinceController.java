@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
-@RequestMapping(com.lexuancong.address.constants.Constants.ApiBaseUrl.ADDRESS_BASE_URL)
 @RestController
 public class ProvinceController {
     private final ProvinceService provinceService;
@@ -19,6 +18,8 @@ public class ProvinceController {
         this.provinceService = provinceService;
     }
 
+
+    // checked
     @GetMapping("/management/provinces/paging")
     public ResponseEntity<ProvincePagingVm> getProvincesPaging(
             @RequestParam(value = "pageIndex",defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER,required = false)
@@ -31,10 +32,13 @@ public class ProvinceController {
         return ResponseEntity.ok(provincePagingVm);
 
     }
-    // show province with country
+
+
+
+    // checked
     @GetMapping({"/management/provinces/{countryId}","/customer/provinces/{countryId}"})
     public ResponseEntity<List<ProvinceGetVm>> getProvincesByCountryId(
-            @PathVariable(value = "countryId",required = true) final Long countryId
+            @PathVariable(value = "countryId") final Long countryId
     ) {
         List<ProvinceGetVm> provinceGetVms = provinceService.getProvincesByCountryId(countryId);
         return ResponseEntity.ok(provinceGetVms);

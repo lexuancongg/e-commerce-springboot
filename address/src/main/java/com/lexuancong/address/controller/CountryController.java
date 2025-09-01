@@ -12,7 +12,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
-@RequestMapping(com.lexuancong.address.constants.Constants.ApiBaseUrl.ADDRESS_BASE_URL)
 @RestController
 public class CountryController {
 
@@ -21,6 +20,8 @@ public class CountryController {
         this.countryService = countryService;
     }
 
+
+    // checked
 
     @GetMapping("/management/countries/paging")
     public ResponseEntity<CountryPagingVm> getCountriesPaging(
@@ -32,11 +33,14 @@ public class CountryController {
         return ResponseEntity.ok(countryService.getCountriesPaging(pageIndex,pageSize));
     }
 
+
+    // checked
     @GetMapping({"/management/countries","/customer/countries"})
     public ResponseEntity<List<CountryGetVm>> getCountries(){
         return ResponseEntity.ok(countryService.getCountries());
     }
 
+    // checked
     @PostMapping("/management/countries")
     public ResponseEntity<CountryGetVm> createCountry(
             @RequestBody @Valid final CountryPostVm countryPostVm,
@@ -45,11 +49,13 @@ public class CountryController {
         CountryGetVm countrySaved = countryService.createCountry(countryPostVm);
         return ResponseEntity.created(
                         uriComponentsBuilder
-                                .replacePath("/country/{id}")
+                                .replacePath("/countries/{id}")
                                 .buildAndExpand(countrySaved.id())
                                 .toUri())
                 .body(countrySaved);
     }
+
+    // checked
 
     @PutMapping("/management/countries/{id}")
     public ResponseEntity<Void> updateCountry(@PathVariable Long id,
@@ -59,6 +65,7 @@ public class CountryController {
     }
 
 
+    // checked
     @DeleteMapping("/management/countries/{id}")
     public ResponseEntity<Void> deleteCountry(@PathVariable Long id){
         countryService.deleteCountry(id);
