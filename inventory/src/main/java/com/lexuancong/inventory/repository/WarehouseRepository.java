@@ -14,4 +14,5 @@ public interface WarehouseRepository extends JpaRepository<Warehouse, Long> {
 """)
     List<Long> getProductIdsInWarehouse(@Param("warehouseId") Long warehouseId);
 
+    boolean existsByNameAndIdNot(String name, Long id);
 }

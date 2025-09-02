@@ -16,12 +16,12 @@ import java.util.List;
 public class AddressController{
     private final AddressService addressService;
 
-    @PostMapping("/customer/address")
+    @PostMapping({"/customer/addresses","/internal/addresses"})
     public ResponseEntity<AddressGetVm> createAddress(@RequestBody @Valid AddressPostVm addressPostVm){
         return ResponseEntity.ok(addressService.createAddress(addressPostVm));
     }
 
-    @PutMapping("/customer/address/{id}")
+    @PutMapping({"/customer/addresses/{id}","/internal/addresses/{id}"})
     public ResponseEntity<Void> updateAddress(@PathVariable Long id, @RequestBody @Valid AddressPostVm addressPostVm){
         addressService.updateAddress(id,addressPostVm);
         return ResponseEntity.ok().build();
@@ -38,7 +38,7 @@ public class AddressController{
         return ResponseEntity.ok(addressService.getAddresses(ids));
     }
 
-    @DeleteMapping("/customer/address/{id}")
+    @DeleteMapping({"/customer/addresses/{id}","/internal/addresses/{id}"})
     public ResponseEntity<Void> deleteAddress(@PathVariable Long id){
         addressService.deleteAddress(id);
         return ResponseEntity.ok().build();
