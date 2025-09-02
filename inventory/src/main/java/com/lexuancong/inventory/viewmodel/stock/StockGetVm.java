@@ -7,6 +7,7 @@ public record StockGetVm(
         int quantity,
         int lockedQuantity,
         Long warehouseId,
-        String warehouseName
+        String warehouseName,
+        String productSku
 ) {
 }

@@ -7,6 +7,7 @@ import com.lexuancong.inventory.repository.StockRepository;
 import com.lexuancong.inventory.repository.WarehouseRepository;
 import com.lexuancong.inventory.service.Internal.ProductService;
 import com.lexuancong.inventory.viewmodel.product.ProductInfoVm;
+import com.lexuancong.inventory.viewmodel.stock.StockGetVm;
 import com.lexuancong.inventory.viewmodel.stock.StockPostVm;
 import com.lexuancong.inventory.viewmodel.stock.StockPutQuantityVm;
 import com.lexuancong.share.exception.DuplicatedException;
@@ -23,18 +24,21 @@ public class StockService {
     private final StockRepository stockRepository;
     private final ProductService productService;
     private final WarehouseRepository warehouseRepository;
+    private final WarehouseService warehouseService;
 
-    public StockService(StockRepository stockRepository, ProductService productService, WarehouseRepository warehouseRepository) {
+    public StockService(StockRepository stockRepository, ProductService productService, WarehouseRepository warehouseRepository, WarehouseService warehouseService) {
         this.stockRepository = stockRepository;
         this.productService = productService;
         this.warehouseRepository = warehouseRepository;
+        this.warehouseService = warehouseService;
     }
 
 
-    public void addProductIntoStock(List<StockPostVm> stockPostVmList){
+    public void addProductIntoWarehouse(List<StockPostVm> stockPostVmList){
         List<Stock> stocks = new ArrayList<>();
         for (StockPostVm stockPostVm : stockPostVmList) {
 
+            // cần update sau vì for lớn gây ra performan kém
             ProductInfoVm productInfoVm = this.productService.getProductById(stockPostVm.productId());
             if(productInfoVm == null){
                 throw new NotFoundException(Constants.ErrorKey.PRODUCT_NOT_FOUND, stockPostVm.productId());
@@ -87,5 +91,14 @@ public class StockService {
         }
         // tham chiếu nên stocks được cập nhật
         this.stockRepository.saveAll(stocks);
+    }
+
+
+    public List<StockGetVm> getStockByWarehouseIdAndProductSkuAndProductName(Long warehouseId, String productSku,String productName){
+        List<Long> productIdsInWarehouse = this.warehouseService.getProductIdsInWarehouse(warehouseId);
+        // tìm kiếm trong productId này có product nào có sku vaf name mach nếu k null
+        List<ProductInfoVm> productInfoVms = this.productService.filterProductInProductIdsByNameAndSku(productIdsInWarehouse,productSku,productName);
+
+
     }
 }

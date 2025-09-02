@@ -1,6 +1,7 @@
 package com.lexuancong.inventory.controller;
 
 import com.lexuancong.inventory.service.StockService;
+import com.lexuancong.inventory.viewmodel.stock.StockGetVm;
 import com.lexuancong.inventory.viewmodel.stock.StockPostVm;
 import com.lexuancong.inventory.viewmodel.stock.StockPutQuantityVm;
 import jakarta.validation.Valid;
@@ -21,8 +22,8 @@ public class StockController {
 
     // checked
     @PostMapping
-    public ResponseEntity<Void> addProductIntoStock(@RequestBody @NotEmpty @Valid List<StockPostVm> stockPostVmList) {
-        this.stockService.addProductIntoStock(stockPostVmList);
+    public ResponseEntity<Void> addProductIntoWarehouse(@RequestBody @NotEmpty @Valid List<StockPostVm> stockPostVmList) {
+        this.stockService.addProductIntoWarehouse(stockPostVmList);
         return ResponseEntity.ok().build();
     }
 
@@ -37,6 +38,19 @@ public class StockController {
     }
 
 
+    // lấy danh sách để show => checked
+
+    @GetMapping
+    public ResponseEntity<List<StockGetVm>> getStockByWarehouseIdAndProductSkuAndProductName(
+            @RequestParam(name = "warehouseId") Long warehouseId,
+            @RequestParam(required = false) String productName,
+            @RequestParam(required = false) String productSku
+    ){
+        return ResponseEntity.ok(
+                this.stockService.getStockByWarehouseIdAndProductSkuAndProductName(warehouseId,productSku,productName)
+        );
+
+    }
 
 
 
