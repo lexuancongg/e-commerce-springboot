@@ -36,7 +36,7 @@ public class ProductService {
                 .body(ProductInfoVm.class);
     }
 
-    public List<ProductInfoVm> filterProductInProductIdsByNameAndSku(List<Long> productIds,String name,String sku){
+    public List<ProductInfoVm> filterProductInProductIdsByNameOrSku(List<Long> productIds,String name,String sku){
         String jwt  = AuthenticationUtils.extractJwt();
         if(productIds.isEmpty()){
             return Collections.emptyList();

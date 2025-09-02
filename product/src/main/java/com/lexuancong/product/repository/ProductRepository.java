@@ -47,4 +47,16 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                                                   @Param("startPrice") Double startPrice,
                                                                   @Param("endPrice") Double endPrice,
                                                                   Pageable pageable);
+
+
+    @Query("SELECT product " +
+            "FROM Product product " +
+            "WHERE (LOWER(product.name) LIKE CONCAT('%', LOWER(:name), '%') " +
+            "       OR LOWER(product.sku) LIKE CONCAT('%', LOWER(:sku), '%')) " +
+            "  AND product.id IN :productIds " +
+            "ORDER BY product.id ASC")
+    List<Product> filterProductInProductIdsByNameOrSku(@Param("productIds") List<Long> productIds,
+                                                       @Param("name") String name,
+                                                       @Param("sku") String sku);
+
 }

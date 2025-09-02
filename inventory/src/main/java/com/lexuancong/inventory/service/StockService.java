@@ -97,7 +97,20 @@ public class StockService {
     public List<StockGetVm> getStockByWarehouseIdAndProductSkuAndProductName(Long warehouseId, String productSku,String productName){
         List<Long> productIdsInWarehouse = this.warehouseService.getProductIdsInWarehouse(warehouseId);
         // tìm kiếm trong productId này có product nào có sku vaf name mach nếu k null
-        List<ProductInfoVm> productInfoVms = this.productService.filterProductInProductIdsByNameAndSku(productIdsInWarehouse,productSku,productName);
+        List<ProductInfoVm> productInfoVms = this.productService.filterProductInProductIdsByNameOrSku(productIdsInWarehouse,productSku,productName);
+        Map<Long,ProductInfoVm> productInfoVmMap = productInfoVms.parallelStream()
+                .collect(Collectors.toMap(ProductInfoVm::id, productInfoVm -> productInfoVm));
+
+        List<Stock> stocks =
+                this.stockRepository.findByWarehouseIdAndProductIds(warehouseId,productInfoVmMap.keySet());
+
+        return stocks.stream()
+                .map(stock ->  {
+                    ProductInfoVm productInfoVm = productInfoVmMap.get(stock.getProductId());
+                    return StockGetVm.fromModel(stock, productInfoVm);
+                }).toList();
+
+
 
 
     }

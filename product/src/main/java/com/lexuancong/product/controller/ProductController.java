@@ -1,8 +1,10 @@
 package com.lexuancong.product.controller;
 
+import com.lexuancong.product.model.Product;
 import com.lexuancong.product.service.ProductService;
 import com.lexuancong.product.constant.Constants;
 import com.lexuancong.product.viewmodel.product.*;
+import com.lexuancong.product.viewmodel.product.producforwarehouse.ProductInfoVm;
 import com.lexuancong.product.viewmodel.product.variants.ProductVariantVm;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -129,6 +131,21 @@ public class ProductController {
         return new ResponseEntity<>(this.productService.getProductVariationsByParentId(parentId),HttpStatus.OK);
     }
 
+
+
+    // checked
+    @GetMapping("/internal/products/warehouse")
+    public ResponseEntity<List<ProductInfoVm>> filterProductInProductIdsByNameOrSku(
+            @RequestParam(name = "name" , required = false) String name,
+            @RequestParam(required = false) List<Long> productIds,
+            @RequestParam(name = "sku", required = false) String sku
+
+    ){
+        return ResponseEntity.ok(this.productService.filterProductInProductIdsByNameOrSku(productIds,name,sku));
+
+
+
+    }
 
 
 

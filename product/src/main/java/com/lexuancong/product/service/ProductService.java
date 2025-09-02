@@ -8,6 +8,7 @@ import com.lexuancong.product.service.internal.ImageService;
 import com.lexuancong.product.viewmodel.image.ImageVm;
 import com.lexuancong.product.viewmodel.product.*;
 import com.lexuancong.product.viewmodel.product.databinding.BaseProductPropertiesRequire;
+import com.lexuancong.product.viewmodel.product.producforwarehouse.ProductInfoVm;
 import com.lexuancong.product.viewmodel.productoptionvalue.ProductOptionValuePostVm;
 import com.lexuancong.product.viewmodel.product.variants.ProductVariantVm;
 import com.lexuancong.product.viewmodel.product.variants.ProductVariationPostVm;
@@ -864,6 +865,12 @@ public class ProductService {
         return Collections.emptyList();
 
 
+    }
+
+    public List<ProductInfoVm> filterProductInProductIdsByNameOrSku(List<Long> productIds,String name,String sku){
+        List<Product> products = this.productRepository.filterProductInProductIdsByNameOrSku(productIds,name,sku);
+        return products.stream().map(ProductInfoVm::fromModel)
+                .toList();
     }
 
 
