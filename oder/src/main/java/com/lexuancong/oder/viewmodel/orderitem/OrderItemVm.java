@@ -10,13 +10,15 @@ public record OrderItemVm(
         int quantity,
         BigDecimal productPrice,
         BigDecimal totalPrice,
-        Long orderId
+        Long orderId,
+        String productName
 
 ) {
     public static OrderItemVm fromModel(OrderItem orderItem) {
         return new OrderItemVm(orderItem.getId(),
                 orderItem.getProductId(),orderItem.getQuantity(),orderItem.getProductPrice(),
-                orderItem.getTotalPrice(),orderItem.getProductId());
+                orderItem.getTotalPrice(),orderItem.getProductId(),orderItem.getProductName()
+        );
 
     }
 }

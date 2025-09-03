@@ -1,8 +1,6 @@
 package com.lexuancong.oder.model;
 
-import com.lexuancong.oder.model.enum_status.DeliveryMethod;
-import com.lexuancong.oder.model.enum_status.DeliveryStatus;
-import com.lexuancong.oder.model.enum_status.OrderStatus;
+import com.lexuancong.oder.model.enum_status.*;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,7 +18,6 @@ public class Order extends AuditEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String email;
-    // ghi chú đơn hàng
     private String note;
     @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     // 1 địa chỉ có một đơn hàng vì nếu 1 địa chỉ có nhiều đơn hàng thì khi thay đổi địa chỉ 1 đơn hàng thì tất cả đơn hàng b thay đổi
@@ -43,6 +40,13 @@ public class Order extends AuditEntity{
     @Column(name = "delivery_method")
     @Enumerated(EnumType.STRING)
     private DeliveryMethod deliveryMethod;
+
+
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod PaymentMethod;
 
 
     // tham chiếu tới bảng payment cho thank toán banking sau này

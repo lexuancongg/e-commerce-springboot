@@ -40,7 +40,7 @@ public class OderService {
 
     public OrderVm createOrder(OrderPostVm orderPostVm){
         Order order = orderPostVm.toModel();
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
+        String userId = AuthenticationUtils.extractCustomerIdFromJwt();
         order.setCustomerId(userId);
 
         this.orderRepository.save(order); // shipping address đã lưu cùng oder
@@ -57,9 +57,6 @@ public class OderService {
         this.cartService.deleteCartItems(orderVm);
         // tru số lượng hàng tồn cho sp
 
-
-        // cap nhat trang thai don hang
-        this.updateOderStatus(order.getId(),OrderStatus.CONFIRMED);
         return orderVm;
 
 
