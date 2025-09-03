@@ -5,9 +5,7 @@ import com.lexuancong.oder.viewmodel.checkout.CheckoutPostVm;
 import com.lexuancong.oder.viewmodel.checkout.CheckoutVm;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class CheckoutController {
@@ -19,6 +17,14 @@ public class CheckoutController {
     public ResponseEntity<CheckoutVm> createCheckout(@Valid @RequestBody CheckoutPostVm checkoutPostVm) {
         return ResponseEntity.ok(this.checkoutService.createCheckout(checkoutPostVm));
     }
+
+    @GetMapping("/customer/checkouts/{id}")
+    public ResponseEntity<CheckoutVm> getCheckoutById(@PathVariable Long id) {
+        return ResponseEntity.ok(this.checkoutService.getCheckoutById(id));
+
+    }
+
+
 
 
 }

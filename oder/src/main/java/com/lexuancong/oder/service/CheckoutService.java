@@ -11,6 +11,7 @@ import com.lexuancong.oder.viewmodel.checkout.CheckoutVm;
 import com.lexuancong.oder.viewmodel.checkout.checkoutitem.CheckoutItemPostVm;
 import com.lexuancong.oder.viewmodel.checkout.checkoutitem.CheckoutItemVm;
 import com.lexuancong.oder.viewmodel.product.ProductCheckoutPreviewVm;
+import com.lexuancong.share.exception.AccessDeniedException;
 import com.lexuancong.share.exception.NotFoundException;
 import com.lexuancong.share.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +49,8 @@ public class CheckoutService {
         CheckoutVm checkoutVm = CheckoutVm.fromModel(checkout);
         return checkoutVm;
     }
+
+
     public List<CheckoutItem> buildCheckoutItems(CheckoutPostVm checkoutPostVm , Checkout checkout){
         List<CheckoutItemPostVm> checkoutItemPostVms = checkoutPostVm.checkoutItemPostVms();
         Set<Long> productIdsCheckoutItems = checkoutItemPostVms.stream()
@@ -73,5 +76,25 @@ public class CheckoutService {
                 } )
                 .toList();
         return checkoutItems;
+    }
+
+
+
+    public CheckoutVm getCheckoutById(Long id){
+        Checkout checkout = this.checkoutRepository.findById(id)
+                .orElseThrow(()-> new NotFoundException(Constants.ErrorKey.CHECKOUT_NOT_FOUND));
+        this.validateOwnCurrentUser(checkout);
+        return CheckoutVm.fromModel(checkout);
+
+    }
+
+    private void validateOwnCurrentUser(Checkout checkout){
+        if(this.checkOwnCurrentUser(checkout)){
+            throw new AccessDeniedException(Constants.ErrorKey.ACCESS_DENIED);
+        }
+    }
+    private boolean checkOwnCurrentUser(Checkout checkout){
+        return !checkout.getId().equals(AuthenticationUtils.extractCustomerIdFromJwt());
+
     }
 }

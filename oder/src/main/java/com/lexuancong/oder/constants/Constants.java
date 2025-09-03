@@ -18,5 +18,7 @@ public final  class Constants {
     }
     public final class ErrorKey{
         public static final String PRODUCT_NOT_FOUND ="PRODUCT_NOT_FOUND";
+        public static final String CHECKOUT_NOT_FOUND ="CHECKOUT_NOT_FOUND";
+        public static final String ACCESS_DENIED ="ACCESS_DENIED";
     }
 }
