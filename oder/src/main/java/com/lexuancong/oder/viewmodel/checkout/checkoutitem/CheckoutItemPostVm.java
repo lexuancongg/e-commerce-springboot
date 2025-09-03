@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Positive;
 
 public record CheckoutItemPostVm(
         Long productId,
-//        validtae phải lớn hơn 0
         @Positive
         int quantity
 ) {

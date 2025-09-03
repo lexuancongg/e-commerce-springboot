@@ -23,7 +23,6 @@ public class Checkout extends AuditEntity {
     // sau này gởi toong báo về email
     private String email;
 
-    private String note;
 
     @Builder.Default
     private BigDecimal totalAmount = BigDecimal.ZERO;

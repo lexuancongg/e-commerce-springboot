@@ -22,6 +22,7 @@ public class CheckoutService {
         checkout.setCheckoutStatus(CheckoutStatus.PENDING);
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         checkout.setCustomerId(customerId);
+
         this.buildCheckoutItems(checkoutPostVm,checkout);
         // save checkout => checkout_Item =>save theo
         checkout = this.checkoutRepository.save(checkout);

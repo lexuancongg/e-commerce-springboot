@@ -19,6 +19,9 @@ public class CheckoutItem {
     private Long id;
     private Long productId;
     private int quantity;
+    // snapshort giá và name lại
+    private String productName;
+    private BigDecimal price;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "checkout_id", updatable = false, nullable = false)
