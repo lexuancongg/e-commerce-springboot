@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-@RequestMapping("/api/product")
 @RestController
 public class ProductController {
     private final ProductService productService;
@@ -97,7 +96,7 @@ public class ProductController {
 
 
     // đã check
-    @GetMapping("/customer/products")
+    @GetMapping({"/customer/products","/internal-order/products"})
     public ResponseEntity<List<ProductPreviewVm>> getProductsByIds (
             @RequestParam("productIds") List<Long> productIds
     ){
@@ -145,6 +144,12 @@ public class ProductController {
 
 
 
+    }
+
+
+    @GetMapping({"/internal-order/products"})
+    public ResponseEntity<List<ProductCheckoutPreviewVm> > getProductCheckouts(  @RequestParam(name = "ids") List<Long> productIds){
+        return ResponseEntity.ok(this.productService.getProductCheckouts(productService));
     }
 
 

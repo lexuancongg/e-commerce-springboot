@@ -59,4 +59,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                                        @Param("name") String name,
                                                        @Param("sku") String sku);
 
+    List<Product> findAllByIdInAndPublicIsTrue(Collection<Long> ids);
 }

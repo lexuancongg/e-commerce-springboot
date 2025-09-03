@@ -4,6 +4,7 @@ import com.lexuancong.apigateway.viewmodel.AuthenticatedUserVm;
 import com.lexuancong.apigateway.viewmodel.AuthenticationInfoVm;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +27,8 @@ public class AuthenticationController {
         AuthenticatedUserVm authenticatedUse = new AuthenticatedUserVm(username);
         return ResponseEntity.ok(new AuthenticationInfoVm(true, authenticatedUse));
     }
+
+
 
     @GetMapping("/session-data")
     public void getSessionData(WebSession session, Principal principal) {

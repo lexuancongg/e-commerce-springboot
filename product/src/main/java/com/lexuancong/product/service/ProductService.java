@@ -874,4 +874,12 @@ public class ProductService {
     }
 
 
+    public List<ProductCheckoutPreviewVm> getProductCheckouts(List<Long> productIdsInCheckoutItems){
+        List<Product> products = this.productRepository.findAllByIdInAndPublicIsTrue(productIdsInCheckoutItems);
+        return products.stream()
+                .map(ProductCheckoutPreviewVm::fromModel)
+                .toList();
+
+    }
+
 }
