@@ -44,9 +44,9 @@ public class OderService {
         order.setCustomerId(userId);
 
         this.orderRepository.save(order);
-        Set<OrderItem> orderItemSet = orderPostVm.orderItemPostVms().stream()
+        List<OrderItem> orderItemSet = orderPostVm.orderItemPostVms().stream()
                 .map(orderItemPostVm -> orderItemPostVm.toModel(order))
-                .collect(Collectors.toSet());
+                .toList();
         // save orderItems
         this.orderItemRepository.saveAll(orderItemSet);
 
@@ -133,6 +133,13 @@ public class OderService {
         List<OrderItem> orderItems = this.orderItemRepository.findAllByOderId(orderId);
         return OrderVm.fromModel(order,orderItems);
 
+    }
+
+    public void  updateOrderStatus(Long id, OrderStatus orderStatus){
+        Order order = this.orderRepository.findById(id)
+                .orElseThrow(()-> new NotFoundException(Constants.ErrorKey.ORDER_NOT_FOUND,id));
+        order.setOderStatus(orderStatus);
+        this.orderRepository.save(order);
     }
 
 }

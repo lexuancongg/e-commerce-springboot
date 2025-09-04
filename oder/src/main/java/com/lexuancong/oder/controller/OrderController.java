@@ -61,6 +61,18 @@ public class OrderController {
     }
 
 
+    // cập nhật lại status của order
+    @PutMapping({"/customer/orders/status/{id}"})
+    public ResponseEntity<Void> updateOrderStatus(
+            @PathVariable Long id,
+            @RequestBody OrderStatus orderStatus
+    ){
+        this.orderService.updateOrderStatus(id,orderStatus);
+        return ResponseEntity.ok().build();
+    }
+
+
+
 
 
 

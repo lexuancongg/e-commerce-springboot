@@ -17,7 +17,6 @@ import java.util.Map;
 
 @EnableKafka
 @Configuration
-// config khi dữ liệu product thay đổi => cập nhật lại
 // config kafka => chủ yếu config cách cho containerfactory để tạo ra container cho các listener dùng để hoạt động
 public class ProductCdcKafkaListenerConfig {
 
