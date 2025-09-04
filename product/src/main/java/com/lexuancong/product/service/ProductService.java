@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -879,6 +880,47 @@ public class ProductService {
         return products.stream()
                 .map(ProductCheckoutPreviewVm::fromModel)
                 .toList();
+
+    }
+
+
+    public void subtractProductQuantityAfterOder(List<ProductSubtractQuantityVm> productSubtractQuantityVms){
+        List<Long> productIds = productSubtractQuantityVms.stream()
+                .map(ProductSubtractQuantityVm::productId)
+                .toList();
+        List<Product> products = this.productRepository.findAllByIdInAndPublicIsTrue(productIds);
+
+        Map<Long,Long> mapQuantitySubtractByProductId = productSubtractQuantityVms.stream()
+                .collect(
+                        Collectors.toMap(
+                                ProductSubtractQuantityVm::productId ,
+                                ProductSubtractQuantityVm::quantity,
+                                Long::sum
+                        )
+                );
+
+
+
+        BiFunction<Long ,Long, Long> functionRecalculate = (inventoryQuantityCurrent, quantitySubtract)->{
+            Long result = inventoryQuantityCurrent - quantitySubtract;
+            return result <=0 ? 0 : result;
+        };
+
+        for (Product product : products) {
+            if(product.isInventoryTracked()){
+                Long inventoryQuantityNew  = this.getInventoryQuantityNewAfterCalculate(product,mapQuantitySubtractByProductId,functionRecalculate);
+                product.setInventoryQuantity(inventoryQuantityNew);
+            }
+        }
+        this.productRepository.saveAll(products);
+    }
+
+    public Long getInventoryQuantityNewAfterCalculate(Product product,Map<Long,Long> mapQuantitySubtractByProductId,
+                                                      BiFunction<Long,Long,Long> functionRecalculate  ){
+        Long quantitySubtract = mapQuantitySubtractByProductId.get(product.getId());
+        Long inventoryQuantityCurrent =  product.getInventoryQuantity();
+        return  functionRecalculate.apply(inventoryQuantityCurrent,quantitySubtract);
+
 
     }
 

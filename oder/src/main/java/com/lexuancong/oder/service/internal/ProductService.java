@@ -1,7 +1,9 @@
 package com.lexuancong.oder.service.internal;
 
 import com.lexuancong.oder.config.ServiceUrlConfig;
+import com.lexuancong.oder.model.OrderItem;
 import com.lexuancong.oder.viewmodel.product.ProductCheckoutPreviewVm;
+import com.lexuancong.oder.viewmodel.product.ProductSubtractQuantityVm;
 import com.lexuancong.oder.viewmodel.product.ProductVariantPreviewVm;
 import com.lexuancong.share.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
@@ -41,5 +43,23 @@ public class ProductService {
                 .getBody();
 
     }
+
+    public void updateQuantityProductAfterOrder(Collection<OrderItem> orderItems){
+        String jwt = AuthenticationUtils.extractJwt();
+        List<ProductSubtractQuantityVm> productSubtractQuantityVms = orderItems.stream()
+                .map(ProductSubtractQuantityVm::fromOrderItem)
+                .toList();
+        URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlConfig.product())
+                .path("/internal-order/products/subtract-quantity")
+                .buildAndExpand()
+                .toUri();
+
+        this.restClient.put()
+                .uri(url)
+                .headers(httpHeaders -> httpHeaders.setBearerAuth(jwt))
+                .body(productSubtractQuantityVms)
+                .retrieve();
+    }
+
 
 }

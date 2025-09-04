@@ -153,6 +153,15 @@ public class ProductController {
     }
 
 
+    @PutMapping("/internal-order/products/subtract-quantity")
+    public ResponseEntity<Void> subtractProductQuantityAfterOder(
+            @Valid @RequestBody List<ProductSubtractQuantityVm> productSubtractQuantityVms
+    ){
+        this.productService.subtractProductQuantityAfterOder(productSubtractQuantityVms);
+        return ResponseEntity.noContent().build();
+    }
+
+
 
 
 }

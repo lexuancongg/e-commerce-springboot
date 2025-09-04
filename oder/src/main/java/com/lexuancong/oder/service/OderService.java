@@ -30,7 +30,6 @@ public class OderService {
     private final OrderItemRepository orderItemRepository;
     private final CartService cartService;
     private final ProductService productService;
-    // tự thêm bean cần thieeys vào
     public OderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository, CartService cartService, ProductService productService) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
@@ -43,7 +42,7 @@ public class OderService {
         String userId = AuthenticationUtils.extractCustomerIdFromJwt();
         order.setCustomerId(userId);
 
-        this.orderRepository.save(order); // shipping address đã lưu cùng oder
+        this.orderRepository.save(order);
         Set<OrderItem> orderItemSet = orderPostVm.orderItemPostVms().stream()
                 .map(orderItemPostVm -> orderItemPostVm.toModel(order))
                 .collect(Collectors.toSet());
@@ -53,10 +52,9 @@ public class OderService {
 
 
         OrderVm orderVm = OrderVm.fromModel(order,orderItemSet);
-        // xóa sản phẩm trong giỏ hàng đi
-        this.cartService.deleteCartItems(orderVm);
-        // tru số lượng hàng tồn cho sp
 
+        this.cartService.deleteCartItems(orderItemSet);
+        this.productService.updateQuantityProductAfterOrder(orderItemSet);
         return orderVm;
 
 

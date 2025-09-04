@@ -2,6 +2,7 @@ package com.lexuancong.cart.controller;
 
 import com.lexuancong.cart.constants.Constants;
 import com.lexuancong.cart.service.CartItemService;
+import com.lexuancong.cart.viewmodel.cartitem.CartItemDeleteVm;
 import com.lexuancong.cart.viewmodel.cartitem.CartItemGetVm;
 import com.lexuancong.cart.viewmodel.cartitem.CartItemPostVm;
 import com.lexuancong.cart.viewmodel.cartitem.CartItemPutVm;
@@ -41,6 +42,13 @@ public class CartItemController {
     public ResponseEntity<Void> deleteCartItem(@PathVariable Long productId){
         cartItemService.deleteCartItem(productId);
         return ResponseEntity.noContent().build();
+    }
+
+
+    @PostMapping("/internal-order/cart-items/remove")
+    public ResponseEntity<List<CartItemGetVm>> removeCartItems(@RequestBody @Valid List<CartItemDeleteVm> cartItemDeleteVms){
+        return ResponseEntity.ok(this.cartItemService.updateCartItemAfterOrder(cartItemDeleteVms));
+
     }
 
 }
