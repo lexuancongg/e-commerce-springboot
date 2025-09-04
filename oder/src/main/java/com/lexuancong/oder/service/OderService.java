@@ -9,12 +9,13 @@ import com.lexuancong.oder.service.internal.CartService;
 import com.lexuancong.oder.service.internal.ProductService;
 import com.lexuancong.oder.specification.OrderSpecification;
 import com.lexuancong.oder.constants.Constants;
-import com.lexuancong.oder.viewmodel.order.CheckUserHasBoughtProductCompletedVm;
-import com.lexuancong.oder.viewmodel.order.OrderDetailVm;
-import com.lexuancong.oder.viewmodel.order.OrderPostVm;
-import com.lexuancong.oder.viewmodel.order.OrderVm;
+import com.lexuancong.oder.viewmodel.order.*;
 import com.lexuancong.oder.viewmodel.product.ProductVariantPreviewVm;
+import com.lexuancong.share.exception.NotFoundException;
 import com.lexuancong.share.utils.AuthenticationUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -65,16 +66,16 @@ public class OderService {
         this.orderRepository.save(order);
     }
 
-    public List<OrderDetailVm> getMyOrders(OrderStatus orderStatus){
-        String userId = SecurityContextHolder.getContext().getAuthentication().getName();
-        Specification<Order> specification = OrderSpecification.findMyOrders(userId,orderStatus);
+    public List<OrderVm> getMyOrders(OrderStatus orderStatus){
+        String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
+        Specification<Order> specification = OrderSpecification.findMyOrders(customerId,orderStatus);
         Sort sort = Sort.by(Sort.Direction.DESC, Constants.Column.CREATE_AT_COLUMN);
         List<Order> orders = this.orderRepository.findAll(specification,sort);
         return orders.stream()
                 .map(order -> {
                     Long orderId = order.getId();
                     List<OrderItem> orderItems = this.orderItemRepository.findAllByOderId(orderId);
-                    return OrderDetailVm.fromModel(order,orderItems);
+                    return OrderVm.fromModel(order,orderItems);
                 })
                 .toList();
 
@@ -102,6 +103,35 @@ public class OderService {
 
 
 
+
+    }
+
+    public OrderPreviewPaging getOrders(int pageIndex, int pageSize){
+        Sort sort = Sort.by(Sort.Direction.DESC, Constants.Column.CREATE_AT_COLUMN);
+        Pageable   pageable = PageRequest.of(pageIndex,pageSize,sort);
+        Page<Order> pageOrders = this.orderRepository.findAll(pageable);
+        List<Order> orders = pageOrders.getContent();
+        List<OrderPreviewVm> orderPreviewVms = orders.stream()
+                .map(OrderPreviewVm::fromModel)
+                .toList();
+
+        return new OrderPreviewPaging(
+                orderPreviewVms,
+                pageIndex,
+                pageSize,
+                (int) pageOrders.getTotalElements(),
+                pageOrders.getTotalPages(),
+                pageOrders.isLast()
+        );
+
+    }
+
+
+    public OrderVm getOrderById(Long orderId){
+        Order order = this.orderRepository.findById(orderId)
+                .orElseThrow(()-> new NotFoundException(Constants.ErrorKey.ORDER_NOT_FOUND,orderId));
+        List<OrderItem> orderItems = this.orderItemRepository.findAllByOderId(orderId);
+        return OrderVm.fromModel(order,orderItems);
 
     }
 

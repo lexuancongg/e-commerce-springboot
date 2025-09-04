@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "`order`")
@@ -53,6 +55,8 @@ public class Order extends AuditEntity{
     private Long paymentId;
 
     private Long checkoutId;
+
+
 
 
 

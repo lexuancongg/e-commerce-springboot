@@ -11,8 +11,7 @@ import com.lexuancong.oder.viewmodel.orderitem.OrderItemVm;
 import com.lexuancong.oder.viewmodel.shippingaddress.ShippingAddressVm;
 
 import java.math.BigDecimal;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public record OrderVm(
@@ -24,24 +23,24 @@ public record OrderVm(
         BigDecimal totalPrice,
         OrderStatus oderStatus,
         DeliveryStatus deliveryStatus,
-        Set<OrderItemVm> orderItemVms,
+        List<OrderItemVm> orderItemVms,
         DeliveryMethod deliveryMethod,
         Long checkoutId,
         PaymentMethod paymentMethod
 ) {
-    public static OrderVm fromModel(Order orderSaved, Set<OrderItem> orderItemSet) {
+    public static OrderVm fromModel(Order orderSaved, List<OrderItem> orderItemSet) {
         ShippingAddress shippingAddress = orderSaved.getShippingAddress();
         ShippingAddressVm shippingAddressVm = ShippingAddressVm.fromModel(shippingAddress);
 
         // tránh lỗi NullPointerException
-        Set<OrderItemVm> orderItemVms = Optional.ofNullable(orderItemSet)
+        List<OrderItemVm> orderItemVms = Optional.ofNullable(orderItemSet)
                 // map xử lý optional
                 .map(setOrderItem -> {
                     // map duyệt qua từng ptu
                     return orderItemSet.stream().map(OrderItemVm::fromModel)
-                            .collect(Collectors.toSet());
+                            .toList();
                 })
-                .orElse(null);
+                .orElse(new ArrayList<>());
 
 
         return new OrderVm(

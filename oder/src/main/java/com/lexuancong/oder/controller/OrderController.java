@@ -1,5 +1,6 @@
 package com.lexuancong.oder.controller;
 
+import com.lexuancong.oder.constants.Constants;
 import com.lexuancong.oder.model.enum_status.OrderStatus;
 import com.lexuancong.oder.service.OderService;
 import com.lexuancong.oder.viewmodel.order.*;
@@ -27,7 +28,7 @@ public class OrderController {
 
     // có thể tận dụng api này cho check ở feedback nhưng mà không tối ưu về performance vì load ht
     @GetMapping("/customer/orders/my-orders")
-    public ResponseEntity<List<OrderDetailVm>> getMyOrders(
+    public ResponseEntity<List<OrderVm>> getMyOrders(
             @RequestParam(required = false)OrderStatus orderStatus
             ) {
         return ResponseEntity.ok(this.orderService.getMyOrders(orderStatus));
@@ -43,10 +44,21 @@ public class OrderController {
         return ResponseEntity.ok(this.orderService.checkUserHasBoughtProductCompleted(productId));
     }
 
-    @GetMapping("management/ordes")
+    @GetMapping("management/orders")
     ResponseEntity<OrderPreviewPaging> getOrders(
+            @RequestParam(value = "pageIndex" ,required = false, defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER) int pageIndex,
+            @RequestParam(value = "pageSize", required = false, defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE) int pageSize
+    ){
+        return ResponseEntity.ok(this.orderService.getOrders(pageIndex,pageSize));
+    }
 
-    )
+
+
+
+    @GetMapping("/management/orders/{id}")
+    public ResponseEntity<OrderVm> getOrderById(@PathVariable Long id){
+        return ResponseEntity.ok(this.orderService.getOrderById(id));
+    }
 
 
 
