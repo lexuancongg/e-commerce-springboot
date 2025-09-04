@@ -20,7 +20,6 @@ public record OrderItemPostVm(
                 .totalPrice(totalPrice)
                 .productName(productName)
                 .order(order)
-                .oderId(order.getId())
                 .build();
     }
 }

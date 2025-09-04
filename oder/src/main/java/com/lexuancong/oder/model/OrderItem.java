@@ -22,11 +22,10 @@ public class OrderItem extends AuditEntity{
     private BigDecimal productPrice ;
     private BigDecimal totalPrice ;
     private String productName ;
-    @Column(name = "order_id")
-    private Long oderId;
+//    @Column(name = "order_id")
+//    private Long oderId;
     @ManyToOne(fetch = FetchType.LAZY)
-    // cả order và oderId đều ánh xạ tới cột oder_id , insertable = false,updatable = false giúp hibernate khoongc inser, update cột oder_id dựa trên obj order
-    @JoinColumn(name = "order_id", insertable = false,updatable = false)
+    @JoinColumn(name = "order_id")
     private Order order ;
 
 }

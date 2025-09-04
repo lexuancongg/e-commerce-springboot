@@ -8,8 +8,7 @@ import com.lexuancong.oder.repository.CheckoutRepository;
 import com.lexuancong.oder.service.internal.ProductService;
 import com.lexuancong.oder.viewmodel.checkout.CheckoutPostVm;
 import com.lexuancong.oder.viewmodel.checkout.CheckoutVm;
-import com.lexuancong.oder.viewmodel.checkout.checkoutitem.CheckoutItemPostVm;
-import com.lexuancong.oder.viewmodel.checkout.checkoutitem.CheckoutItemVm;
+import com.lexuancong.oder.viewmodel.checkoutitem.CheckoutItemPostVm;
 import com.lexuancong.oder.viewmodel.product.ProductCheckoutPreviewVm;
 import com.lexuancong.share.exception.AccessDeniedException;
 import com.lexuancong.share.exception.NotFoundException;
@@ -17,9 +16,7 @@ import com.lexuancong.share.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.Mac;
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,7 +31,6 @@ public class CheckoutService {
 
     public CheckoutVm createCheckout(CheckoutPostVm checkoutPostVm){
         Checkout checkout = checkoutPostVm.toModel();
-        checkout.setCheckoutStatus(CheckoutStatus.PENDING);
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         checkout.setCustomerId(customerId);
         List<CheckoutItem> checkoutItems = this.buildCheckoutItems(checkoutPostVm,checkout);
@@ -43,7 +39,7 @@ public class CheckoutService {
                 .reduce(BigDecimal.ZERO,
                         (acc, item) -> acc.add(item.getPrice()),
                         BigDecimal::add); // gộp kết quả từ nhiều thread
-        checkout.setTotalAmount(total);
+        checkout.setTotalPrice(total);
 
         checkout = this.checkoutRepository.save(checkout);
         CheckoutVm checkoutVm = CheckoutVm.fromModel(checkout);

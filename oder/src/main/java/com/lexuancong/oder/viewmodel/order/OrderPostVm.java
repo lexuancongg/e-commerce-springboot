@@ -36,6 +36,7 @@ public record OrderPostVm(
                 .deliveryStatus(DeliveryStatus.PENDING_PICKUP)
                 .deliveryMethod(this.deliveryMethod)
                 .checkoutId(checkoutId)
+                .paymentStatus()
                 .build();
 
     }

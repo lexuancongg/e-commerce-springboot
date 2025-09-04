@@ -1,8 +1,7 @@
 package com.lexuancong.oder.viewmodel.checkout;
 
 import com.lexuancong.oder.model.Checkout;
-import com.lexuancong.oder.model.CheckoutItem;
-import com.lexuancong.oder.viewmodel.checkout.checkoutitem.CheckoutItemVm;
+import com.lexuancong.oder.viewmodel.checkoutitem.CheckoutItemVm;
 
 import java.util.List;
 

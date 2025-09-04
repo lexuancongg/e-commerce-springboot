@@ -25,7 +25,7 @@ public class Checkout extends AuditEntity {
 
 
     @Builder.Default
-    private BigDecimal totalAmount = BigDecimal.ZERO;
+    private BigDecimal totalPrice = BigDecimal.ZERO;
 
 
     private String customerId;

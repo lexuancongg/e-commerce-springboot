@@ -2,10 +2,7 @@ package com.lexuancong.oder.controller;
 
 import com.lexuancong.oder.model.enum_status.OrderStatus;
 import com.lexuancong.oder.service.OderService;
-import com.lexuancong.oder.viewmodel.order.CheckUserHasBoughtProductCompletedVm;
-import com.lexuancong.oder.viewmodel.order.OrderDetailVm;
-import com.lexuancong.oder.viewmodel.order.OrderPostVm;
-import com.lexuancong.oder.viewmodel.order.OrderVm;
+import com.lexuancong.oder.viewmodel.order.*;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +42,13 @@ public class OrderController {
     ){
         return ResponseEntity.ok(this.orderService.checkUserHasBoughtProductCompleted(productId));
     }
+
+    @GetMapping("management/ordes")
+    ResponseEntity<OrderPreviewPaging> getOrders(
+
+    )
+
+
 
 
 

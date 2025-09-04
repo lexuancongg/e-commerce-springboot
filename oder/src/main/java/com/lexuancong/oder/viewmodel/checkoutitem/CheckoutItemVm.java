@@ -1,4 +1,4 @@
-package com.lexuancong.oder.viewmodel.checkout.checkoutitem;
+package com.lexuancong.oder.viewmodel.checkoutitem;
 
 import com.lexuancong.oder.model.CheckoutItem;
 
