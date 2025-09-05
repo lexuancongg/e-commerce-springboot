@@ -1,7 +1,7 @@
 "use client"
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import apiClient from "@/utils/api/apiClient";
-import {Dropdown} from "react-bootstrap";
+import { Dropdown } from "react-bootstrap";
 import Link from "next/link";
 
 type UserAuthenticationInfo = {
@@ -16,7 +16,7 @@ type authenticationInfoVm = {
 function UserAuthInfo() {
 
     const [authenticationInfoVm, setUserAuthenticationVm] = useState<authenticationInfoVm>({
-        isAuthenticated: true,
+        isAuthenticated: false,
         userAuthenticationInfo: {
             userName: ''
         }
@@ -39,12 +39,12 @@ function UserAuthInfo() {
     return (
         <>
             {authenticationInfoVm.isAuthenticated
-                    ?
+                ?
                 (
 
                     <Dropdown>
                         <Dropdown.Toggle variant="dark" id="user-dropdow " className="bg-transparent"
-                                         style={{ border: 'none', color: '#b2b2b2' }}
+                            style={{ border: 'none', color: '#b2b2b2' }}
                         >
                             {authenticationInfoVm.userAuthenticationInfo.userName || 'xuan cong'}
                         </Dropdown.Toggle>
@@ -55,10 +55,15 @@ function UserAuthInfo() {
                         </Dropdown.Menu>
                     </Dropdown>
                 )
-                    :
+                :
                 (
                     <div>
-                        <Link href="/login" className="d-blockh-full">Login</Link>
+                        <Link
+                            href="/login"
+                            className="block text-gray-700 hover:text-blue-600 transition px-2 py-1 text-2xl"
+                        >
+                            <i className="bi bi-person-circle"></i>
+                        </Link>
                     </div>
                 )
             }

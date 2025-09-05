@@ -22,15 +22,12 @@ import '../styles/modules/order/checkout/checkout.css';
 import { Geist } from 'next/font/google'
 
 const geist = Geist({
-    // độ dày chữ
     weight:'400',
-    // chỉ tải latin , không tải ca loai khác
     subsets: ['latin'],
 })
 
 function App({children}: React.PropsWithChildren) {
     return (
-        //  toàn bộ ứng dụng sẽ được sinh ra class với font tương ứng=> toàn bộ cùng 1 font
         <html lang={"en"} className={geist.className}>
         <body>
         <AppProvider>
