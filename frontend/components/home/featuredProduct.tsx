@@ -1,5 +1,6 @@
 'use client'
 import { FC, useState } from "react";
+import { Container } from "react-bootstrap";
 
 interface Product {
     id: string;
@@ -43,6 +44,20 @@ const ProductOverview = () => {
             image: "https://preview.colorlib.com/theme/cozastore/images/product-04.jpg",
             category: "shoes",
         },
+         {
+            id: "5",
+            name: "Running Shoes",
+            price: 59.99,
+            image: "https://preview.colorlib.com/theme/cozastore/images/product-05.jpg",
+            category: "shoes",
+        },
+         {
+            id: "6",
+            name: "Running Shoes",
+            price: 59.99,
+            image: "https://preview.colorlib.com/theme/cozastore/images/product-06.jpg",
+            category: "shoes",
+        },
 
     ];
     const [activeTab, setActiveTab] = useState("All Products");
@@ -53,7 +68,7 @@ const ProductOverview = () => {
 
 
     return (
-        <div className="container mt-16">
+        <Container className=" mt-16 border ">
             <div className="mb-4">
                 <h3 className="text-4xl font-bold text-gray-900">Product Overview</h3>
             </div>
@@ -90,7 +105,7 @@ const ProductOverview = () => {
             </div>
 
             {/* Products grid */}
-            <div className="row isotope-grid">
+            <div className="row isotope-grid gap-y-8">
                 {products.map((product) => (
                     <div
                         key={product.id}
@@ -144,13 +159,14 @@ const ProductOverview = () => {
             <div className="flex justify-center mt-10">
                 <a
                     href="#"
-                    className="px-6 py-2 text-sm font-medium text-white bg-red-500 rounded hover:bg-red-600 transition"
+                    className="px-6 py-2 text-sm font-medium text-black bg-gray-300 rounded hover:!text-white hover:!bg-black transition"
                 >
                     Load More
                 </a>
             </div>
 
-        </div>
+
+        </Container>
 
 
     );

@@ -33,12 +33,12 @@ const Category: NextPage = () => {
 
     const [current, setCurrent] = useState(0);
 
-  const next = () => {
-    if (current < categories.length - 3) setCurrent(current + 1); // show 3 item
-  };
-  const prev = () => {
-    if (current > 0) setCurrent(current - 1);
-  };
+    const next = () => {
+        if (current < categories.length - 3) setCurrent(current + 1); // show 3 item
+    };
+    const prev = () => {
+        if (current > 0) setCurrent(current - 1);
+    };
 
 
     // event funciton
@@ -61,49 +61,64 @@ const Category: NextPage = () => {
 
 
     return (
-        <Container className="mt-5">
-            <div className="row">
-                {categories.map(category =>
-                (
-                    <div className="col-md-6 col-xl-4 p-b-30 m-lr-auto">
-                        <div className="block1 wrap-pic-w relative overflow-hidden cursor-pointer group">
-                            <LoadImageSafe
-                                src={category.categoryImage?.url!}
-                                alt="IMG-BANNER"
-                                className="w-full h-full object-cover"
-                            />
+        <Container className="mt-5 relative overflow-hidden  ">
+            <div
+                className="flex transition-transform duration-500 ease-out"
+                style={{
+                    transform: `translateX(calc(-${current * (100 / 3)}% - ${current * (1/3 )}rem))`, 
+                    gap: "1rem", 
+                }}
+            >
+                {categories.map((category) => (
+                    <div
+                        key={category.id}
+                        className="flex-none relative overflow-hidden cursor-pointer group rounded-xl border border-gray-300 "
+                        style={{
+                            width: "calc((100% - 2rem) / 3)", 
+                            aspectRatio: "4/3", 
+                        }}
+                    >
+                        <LoadImageSafe
+                            src={category.categoryImage?.url!}
+                            alt={category.name}
+                            className="w-full h-full object-cover"
+                        />
 
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent pointer-events-none"></div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent pointer-events-none"></div>
 
-                            <a
-                                href="product.html"
-                                className="absolute inset-0 flex flex-col justify-between p-8"
-                            >
-                                {/* Text */}
-                                <div className="flex flex-col space-y-1">
-                                    <span className="text-white text-xl font-bold transition-all group-hover:-translate-y-1 group-hover:text-yellow-400">
-                                        Women
-                                    </span>
-                                    <span className="text-white text-sm transition-all group-hover:-translate-y-1 group-hover:text-yellow-300">
-                                        Spring 2018
-                                    </span>
-                                </div>
-
-                                {/* Shop Now */}
-                                <div className="text-white font-semibold transition-all group-hover:-translate-y-1 group-hover:text-white">
-                                    Shop Now
-                                </div>
-                            </a>
-                        </div>
+                        <a
+                            href={`/category/${category.slug}`}
+                            className="absolute inset-0 flex flex-col justify-between p-6"
+                        >
+                            <div className="flex flex-col space-y-1">
+                                <span className="text-black text-2xl font-bold transition-all group-hover:-translate-y-1 group-hover:text-yellow-400">
+                                    {category.name}
+                                </span>
+                                <span className="text-black-100 text-xs transition-all group-hover:-translate-y-1 group-hover:text-yellow-300">
+                                    Spring 2018
+                                </span>
+                            </div>
+                            <div className="text-white font-semibold transition-all group-hover:-translate-y-1 group-hover:text-white">
+                                Shop Now
+                            </div>
+                        </a>
                     </div>
-                )
-
-                )}
-
-
-
-
+                ))}
             </div>
+
+            {/* Prev / Next Buttons */}
+            <button
+                onClick={prev}
+                className="absolute top-1/2 left-0 -translate-y-1/2 bg-black/50 text-white px-3 py-2 rounded-full"
+            >
+                ‹
+            </button>
+            <button
+                onClick={next}
+                className="absolute top-1/2 right-0 -translate-y-1/2 bg-black/50 text-white px-3 py-2 rounded-full"
+            >
+                ›
+            </button>
         </Container>
 
     )
