@@ -47,98 +47,6 @@ const Header = ({ children }: React.PropsWithChildren) => {
         }
 
     }, [])
-    // return (
-    //     <header>
-    //         <div className="header">
-    //             <nav className="top-bar">
-    //                 <div className="top-bar-container container">
-    //                     <div className="left-top-bar">
-    //                         <div>SHOP XUANCONG</div>
-    //                     </div>
-
-
-    //                     <div className="right-top-bar d-flex h-full">
-    //                         {
-    //                             data_menu.map((item) => (
-    //                                 <Link href={item.links} className="d-flex align-items-center px-4" key={item.id}>
-    //                                     {item.icon && (
-    //                                         <div className="icon-header-bell-question">
-    //                                             <i className={item.icon}></i>
-    //                                         </div>
-    //                                     )}
-    //                                     {item.name}
-    //                                 </Link>
-    //                             ))
-    //                         }
-    //                         <div className="d-flex align-items-center px-4">{children}</div>
-
-
-
-    //                     </div>
-    //                 </div>
-    //             </nav>
-    //             <nav className="limiter-menu-desktop container">
-
-    //                 <Link href="/" className="header-logo me-3">
-    //                 <LoadImageSafe
-    //                  src="https://img.freepik.com/premium-vector/ecommerce-logo-design_624194-152.jpg?w=2000"
-    //                   className="h-20 w-20 object-contain rounded-full"
-    //                  >
-
-    //                  </LoadImageSafe>
-    //                     <h3 className="text-black">SHOP XUANCONG</h3>
-    //                 </Link>
-
-    //                 <div className="header-search flex-grow-1">
-    //                     <div className="search-wrapper">
-    //                         <form onSubmit={handleSubmitSearch} className="search-form" ref={formRef}>
-    //                             <label htmlFor="header-search" className="search-icon">
-    //                                 <i className="bi bi-search"></i>
-    //                             </label>
-    //                             <input
-    //                                 id="header-search"
-    //                                 ref={inputSearchRef}
-    //                                 className="search-input"
-    //                                 placeholder="What you will find today?"
-    //                                 onFocus={handleInputFocus}
-    //                                 value={searchInput}
-    //                                 onChange={(e) => setSearchInput(e.target.value)}
-    //                             />
-
-    //                             {showDropdownSuggestions && (
-    //                                 <div className="search-auto-complete">
-    //                                     <div className="suggestion">
-
-    //                                     </div>
-    //                                     <div className="bottom-widgets"></div>
-    //                                 </div>
-    //                             )}
-
-    //                             <button type="submit" className="search-button">
-    //                                 Search
-    //                             </button>
-    //                         </form>
-    //                     </div>
-
-    //                     <div className="search-suggestion">
-
-    //                     </div>
-    //                 </div>
-
-
-    //                 <Link className="header-cart" href="/cart">
-    //                     <div className="icon-cart">
-    //                         <i className="bi bi-cart3"></i>
-    //                     </div>
-    //                     <div className="quantity-cart">{numberCartItems}</div>
-    //                 </Link>
-    //             </nav>
-    //             <nav className="limiter-menu-desktop container"></nav>
-    //         </div>
-    //         {showDropdownSuggestions && <div className="container-layer"></div>}
-    //         <div className="lower-container"></div>
-    //     </header>
-    // )
 
 
 
@@ -178,9 +86,9 @@ const Header = ({ children }: React.PropsWithChildren) => {
                 {/* Logo */}
                 <Link href="/" className="flex items-center gap-2">
                     <img
-                        src="https://img.freepik.com/premium-vector/ecommerce-logo-design_624194-152.jpg?w=2000"
+                        src="https://preview.colorlib.com/theme/ashion/img/logo.png"
                         alt="Logo"
-                        className="h-12 w-12 object-contain rounded-full"
+                        className="h-20 w-20 object-contain rounded-full"
                     />
                     <div className="flex flex-col leading-none">
                         <span
@@ -205,22 +113,25 @@ const Header = ({ children }: React.PropsWithChildren) => {
                         <Link
                             key={cat.id}
                             href={`/category/${cat.slug}`}
-                            className="text-gray-700 font-semibold px-3 py-1 rounded-full hover:text-white hover:bg-blue-500 transition-all duration-300"
+                            className="text-sm text-gray-600 font-medium px-3 py-1 rounded-full  hover:text-white hover:bg-blue-500 transition-all duration-300 tracking-wide"
                             style={{ fontFamily: 'Poppins, sans-serif' }}
                         >
                             {cat.name}
                         </Link>
-
                     ))}
 
                     {categories.length > 5 && (
                         <Dropdown>
-                            <Dropdown.Toggle className="bg-transparent border-0 text-gray-700 hover:text-blue-500 font-semibold">
+                            <Dropdown.Toggle className="text-sm text-gray-600 font-medium px-3 py-1 rounded-full border border-gray-200 hover:text-white hover:bg-blue-500 transition-all duration-300 tracking-wide bg-transparent">
                                 More
                             </Dropdown.Toggle>
-                            <Dropdown.Menu className="bg-white border rounded shadow-lg">
+                            <Dropdown.Menu className="bg-white border rounded shadow-lg text-sm">
                                 {categories.slice(5).map((cat) => (
-                                    <Dropdown.Item key={cat.id} href={`/category/${cat.slug}`}>
+                                    <Dropdown.Item
+                                        key={cat.id}
+                                        href={`/category/${cat.slug}`}
+                                        className="px-4 py-2 hover:bg-gray-100 text-gray-700 transition"
+                                    >
                                         {cat.name}
                                     </Dropdown.Item>
                                 ))}
@@ -229,15 +140,26 @@ const Header = ({ children }: React.PropsWithChildren) => {
                     )}
 
                     <Dropdown>
-                        <Dropdown.Toggle className="bg-transparent border-0 text-gray-700 hover:text-blue-500 font-semibold">
+                        <Dropdown.Toggle className="text-sm text-gray-600 font-medium px-3 py-1 rounded-full border border-gray-200 hover:text-white hover:bg-blue-500 transition-all duration-300 tracking-wide bg-transparent">
                             Pages
                         </Dropdown.Toggle>
-                        <Dropdown.Menu className="bg-white border rounded shadow-lg">
-                            <Dropdown.Item href="/about">About</Dropdown.Item>
-                            <Dropdown.Item href="/contact">Contact</Dropdown.Item>
+                        <Dropdown.Menu className="bg-white border rounded shadow-lg text-sm">
+                            <Dropdown.Item
+                                href="/about"
+                                className="px-4 py-2 hover:bg-gray-100 text-gray-700 transition"
+                            >
+                                About
+                            </Dropdown.Item>
+                            <Dropdown.Item
+                                href="/contact"
+                                className="px-4 py-2 hover:bg-gray-100 text-gray-700 transition"
+                            >
+                                Contact
+                            </Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
                 </nav>
+
 
 
                 {/* Icons (Search + Cart) */}

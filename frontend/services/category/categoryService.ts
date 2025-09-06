@@ -9,8 +9,8 @@ class CategoryService{
 
     public async getCategories():Promise<CategoryVm[]>{
         const response = await apiClient.get(`${this.baseUrl}/customer/categories`);
+          return category_demo_data;
         if(response.ok) return await response.json();
-        return category_demo_data;
         throw response;
 
     }
