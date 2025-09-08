@@ -20,7 +20,6 @@ const navigationPaths: NavigationPathModel[] = [
 
 const Profile = ()=>{
 
-    // ngầm hiểu là kiểu data ProfileInfoVm hoặc undifine
     const [customer , setCustomer] = useState<CustomerVm>();
     // dành cho khi chỉnh sửa laại profile
     const onsubmit = (data :CustomerProfilePutVm, event:any)=>{
