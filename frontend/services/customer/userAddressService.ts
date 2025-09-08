@@ -21,10 +21,10 @@ class UserAddressService {
         throw response;
 
     }
-    public async getDetailAddresses():Promise<AddressDetailVm>{
+    public async getDetailAddresses():Promise<AddressDetailVm[]>{
         const response = await apiClient.get(`${this.baseUrl}/customer/addresses`)
         if (response.ok) return  await  response.json();
-        return address_demo_data[0];
+        return address_demo_data;
         throw response;
     }
 

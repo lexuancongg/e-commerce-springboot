@@ -85,7 +85,7 @@ const MyAddress = (): JSX.Element => {
 
     return (
         <>
-            <ProfileLayoutComponent menuActive="address" navigationPaths={navigationPaths}>
+            <ProfileLayoutComponent menuActive="address" >
                 <div className="border border-dashed border-gray-300 p-3 flex justify-center items-center">
                     <button className="flex items-center text-black">
                         <BiPlusMedical className="text-lg"/>
