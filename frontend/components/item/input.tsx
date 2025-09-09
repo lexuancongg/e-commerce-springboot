@@ -12,7 +12,7 @@ type Props<T extends FieldValues> = {
   registerOptions?: RegisterOptions<T>,
   defaultValue?: string | number,
   disabled?: boolean,
-    placeholder?: string,
+  placeholder?: string,
   error?: string
 
 }

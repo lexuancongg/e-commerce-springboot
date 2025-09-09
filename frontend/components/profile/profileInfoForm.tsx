@@ -3,7 +3,8 @@ import {FieldErrors, UseFormRegister, UseFormSetValue} from "react-hook-form";
 import {CustomerVm} from "@/models/customer/CustomerVm";
 import Input from "@/components/item/input";
 import Link from "next/link";
-type  Props = {
+
+type Props = {
     register: UseFormRegister<CustomerVm>,
     // submit
     handleSubmit: () => void,
@@ -13,71 +14,50 @@ type  Props = {
     // xác định tên nút là create hay update
     setValue: UseFormSetValue<CustomerVm>;
 }
-const ProfileInfoForm : FC<Props> = ({
-    errors,
-    handleSubmit,
-    profileInfo,
-    setValue,
-    register
-                                     })=>{
+const ProfileInfoForm: FC<Props> = (
+    {
+        errors,
+        handleSubmit,
+        profileInfo,
+        setValue,
+        register
+    }
+) => {
+
+    const fields = [
+        {label: "Username", name: "username", disabled: true, required: true},
+        {label: "First Name", name: "firstName", required: true},
+        {label: "Last Name", name: "lastName", required: true},
+        {label: "Email", name: "email", required: true},
+    ];
     return (
         <>
-            <div className="row">
-                <div className="col-lg-9">
-                    <Input
-                        labelText="userName"
-                        register={register}
-                        fieldName="username"
-                        disabled={true}
-                        defaultValue={profileInfo?.username}
-                        registerOptions={{
-                            required: {value: true, message: 'this feild is require'}
-                        }}
-                    />
-                </div>
+            {
+                fields.map(
+                    field => (
+                        <div className="row" key={field.name}>
+                            <div className="col-lg-9">
+                                <Input
+                                    labelText={field.label}
+                                    register={register}
+                                    fieldName={field.name as keyof CustomerVm}
+                                    disabled={field.disabled || false}
+                                    defaultValue={profileInfo?.[field.name as keyof CustomerVm]}
+                                    registerOptions={
+                                        field.required
+                                            ? {required: {value: true, message: "This field is required"}}
+                                            : undefined
+                                    }
+                                    error={errors[field.name as keyof CustomerVm]?.message}
 
-            </div>
-            <div className={'row'}>
-                <div className="col-lg-9">
-                    <Input
-                        labelText="firstName"
-                        register={register}
-                        fieldName="firstName"
-                        registerOptions={{
-                            required: {value: true, message: 'This feild is required'},
-                        }}
-                        defaultValue={profileInfo?.firstName}
-                    />
-                </div>
-            </div>
-            <div className={'row'}>
-                <div className="col-lg-9">
-                    <Input
-                        labelText="lastName"
-                        register={register}
-                        fieldName="lastName"
-                        registerOptions={{
-                            required: {value: true, message: 'This feild is required'},
-                        }}
-                        defaultValue={profileInfo?.lastName}
-                    />
-                </div>
-            </div>
-            <div className={'row'}>
-                <div className="col-lg-9">
-                    <Input
-                        labelText="email"
-                        register={register}
-                        fieldName="email"
-                        registerOptions={{
-                            required: {value: true, message: 'This feild is required'},
-                        }}
-                        defaultValue={profileInfo?.email}
-                    />
-                </div>
-            </div>
+                                />
+                            </div>
+                        </div>
+                    )
+                )
+            }
             <div className="text-center">
-                <button onClick={handleSubmit}  className="btn btn-primary" type="button">
+                <button onClick={handleSubmit} className="btn btn-primary" type="button">
                     Update
                 </button>
                 <Link href="/">

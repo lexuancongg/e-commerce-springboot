@@ -6,6 +6,7 @@ import {CustomerVm} from "@/models/customer/CustomerVm";
 import {useEffect, useState} from "react";
 import customerService from "@/services/customer/customerService";
 import {CustomerProfilePutVm} from "@/models/customer/CustomerProfilePutVm";
+import {Container} from "react-bootstrap";
 
 const Profile = () => {
 
@@ -31,21 +32,20 @@ const Profile = () => {
     }, []);
 
     const {register, handleSubmit, formState: {errors}, setValue} = useForm<CustomerVm>();
-
-
     return (
-        <ProfileLayoutComponent menuActive={"profile"}>
-            <ProfileInfoForm
-                register={register}
-                handleSubmit={handleSubmit(onsubmit)}
+        <Container >
+            <ProfileLayoutComponent menuActive={"profile"}>
+                <ProfileInfoForm
+                    register={register}
+                    handleSubmit={handleSubmit(onsubmit)}
+                    errors={errors}
+                    profileInfo={customer}
+                    setValue={setValue}>
 
-                errors={errors}
-                profileInfo={customer}
-                setValue={setValue}>
+                </ProfileInfoForm>
 
-            </ProfileInfoForm>
-
-        </ProfileLayoutComponent>
+            </ProfileLayoutComponent>
+        </Container>
     )
 }
 export default Profile;
