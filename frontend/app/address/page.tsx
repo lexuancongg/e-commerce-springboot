@@ -1,5 +1,4 @@
 'use client'
-import {NavigationPathModel} from "@/models/Navigation/NavigationPathModel";
 import React, {JSX, useEffect, useState} from "react";
 import {AddressDetailVm} from "@/models/address/AddressDetailVm";
 import ProfileLayoutComponent from "@/components/common/profileLayout";
@@ -8,16 +7,7 @@ import CardAddress from "@/components/address/cardAddress";
 import ConfirmationDialog from "@/components/dialog/confirmDialog";
 import userAddressService from "@/services/customer/userAddressService";
 
-const navigationPaths: NavigationPathModel[] = [
-    {
-        pageName: "Home",
-        url: '/'
-    },
-    {
-        pageName: 'Address',
-        url: '#'
-    }
-]
+
 
 
 const MyAddress = (): JSX.Element => {

@@ -65,8 +65,8 @@ const EditAddress = ()=>{
             }).catch(error=>console.log(error))
     }
 
-    return <ProfileLayoutComponent navigationPaths={navigationPaths} menuActive={'address'}>
-        <AddressForm buttonText={'update'} address={address} register={register} handleSubmit={handleSubmit(onSubmit)} errors={errors} setValue={setValue}>
+    return <ProfileLayoutComponent  menuActive={'address'}>
+        <AddressForm buttonText={'update'} addressInit={address} register={register} handleSubmit={handleSubmit(onSubmit)} errors={errors} setValue={setValue}>
         </AddressForm>
     </ProfileLayoutComponent>
 

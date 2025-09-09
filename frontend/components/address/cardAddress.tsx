@@ -1,56 +1,81 @@
-import { AddressDetailVm } from "@/models/address/AddressDetailVm";
+import {AddressDetailVm} from "@/models/address/AddressDetailVm";
 import Link from "next/link";
-import { FC } from "react";
-import { FaTrash } from "react-icons/fa";
-import { FiEdit } from "react-icons/fi";
-import { HiCheckCircle } from "react-icons/hi";
-import { TiContacts } from "react-icons/ti";
+import {FC} from "react";
+import {FaTrash} from "react-icons/fa";
+import {FiEdit} from "react-icons/fi";
+import {HiCheckCircle} from "react-icons/hi";
+import {TiContacts} from "react-icons/ti";
+import {MdRadioButtonChecked} from "react-icons/md";
+
 type Props = {
-  address: AddressDetailVm,
-  handleChooseAddressDefault: (addressId: number) => void,
-  handleChooseDeleteAddress: (addressId: number) => void
+    address: AddressDetailVm,
+    handleChooseAddressDefault: (addressId: number) => void,
+    handleChooseDeleteAddress: (addressId: number) => void
 }
 const CardAddress: FC<Props> = (
-  {
-    address,
-    handleChooseAddressDefault,
-    handleChooseDeleteAddress
-  }
+    {
+        address,
+        handleChooseAddressDefault,
+        handleChooseDeleteAddress
+    }
 ) => {
-  return (
-    <div className="col-span-4  w-1/2 p-2" key={address.id}>
-      <div className="flex bg-red-500 rounded-lg overflow-hidden shadow-md">
-        <div className="flex items-center justify-center w-24 bg-blue-500">
-          <TiContacts className="text-white text-5xl" />
+    return (
+        <div className="col-span-4 w-full md:w-1/2 p-2" key={address.id}>
+            <div
+                className="flex rounded-xl overflow-hidden shadow-md border border-gray-200 bg-white hover:shadow-lg transition-shadow duration-200">
+
+                {/* Icon */}
+                <div className="flex items-center justify-center w-24 bg-gradient-to-b from-blue-500 to-blue-600">
+                    <TiContacts className="text-white text-5xl"/>
+                </div>
+
+                {/* Content */}
+                <div className="p-4 w-full relative">
+                    {/* Active badge */}
+                    {address.isActive && (
+                        <span
+                            className="absolute top-3 right-3 bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded-full">
+                            Default
+                        </span>
+                    )}
+
+
+                    {/* Info */}
+                    <div className="space-y-1 text-gray-700">
+                        <div className="text-sm font-semibold">
+                            Contact: <span className="font-normal">{address.contactName}</span>
+                        </div>
+                        <div className="text-sm break-words">
+                            Address: <span className="font-normal">{address.specificAddress}</span>
+                        </div>
+                        <div className="text-sm">
+                            Phone: <span className="font-normal">{address.phoneNumber}</span>
+                        </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex justify-end space-x-4 mt-4">
+                        <MdRadioButtonChecked
+                            className={`cursor-pointer ${address.isActive ? "text-green-500" : "text-gray-400"} hover:text-green-600 transition-colors`}
+                            title="Set Default"
+                            onClick={() => handleChooseAddressDefault(address.id)}
+                        />
+
+                        <Link href={`/address/${address.id}/edit`}>
+                            <FiEdit
+                                className="cursor-pointer text-blue-500 hover:text-blue-600 transition-colors"
+                                title="Edit"
+                            />
+                        </Link>
+                        <FaTrash
+                            className="cursor-pointer text-red-500 hover:text-red-600 transition-colors"
+                            title="Delete"
+                            onClick={() => handleChooseDeleteAddress(address.id || 0)}
+                        />
+                    </div>
+                </div>
+            </div>
         </div>
-        <div className="p-4 w-full bg-red-500 text-white">
-          {address.isActive == true && (
-              <div className="m-2" style={{ float: 'right' }}>
-                <div
-                    style={{
-                      width: '15px',
-                      height: '15px',
-                      borderRadius: '50%',
-                      background: '#0eea5d',
-                    }}
-                ></div>
-              </div>
-          )}
-          <div className="text-sm">Contact name: {address.contactName}</div>
-          <div className="text-sm break-words">Address: {address.specificAddress}</div>
-          <div className="text-sm">Phone number: {address.phoneNumber}</div>
-          <div className="flex justify-end space-x-3 mt-3">
-            <HiCheckCircle className="cursor-pointer text-green-300" title="Active" />
-            <Link href={`/address/${address.id}/edit`}>
-              <FiEdit className="cursor-pointer text-blue-300" title="Edit" />
-            </Link>
-            <FaTrash className="cursor-pointer text-red-300" title="Delete"
-              onClick={() => handleChooseDeleteAddress(address.id || 0)}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+    );
 };
 export default CardAddress;

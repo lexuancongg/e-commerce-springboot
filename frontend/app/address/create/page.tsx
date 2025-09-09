@@ -8,20 +8,7 @@ import {AddressPostVm} from "@/models/address/AddressPostVm";
 import customerAddressService from "@/services/customer/userAddressService";
 import {router} from "next/client";
 
-const navigationPaths : NavigationPathModel[] = [
-    {
-        pageName:"Home",
-        url:'#'
-    },
-    {
-        pageName:'Address',
-        url:'#'
-    },
-    {
-        pageName:'Create',
-        url:'#'
-    }
-]
+
 export default function CreateAddress (){
     // Partial : biến các thuộc tính của T thành opational
     const onSubmit = (data:AddressDetailVm  , event: any)=>{
@@ -58,7 +45,7 @@ export default function CreateAddress (){
     const {register,handleSubmit,formState: {errors},setValue} = useForm<AddressDetailVm>();
     
     return (
-        <ProfileLayoutComponent menuActive="address" navigationPaths={navigationPaths}>
+        <ProfileLayoutComponent menuActive="address" >
             <AddressForm  setValue={setValue} register={register} handleSubmit={handleSubmit(onSubmit)} buttonText="create" errors={errors}  ></AddressForm>
         </ProfileLayoutComponent>
     )

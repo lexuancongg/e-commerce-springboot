@@ -14,16 +14,7 @@ import {usePathname, useSearchParams} from 'next/navigation'
 import * as querystring from "node:querystring";
 import productService from "@/services/product/productService";
 
-const navigationPaths: NavigationPathModel[] = [
-    {
-        pageName: "Home",
-        url: '/'
-    },
-    {
-        pageName: 'products',
-        url: '#'
-    }
-]
+
 const CATEGORY_SLUG = 'categorySlug';
 
 export default function ProductList() {
@@ -125,143 +116,263 @@ export default function ProductList() {
         }
 
     }
+
+
+    const productsDemo = [
+        {
+            id: "1",
+            name: "Women T-Shirt",
+            price: 19.99,
+            image: "https://preview.colorlib.com/theme/cozastore/images/product-01.jpg",
+            category: "women",
+        },
+        {
+            id: "2",
+            name: "Men Jacket",
+            price: 49.99,
+            image: "https://preview.colorlib.com/theme/cozastore/images/product-02.jpg",
+            category: "men",
+        },
+        {
+            id: "3",
+            name: "Leather Bag",
+            price: 79.99,
+            image: "https://preview.colorlib.com/theme/cozastore/images/product-03.jpg",
+            category: "bag",
+        },
+        {
+            id: "4",
+            name: "Running Shoes",
+            price: 59.99,
+            image: "https://preview.colorlib.com/theme/cozastore/images/product-04.jpg",
+            category: "shoes",
+        },
+        {
+            id: "5",
+            name: "Running Shoes",
+            price: 59.99,
+            image: "https://preview.colorlib.com/theme/cozastore/images/product-05.jpg",
+            category: "shoes",
+        },
+        {
+            id: "6",
+            name: "Running Shoes",
+            price: 59.99,
+            image: "https://preview.colorlib.com/theme/cozastore/images/product-06.jpg",
+            category: "shoes",
+        },
+
+    ];
+    const [activeTab, setActiveTab] = useState("All Products");
+
+
+    const categoriesDemo = ["All Products", "Women", "Men", "Bag", "Shoes", "Watches"];
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
     return (
-        <Container>
-            <Head>
-                <title>listProduct</title>
-            </Head>
+        <Container className="mt-16">
+            <div className="mb-4">
+                <h3 className="text-4xl font-bold text-gray-900">Product Overview</h3>
+            </div>
 
-            <NavigationComponent props={navigationPaths}></NavigationComponent>
+            {/* Tabs */}
+            <div className="flex items-center justify-between border-b pb-4 mb-8">
+                <div className="flex space-x-8">
+                    {categoriesDemo.map((cat) => (
+                        <button
+                            key={cat}
+                            onClick={() => setActiveTab(cat)}
+                            className={`pb-2 border-b-2 transition-all duration-200 ${activeTab === cat
+                                ? 'text-black font-medium border-red-500'
+                                : 'text-gray-500 border-transparent hover:text-black hover:border-gray-300'
+                            }`}
+                        >
+                            {cat}
+                        </button>
+                    ))}
+                </div>
 
-            <div className="py-8 bg-gray-100">
-                <div className="max-w-screen-xl mx-auto px-4">
-                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                        {/* Sidebar Filter */}
-                        <div className="hidden lg:block bg-white p-6 rounded-lg shadow">
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-lg font-semibold">Filter By</h3>
-                                <button onClick={handleDeleteFilter}
-                                        className="text-sm text-white bg-gray-600 px-3 py-1 rounded hover:bg-gray-700">
-                                    Clear filter
-                                </button>
-                            </div>
-
-                            {/* Category */}
-                            <div className="mb-6">
-                                <h4 className="text-md font-semibold mb-2">Categories</h4>
-                                <ul className="flex flex-wrap gap-2">
-                                    {categories.map((cate) => (
-                                        <li
-                                            key={cate.id}
-                                            className={`cursor-pointer px-3 py-1 border border-gray-500 rounded-full text-sm hover:bg-gray-200 
-                                            ${categoryIdActive === cate.id ? 'bg-violet-500 text-white' : ''}`}
-                                            onClick={() => {
-                                                if (categoryIdActive != cate.id) {
-                                                    updateFilter(CATEGORY_SLUG, cate.slug)
-                                                }
-                                                setCategoryIdActive(cate.id);
-                                            }}
-
-                                        >
-                                            {cate.name}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-
-                            {/* Price Filter */}
-                            <div>
-                                <h4 className="text-md font-semibold mb-2">Price</h4>
-                                <div className="flex gap-2">
-                                    <div className="w-1/2">
-                                        <label className="block text-xs mb-1">From</label>
-                                        <input
-                                            type="number"
-                                            className="w-full p-2 border rounded text-sm"
-                                            placeholder="0"
-                                            ref={inputStartPriceRef}
-                                            onChange={(event) => {
-                                                updateFilter("startPrice", Number(event.target.value))
-                                            }}
-                                        />
-                                    </div>
-                                    <div className="w-1/2">
-                                        <label className="block text-xs mb-1">To</label>
-                                        <input
-                                            type="number"
-                                            className="w-full p-2 border rounded text-sm"
-                                            placeholder="0"
-                                            onChange={(event) => {
-
-                                                updateFilter("endPrice", Number(event.target.value))
-                                            }}
-                                            ref={inputEndPriceRef}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Product Section */}
-                        <div className="lg:col-span-3">
-                            <div
-                                className="bg-white p-4 rounded-lg shadow mb-4 flex flex-col md:flex-row justify-between items-center gap-4">
-                                <div className="flex items-center gap-3">
-                                    <span className="text-sm font-medium">Sort By:</span>
-                                    <select className="border p-2 rounded text-sm">
-                                        <option value="">Featured</option>
-                                        <option value="">Best Selling</option>
-                                    </select>
-                                </div>
-                                <div className="w-full md:w-1/3">
-                                    <input
-                                        type="text"
-                                        className="w-full border p-2 rounded text-sm"
-                                        placeholder="Search..."
-                                        onChange={(event) => {
-                                            updateFilter('productName', event.target.value)
-                                        }}
-                                        ref={inputSearchRef}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Product Grid */}
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                                {products.length > 0 &&
-                                    products.map((product) => (
-                                        <ProductCard
-                                            className={['products-page']}
-                                            product={product}
-                                            key={product.id}
-                                        />
-                                    ))}
-                            </div>
-
-                            {/* Pagination */}
-                            {totalPage > 1 && (
-                                <div className="mt-6">
-                                    <ReactPaginate
-                                        forcePage={pageIndex}
-                                        previousLabel={'Previous'}
-                                        nextLabel={'Next'}
-                                        pageCount={totalPage}
-                                        onPageChange={changePage}
-                                        containerClassName={'pagination-container'}
-                                        previousClassName={'previous-btn'}
-                                        nextClassName={'next-btn'}
-                                        disabledClassName={'pagination-disabled'}
-                                        activeClassName={'pagination-active'}
-                                    />
-                                </div>
-                            )}
-                        </div>
+                {/* Actions */}
+                <div className="flex space-x-3">
+                    <button
+                        onClick={() => setIsFilterOpen(!isFilterOpen)}
+                        className="flex items-center border px-4 py-2 rounded hover:bg-gray-100 text-sm"
+                    >
+                        <span className="material-icons mr-1 text-base">filter_list</span>
+                        Filter
+                    </button>
+                    <button
+                        onClick={()=> setIsSearchOpen(!isSearchOpen)}
+                        className="flex items-center border px-4 py-2 rounded hover:bg-gray-100 text-sm">
+                        <span className="material-icons mr-1 text-base">search</span>
+                        Search
+                    </button>
+                </div>
+            </div>
+            <div
+                className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                    isSearchOpen ? 'max-h-[100px]' : 'max-h-0'
+                }`}
+            >
+                <div className="bg-gray-50 p-4">
+                    <div className="flex items-center">
+                        <input
+                            type="text"
+                            placeholder="Search products..."
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                        <button className="ml-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                            Search
+                        </button>
                     </div>
                 </div>
             </div>
 
+            {/* Filter Panel */}
+            <div
+                className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                    isFilterOpen ? 'max-h-[300px]' : 'max-h-0'
+                }`}
+            >
+                <div className="bg-red-50 p-4 grid grid-cols-4 gap-4">
+                    {/* Sort By */}
+                    <div>
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">Sort By</h4>
+                        <ul className="space-y-1">
+                            <li className="text-sm text-gray-600 hover:text-black">Default</li>
+                            <li className="text-sm text-gray-600 hover:text-black">Popularity</li>
+                            <li className="text-sm text-gray-600 hover:text-black">Average rating</li>
+                            <li className="text-sm text-gray-600 hover:text-black">Newness</li>
+                            <li className="text-sm text-gray-600 hover:text-black">Price: Low to High</li>
+                            <li className="text-sm text-gray-600 hover:text-black">Price: High to Low</li>
+                        </ul>
+                    </div>
 
+                    {/* Price */}
+                    <div>
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">Price</h4>
+                        <ul className="space-y-1">
+                            <li className="text-sm text-gray-600 hover:text-black">All</li>
+                            <li className="text-sm text-gray-600 hover:text-black">$0.00 - $50.00</li>
+                            <li className="text-sm text-gray-600 hover:text-black">$50.00 - $100.00</li>
+                            <li className="text-sm text-gray-600 hover:text-black">$100.00 - $150.00</li>
+                            <li className="text-sm text-gray-600 hover:text-black">$150.00 - $200.00</li>
+                            <li className="text-sm text-gray-600 hover:text-black">$200.00+</li>
+                        </ul>
+                    </div>
+
+                    {/* Color */}
+                    <div>
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">Color</h4>
+                        <ul className="space-y-1">
+                            <li className="flex items-center">
+                                <span className="w-4 h-4 bg-black rounded-full mr-2"></span> Black
+                            </li>
+                            <li className="flex items-center">
+                                <span className="w-4 h-4 bg-blue-500 rounded-full mr-2"></span> Blue
+                            </li>
+                            <li className="flex items-center">
+                                <span className="w-4 h-4 bg-gray-400 rounded-full mr-2"></span> Grey
+                            </li>
+                            <li className="flex items-center">
+                                <span className="w-4 h-4 bg-green-500 rounded-full mr-2"></span> Green
+                            </li>
+                            <li className="flex items-center">
+                                <span className="w-4 h-4 bg-red-500 rounded-full mr-2"></span> Red
+                            </li>
+                            <li className="flex items-center">
+                                <span className="w-4 h-4 bg-white border rounded-full mr-2"></span> White
+                            </li>
+                        </ul>
+                    </div>
+
+                    {/* Tags */}
+                    <div>
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">Tags</h4>
+                        <ul className="space-y-1">
+                            <li className="text-sm text-gray-600 hover:text-black">Fashion</li>
+                            <li className="text-sm text-gray-600 hover:text-black">Lifestyle</li>
+                            <li className="text-sm text-gray-600 hover:text-black">Denim</li>
+                            <li className="text-sm text-gray-600 hover:text-black">Streetstyle</li>
+                            <li className="text-sm text-gray-600 hover:text-black">Crafts</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            {/* Products grid */}
+            <div className="row isotope-grid gap-y-8 mt-8">
+                {productsDemo.map((product) => (
+                    <div
+                        key={product.id}
+                        className="col-sm-6 col-md-4 col-lg-3 p-b-35 isotope-item"
+                    >
+                        <div className="block2 group">
+                            {/* Ảnh + overlay */}
+                            <div className="relative overflow-hidden rounded-md">
+                                <img
+                                    src={product.image}
+                                    alt={product.name}
+                                    className="w-full h-auto transition-transform duration-300 group-hover:scale-105"
+                                />
+
+                                {/* Overlay Quick View */}
+                                <a
+                                    href="#"
+                                    className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition duration-300"
+                                >
+                                    <span className="text-white text-sm font-medium bg-red-500 px-4 py-2 rounded">
+                                        Quick View
+                                    </span>
+                                </a>
+                            </div>
+
+                            {/* Info */}
+                            <div className="mt-3 flex justify-between items-center">
+                                <div>
+                                    <a
+                                        href="product-detail.html"
+                                        className="block text-gray-700 font-medium hover:text-fuchsia-500 transition"
+                                    >
+                                        {product.name}
+                                    </a>
+                                    <span className="text-gray-900 font-semibold transition">
+                                        ${product.price.toFixed(2)}
+                                    </span>
+                                </div>
+
+                                <button className="text-gray-400 hover:text-red-500 transition">
+                                    ♥
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+
+            {totalPage > 1 && (
+                <div className="mt-6">
+                    <ReactPaginate
+                        forcePage={pageIndex}
+                        previousLabel={"←"}
+                        nextLabel={"→"}
+                        pageCount={totalPage}
+                        onPageChange={changePage}
+                        containerClassName="flex justify-center items-center space-x-2 mt-8"
+                        pageClassName="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition"
+                        activeClassName="!bg-black !text-white border-black"
+                        previousClassName="px-3 py-1 border border-gray-300 rounded-md text-gray-500 hover:bg-gray-100"
+                        nextClassName="px-3 py-1 border border-gray-300 rounded-md text-gray-500 hover:bg-gray-100"
+                        disabledClassName="opacity-50 cursor-not-allowed"
+                    />
+
+                </div>
+            )}
         </Container>
+
+
     );
 
 

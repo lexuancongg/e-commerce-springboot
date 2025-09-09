@@ -11,16 +11,11 @@ import addressService from "@/services/address/addressService";
 import { useParams, useRouter } from "next/navigation"; // ✅ Dùng đúng cho App Router
 
 
-type Props = {
-    isDisplay:boolean ,
-  // để đăng ký
+type Props = { isDisplay:boolean ,
   register: UseFormRegister<AddressDetailVm>,
-  // submit
   handleSubmit: () => void,
   errors: FieldErrors<AddressDetailVm>,
-  // trường hợp có nếu update , còn undefine nếu create
-  address?: AddressDetailVm ,
-  // xác định tên nút là create hay update
+  addressInit?: AddressDetailVm ,
   buttonText?: string,
   setValue: UseFormSetValue<AddressDetailVm>;
 }
@@ -29,7 +24,7 @@ const AddressForm: FC<Props> = (
     errors,
     handleSubmit,
     register,
-    address,
+    addressInit,
     buttonText,
     setValue,
       isDisplay = true
@@ -55,13 +50,13 @@ const AddressForm: FC<Props> = (
 
   // trường hợp useForm hiển thị cho edit => phải lấy được district và province tương ứng
   useEffect(() => {
-    if (address) {
+    if (addressInit) {
       // lấy province theo country
-      addressService.getProvinces(address.countryId)
+      addressService.getProvinces(addressInit.countryId)
         .then((resProvinces) => {
           setProvinces(resProvinces);
         })
-      addressService.getDistricts(address.provinceId)
+      addressService.getDistricts(addressInit.provinceId)
         .then((resDistricts) => {
           setDistricts(resDistricts);
         })
@@ -103,7 +98,7 @@ const AddressForm: FC<Props> = (
             registerOptions={{
               required: { value: true, message: 'This feild is required' },
             }}
-            defaultValue={address?.contactName}
+            defaultValue={addressInit?.contactName}
           />
         </div>
         <div className="col-lg-6">
@@ -114,7 +109,7 @@ const AddressForm: FC<Props> = (
             registerOptions={{
               required: { value: true, message: 'This feild is required' },
             }}
-            defaultValue={address?.phoneNumber}
+            defaultValue={addressInit?.phoneNumber}
           />
         </div>
       </div>
@@ -124,7 +119,7 @@ const AddressForm: FC<Props> = (
             labelText="Country"
             fieldName="countryId"
             placeholder="Select country"
-            defaultValue={address?.countryId}
+            defaultValue={addressInit?.countryId}
                 options={countries}
             register={register}
             registerOptions={{
@@ -141,7 +136,7 @@ const AddressForm: FC<Props> = (
             fieldName="provinceId"
             options={provinces}
             placeholder="Select state or province"
-            defaultValue={address?.provinceId}
+            defaultValue={addressInit?.provinceId}
             registerOptions={{
               required: { value: true, message: 'Please select state or province' },
               onChange: onchangeProvince,
@@ -157,7 +152,7 @@ const AddressForm: FC<Props> = (
             fieldName="districtId"
             options={districts}
             placeholder="Select district"
-            defaultValue={address?.districtId}
+            defaultValue={addressInit?.districtId}
             registerOptions={{
               required: { value: true, message: 'Please select district' },
               onChange: (event: any) => {
@@ -172,7 +167,7 @@ const AddressForm: FC<Props> = (
             labelText="specificAddress"
             register={register}
             fieldName="specificAddress"
-            defaultValue={address?.districtId}
+            defaultValue={addressInit?.districtId}
             registerOptions={{
               required: { value: true, message: 'Please input  specificAddress' },
              

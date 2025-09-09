@@ -190,7 +190,7 @@ const Header = ({ children }: React.PropsWithChildren) => {
 
             {/* ---- Dropdown search ---- */}
             {showSearch && (
-                <div className="absolute left-0 top-full w-full bg-white shadow-md border-t">
+                <div className="absolute left-0 top-full w-full bg-white shadow-md border-t z-50">
                     <div className="container mx-auto py-4">
                         <form className="flex items-center gap-2">
                             <i className="bi bi-search text-gray-500 text-xl"></i>

@@ -158,7 +158,7 @@ const Checkout = ()=>{
                                                 register={registerShippingAddress}
                                                 setValue={setValueShippingAddress}
                                                 errors={errorsShippingAddress}
-                                                address={undefined}
+                                                addressInit={undefined}
                                                 buttonText="Use this address"
                                             />
                                         </div>
