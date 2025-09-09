@@ -1,71 +1,84 @@
 'use client'
-import { FC, useState } from "react";
+import {FC, useEffect, useState} from "react";
 import { Container } from "react-bootstrap";
+import {ProductPreviewVm} from "@/models/product/ProductPreviewVm";
+import productService from "@/services/product/productService";
+import ReactPaginate from "react-paginate";
 
-interface Product {
-    id: string;
-    name: string;
-    price: number;
-    image: string;
-    category: string; // ví dụ 'women', 'men', 'bag', ...
-}
+const productsDemo : ProductPreviewVm[] = [
+    {
+        id: 1,
+        name: "Women T-Shirt",
+        price: 19.99,
+        avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/product-01.jpg",
+        slug: "women",
+    },
+    {
+        id: 2,
+        name: "Men Jacket",
+        price: 49.99,
+        avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/product-02.jpg",
+        slug: "men",
+    },
+    {
+        id: 3,
+        name: "Leather Bag",
+        price: 79.99,
+        avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/product-03.jpg",
+        slug: "bag",
+    },
+    {
+        id: 4,
+        name: "Running Shoes",
+        price: 59.99,
+        avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/product-04.jpg",
+        slug: "shoes",
+    },
+    {
+        id: 5,
+        name: "Running Shoes",
+        price: 59.99,
+        avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/product-05.jpg",
+        slug: "shoes",
+    },
+    {
+        id: 6,
+        name: "Running Shoes",
+        price: 59.99,
+        avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/product-06.jpg",
+        slug: "shoes",
+    },
 
-interface Props {
-    products: Product[];
-}
+];
 
 const ProductOverview = () => {
-    const products = [
-        {
-            id: "1",
-            name: "Women T-Shirt",
-            price: 19.99,
-            image: "https://preview.colorlib.com/theme/cozastore/images/product-01.jpg",
-            category: "women",
-        },
-        {
-            id: "2",
-            name: "Men Jacket",
-            price: 49.99,
-            image: "https://preview.colorlib.com/theme/cozastore/images/product-02.jpg",
-            category: "men",
-        },
-        {
-            id: "3",
-            name: "Leather Bag",
-            price: 79.99,
-            image: "https://preview.colorlib.com/theme/cozastore/images/product-03.jpg",
-            category: "bag",
-        },
-        {
-            id: "4",
-            name: "Running Shoes",
-            price: 59.99,
-            image: "https://preview.colorlib.com/theme/cozastore/images/product-04.jpg",
-            category: "shoes",
-        },
-         {
-            id: "5",
-            name: "Running Shoes",
-            price: 59.99,
-            image: "https://preview.colorlib.com/theme/cozastore/images/product-05.jpg",
-            category: "shoes",
-        },
-         {
-            id: "6",
-            name: "Running Shoes",
-            price: 59.99,
-            image: "https://preview.colorlib.com/theme/cozastore/images/product-06.jpg",
-            category: "shoes",
-        },
 
-    ];
-    const [activeTab, setActiveTab] = useState("All Products");
+    const [activeTab, setActiveTab] = useState("All");
+
+    const categories = ["All", "Women", "Men", "Bag", "Shoes", "Watches"];
+
+    const [products, setProducts] = useState<ProductPreviewVm[]>([]);
+    const [pageIndex,setPageIndex] = useState<number>(0);
+    const [totalPages, setTotalPages] = useState<number>(0);
+
+    useEffect(() => {
+        productService.getFeaturedProductsPaging(pageIndex)
+            .then((res)=>{
+                setProducts(res.productPreviewsPayload)
+                setTotalPages(res.totalPages)
+            })
+            .catch((error)=>{
+                console.log("error get product featured")
+                setProducts(productsDemo)
+                setTotalPages(10)
+            })
+    }, [pageIndex]);
 
 
 
-    const categories = ["All Products", "Women", "Men", "Bag", "Shoes", "Watches"];
-
+    const handleChangePageIndex = ({selected}:{selected:number})=>{
+        setPageIndex(selected);
+    }
 
     return (
         <Container className=" mt-16  ">
@@ -73,7 +86,6 @@ const ProductOverview = () => {
                 <h3 className="text-4xl font-bold text-gray-900">Product Overview</h3>
             </div>
 
-            {/* Tabs */}
             <div className="flex items-center justify-between border-b pb-4 mb-8">
                 <div className="flex space-x-8">
                     {categories.map((cat) => (
@@ -91,7 +103,6 @@ const ProductOverview = () => {
                 </div>
 
 
-                {/* Actions */}
                 <div className="flex space-x-3">
                     <button className="flex items-center border px-4 py-2 rounded hover:bg-gray-100 text-sm">
                         <span className="material-icons mr-1 text-base">filter_list</span>
@@ -115,7 +126,7 @@ const ProductOverview = () => {
                             {/* Ảnh + overlay */}
                             <div className="relative overflow-hidden rounded-md">
                                 <img
-                                    src={product.image}
+                                    src={product.avatarUrl}
                                     alt={product.name}
                                     className="w-full h-auto transition-transform duration-300 group-hover:scale-105"
                                 />
@@ -164,6 +175,25 @@ const ProductOverview = () => {
                     Load More
                 </a>
             </div>
+
+            {totalPages > 1 && (
+                <div className="mt-6">
+                    <ReactPaginate
+                        forcePage={pageIndex}
+                        previousLabel={"←"}
+                        nextLabel={"→"}
+                        pageCount={totalPages}
+                        onPageChange={handleChangePageIndex}
+                        containerClassName="flex justify-center items-center space-x-2 mt-8"
+                        pageClassName="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition"
+                        activeClassName="!bg-black !text-white border-black"
+                        previousClassName="px-3 py-1 border border-gray-300 rounded-md text-gray-500 hover:bg-gray-100"
+                        nextClassName="px-3 py-1 border border-gray-300 rounded-md text-gray-500 hover:bg-gray-100"
+                        disabledClassName="opacity-50 cursor-not-allowed"
+                    />
+
+                </div>
+            )}
 
 
         </Container>

@@ -1,5 +1,5 @@
 export type AddressDetailVm = {
-    id?: number,
+    id: number,
     contactName : string,
     phoneNumber: string,
     specificAddress: string,

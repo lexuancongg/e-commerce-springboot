@@ -3,7 +3,6 @@ import type { NextConfig } from "next";
 // config file cho nextjs
 const nextConfig: NextConfig = {
     reactStrictMode :true,
-    // cấu hình cho phép tải hình ảnh bên ngoài,
     experimental: {
     },
     images: {
@@ -15,6 +14,14 @@ const nextConfig: NextConfig = {
                 pathname: '/my-bucket/**',
                 search: '',
             },
+        ]
+    },
+    async rewrites() {
+        return [
+            {
+                source: "/api/:path*",
+                destination: "http://localhost:8000/api/:path*" // proxy
+            }
         ]
     }
 };

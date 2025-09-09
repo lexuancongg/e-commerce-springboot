@@ -21,9 +21,6 @@ public class Category extends AuditEntity {
     private String name;
     private String description;
     private String slug;
-    private String metaKeywords;
-    private String metaDescription;
-    private Short displayIndex;
     private boolean isPublic;
     // avatar category
     private Long imageId;

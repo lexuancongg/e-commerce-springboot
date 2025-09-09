@@ -2,7 +2,7 @@ package com.lexuancong.product.viewmodel.product;
 
 import java.util.List;
 
-public record ProductFeaturePagingVm(
+public record ProductPreviewPagingVm(
         List<ProductPreviewVm> productPreviewsPayload,
         int pageIndex,
         int pageSize,

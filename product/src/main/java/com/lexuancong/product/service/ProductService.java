@@ -613,7 +613,7 @@ public class ProductService {
     }
 
 
-    public ProductFeaturePagingVm getFeaturedProductsPaging(int pageIndex, int pageSize) {
+    public ProductPreviewPagingVm getFeaturedProductsPaging(int pageIndex, int pageSize) {
         // interface phn trang và sx khi truy vấn db
         Pageable pageable = PageRequest.of(pageIndex, pageSize);
         Page<Product> productPage = this.productRepository.findAllByFeatureIsTrueAndShownSeparatelyIsTrueAndPublicIsTrueOrderByIdAsc(pageable);
@@ -624,7 +624,7 @@ public class ProductService {
                     return new ProductPreviewVm(product.getId(), product.getName(), product.getSlug(), product.getPrice(), avatarUrl);
                 }).toList();
 
-        return new ProductFeaturePagingVm(
+        return new ProductPreviewPagingVm(
                 productPreviewPayload, pageIndex, pageSize,
                 (int) productPage.getTotalElements(),
                 productPage.getTotalPages(),

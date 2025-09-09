@@ -11,7 +11,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.security.Principal;
 import java.util.List;
-@RequestMapping("/api/category")
+@RequestMapping("/api/product")
 @RestController
 public class CategoryController {
     private final CategoryService categoryService;

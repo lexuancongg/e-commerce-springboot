@@ -1,60 +1,68 @@
 'use client'
 import { NextPage } from "next";
-import { useEffect, useMemo, useState } from "react";
-import { CategoryVm as CategoryModel } from "@/models/category/CategoryVm";
+import { useEffect, useState } from "react";
+import {CategoryVm} from "@/models/category/CategoryVm";
 import { Container } from "react-bootstrap";
 import categoryService from "@/services/category/categoryService";
-import CategoryCard from "@/components/category/categoryCard";
-import { useRouter, useParams, usePathname, useSearchParams } from "next/navigation";
-import { category_demo_data } from "@/demo_data/category/category_demo_data";
+import { useRouter } from "next/navigation";
 import LoadImageSafe from "../common/loadImageSafe";
 
-const Category: NextPage = () => {
-    const router = useRouter();
-    const [categories, setCategories] = useState<CategoryModel[]>(category_demo_data);
-    const [currentPage, setCurentPage] = useState<number>(1);
-    const defaultItemsPerPage: number = 20;
+const categoriesDemo : CategoryVm[] = [
+    {
+        id: 1,
+        name: "Woment",
+        slug: "electronics",
 
-    // tính tổng page chỉ tính lại khi có su thay đổi
-    const totalPages = useMemo(() => {
-        return Math.ceil(categories.length / defaultItemsPerPage);
-    }, [categories.length])
-
-
-    // sau này phân trang lai bằng việc callApi kèm pageNo
-    const startIndex = useMemo(() => (currentPage - 1) * defaultItemsPerPage, [currentPage]);
-    const endIndex = useMemo(() => startIndex + defaultItemsPerPage, [startIndex]);
-    const currentItems: CategoryModel[] = categories.slice(startIndex, endIndex);
-    // chia ra để hiển thị layout
-    const chunkedItems: CategoryModel[][] = [];
-    for (let i = 0; i < currentItems.length; i += 2) {
-        chunkedItems.push(currentItems.slice(i, i + 2))
+        avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/banner-01.jpg",
+    },
+    {
+        id: 2,
+        name: "Men",
+        slug: "fashion",
+            avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/banner-02.jpg",
+    },
+    {
+        id: 3,
+        name: "Kids",
+        slug: "fashion",
+            avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/banner-03.jpg",
+    },
+    {
+        id: 4,
+        name: "Fashion",
+        slug: "fashion",
+            avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/banner-05.jpg",
     }
+]
+
+const Category: NextPage = () => {
 
     const [current, setCurrent] = useState(0);
+    const router = useRouter();
+    const [categories, setCategories] = useState<CategoryVm[]>([]);
 
     const next = () => {
-        if (current < categories.length - 3) setCurrent(current + 1); // show 3 item
+        if (current < categories.length - 3) {
+            setCurrent(current + 1);
+        }
     };
     const prev = () => {
         if (current > 0) setCurrent(current - 1);
     };
 
 
-    // event funciton
-    const goToPage = (pageNumber: number) => {
-        setCurentPage(pageNumber);
-    }
-
-    const handleClick = (slug: string) => {
+    const handleClickCategoryCard = (slug: string) => {
         router.push(`/products?categorySlug=${slug}`)
 
     }
-    // feach Api
     useEffect(() => {
         categoryService.getCategories()
             .then((responseCategoriesVms) => {
                 setCategories(responseCategoriesVms);
+            })
+            .catch((error) =>{
+                setCategories(categoriesDemo)
+                console.log(error.message)
             })
 
     }, []);
@@ -71,6 +79,7 @@ const Category: NextPage = () => {
             >
                 {categories.map((category) => (
                     <div
+                        onClick={()=> handleClickCategoryCard(category.slug)}
                         key={category.id}
                         className="flex-none relative overflow-hidden cursor-pointer group rounded-xl border border-gray-300 "
                         style={{
@@ -79,7 +88,7 @@ const Category: NextPage = () => {
                         }}
                     >
                         <LoadImageSafe
-                            src={category.categoryImage?.url!}
+                            src={category.avatarUrl}
                             alt={category.name}
                             className="w-full h-full object-cover"
                         />
@@ -106,7 +115,6 @@ const Category: NextPage = () => {
                 ))}
             </div>
 
-            {/* Prev / Next Buttons */}
             <button
                 onClick={prev}
                 className="absolute top-1/2 left-0 -translate-y-1/2 bg-black/50 text-white px-3 py-2 rounded-full"

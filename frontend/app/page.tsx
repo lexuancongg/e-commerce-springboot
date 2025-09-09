@@ -12,11 +12,8 @@ export default function Home(){
             <MainBanner></MainBanner>
             <Category></Category>
             <FeaturedProduct></FeaturedProduct>
-            {/* <BannerSlide></BannerSlide> */}
             <RecommentProduct></RecommentProduct>
             <ServicesSection></ServicesSection>
-            
-            
 
         </div>
     );

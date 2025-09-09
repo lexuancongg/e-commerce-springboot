@@ -9,7 +9,6 @@ import {Product_detail_demo_data} from "@/demo_data/product/product_detail_demo_
 import {ProductOptionValueVm} from "@/models/product/options/ProductOptionValueVm";
 import {Product_option_value_demo_data} from "@/demo_data/product/product_options/product_option_value_demo_data";
 
-// response : object chứa thông tin kq req gồm nhu status , body...
 class ProductService {
     // process.env : biến của nodejs => object toàn cục chứa các biến môi trường
     private baseUrl:string = `${process.env.API_BASE_URL_PRODUCT}`
@@ -29,23 +28,22 @@ class ProductService {
 
 
 
-    // lấy ngau nhien ds sp noi bat lam slide
     public async getFeaturedProductsMakeSlide():Promise<ProductPreviewVm[]>{
         console.log(this.baseUrl)
         const response = await  apiClient.get(`${this.baseUrl}/customer/products/featured/slide`);
-        if(response.ok) return  await  response.json();
-        return  productsFeaturedMakeSlide_demo;
-        // bắn leen để handle trong cath
+        if(response.ok) {
+            return  await  response.json();
+        }
         throw response;
     }
 
 
     public async  getFeaturedProductsPaging(pageIndex: number):Promise<ProductPreviewPagingVm>{
-        const response = await apiClient.get(`${this.baseUrl}/customer/products/featured?pageIndex=${pageIndex}`);
-        if(response.ok) return await  response.json();
-        return  productFeaturePagingVm_demo
+        const response = await apiClient.get(`/api/product/customer/products/featured?pageIndex=${pageIndex}`);
+        if(response.ok) {
+            return await  response.json();
+        }
         throw response;
-
     }
 
 
@@ -81,6 +79,9 @@ class ProductService {
         if(response.ok) return await response.json();
         return Product_option_value_demo_data;
         throw response;
+    }
+    public async  getProductBestSeller():Promise<ProductPreviewVm[]>{
+        return  [];
     }
 
 }

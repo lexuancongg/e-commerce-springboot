@@ -5,7 +5,12 @@ import com.lexuancong.product.viewmodel.image.ImageVm;
 import lombok.Builder;
 
 @Builder
-public record CategoryVm(Long id, String name, String slug, ImageVm image) {
+public record CategoryVm(
+        Long id,
+        String name,
+        String slug,
+        String avatarUrl) {
+
     public static CategoryVm fromModel(Category category) {
         return new CategoryVm(category.getId(), category.getName(), category.getSlug(), null);
     }

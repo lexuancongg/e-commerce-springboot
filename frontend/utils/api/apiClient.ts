@@ -24,8 +24,7 @@ const callApi = async (method : string , endPoint:string , data:any = null, cont
     try {
         return await fetch(endPoint, requestOptions.method == 'GET' ? undefined : requestOptions);
     }catch (err){
-        // xay ra khi loi mang hoac server khong phan hoi
-        console.log("loi xay ra")
+
         throw err;
     }
 }

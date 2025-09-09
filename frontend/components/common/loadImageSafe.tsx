@@ -15,7 +15,6 @@
             width = 500,
             height =500,
             src,
-            // mỗi giao dienj cần một css rieneg
             className,
             style,
             alt,
@@ -26,7 +25,6 @@
         const [fallBack,setFallBack] = useState<string|null>(null);
         const [srcUrl,setSrcUrl] = useState<string>(src);
 
-        // neeus src thay doi => fallback nhường chổ để thử lai src
         useEffect(()=>{
             setSrcUrl(src);
             setFallBack(null);
@@ -36,7 +34,6 @@
             <Image
                 width={width}
                 height={height}
-                style={style}
                 className={className}
                 src={fallBack || srcUrl}
                 alt={alt}

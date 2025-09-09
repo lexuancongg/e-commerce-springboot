@@ -1,6 +1,5 @@
 package com.lexuancong.product.controller;
 
-import com.lexuancong.product.model.Product;
 import com.lexuancong.product.service.ProductService;
 import com.lexuancong.product.constant.Constants;
 import com.lexuancong.product.viewmodel.product.*;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 @RestController
+@RequestMapping("/api/product")
 public class ProductController {
     private final ProductService productService;
     public ProductController(ProductService productService) {
@@ -38,7 +38,7 @@ public class ProductController {
 
     // ds nổi bật => đã check
     @GetMapping("/customer/products/featured")
-    public ResponseEntity<ProductFeaturePagingVm> getFeaturedProductsPaging(
+    public ResponseEntity<ProductPreviewPagingVm> getFeaturedProductsPaging(
             @RequestParam(value = "pageIndex", defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER) int pageIndex,
             @RequestParam(value = "pageSize",defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE) int pageSize
     ) {

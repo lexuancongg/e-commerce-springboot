@@ -40,7 +40,7 @@ public class CategoryService {
                     .id(category.getId())
                     .name(category.getName())
                     .slug(category.getSlug())
-                    .image(image)
+                    .avatarUrl(image != null ? image.url() : "")
                     .build();
             categoryVms.add(categoryVm);
         });
@@ -84,9 +84,7 @@ public class CategoryService {
         category.setName(categoryPostVm.name());
         category.setSlug(categoryPostVm.slug());
         category.setDescription(categoryPostVm.description());
-        category.setMetaDescription(categoryPostVm.metaDescription());
-        category.setDisplayIndex(categoryPostVm.displayIndex());
-        category.setMetaKeywords(categoryPostVm.metaKeywords());
+
         category.setPublic(categoryPostVm.isPublic());
         category.setImageId(categoryPostVm.imageId());
         if (categoryPostVm.parentId() != null) {

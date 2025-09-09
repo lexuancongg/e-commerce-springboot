@@ -5,51 +5,74 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
+import {ProductPreviewVm} from "@/models/product/ProductPreviewVm";
+import {useEffect, useState} from "react";
+import productService from "@/services/product/productService";
 
 
+const productsDemo : ProductPreviewVm[]  = [
+    {
+        id: 1,
+        name: "Women T-Shirt",
+        price: 19.99,
+        avatarUrl:
+            "https://preview.colorlib.com/theme/cozastore/images/product-01.jpg",
+        slug: "women",
+    },
+    {
+        id: 2,
+        name: "Men Jacket",
+        price: 49.99,
+        avatarUrl:
+            "https://preview.colorlib.com/theme/cozastore/images/product-02.jpg",
+        slug: "men",
+    },
+    {
+        id: 3,
+        name: "Leather Bag",
+        price: 79.99,
+        avatarUrl:
+            "https://preview.colorlib.com/theme/cozastore/images/product-03.jpg",
+        slug: "bag",
+    },
+    {
+        id: 4,
+        name: "Running Shoes",
+        price: 59.99,
+        avatarUrl:
+            "https://preview.colorlib.com/theme/cozastore/images/product-04.jpg",
+        slug: "shoes",
+    },
+    {
+        id: 5,
+        name: "Hat",
+        price: 15.99,
+        avatarUrl:
+            "https://preview.colorlib.com/theme/cozastore/images/product-05.jpg",
+        slug: "accessory",
+    },
+];
 const RecommentProduct = () => {
-    const products = [
-        {
-            id: "1",
-            name: "Women T-Shirt",
-            price: 19.99,
-            image:
-                "https://preview.colorlib.com/theme/cozastore/images/product-01.jpg",
-            category: "women",
-        },
-        {
-            id: "2",
-            name: "Men Jacket",
-            price: 49.99,
-            image:
-                "https://preview.colorlib.com/theme/cozastore/images/product-02.jpg",
-            category: "men",
-        },
-        {
-            id: "3",
-            name: "Leather Bag",
-            price: 79.99,
-            image:
-                "https://preview.colorlib.com/theme/cozastore/images/product-03.jpg",
-            category: "bag",
-        },
-        {
-            id: "4",
-            name: "Running Shoes",
-            price: 59.99,
-            image:
-                "https://preview.colorlib.com/theme/cozastore/images/product-04.jpg",
-            category: "shoes",
-        },
-        {
-            id: "5",
-            name: "Hat",
-            price: 15.99,
-            image:
-                "https://preview.colorlib.com/theme/cozastore/images/product-05.jpg",
-            category: "accessory",
-        },
-    ];
+
+    const [products,setProducts] = useState<ProductPreviewVm[]>([])
+
+
+    useEffect(() => {
+        productService.getProductBestSeller()
+            .then((res)=>{
+                setProducts(productsDemo)
+                // setProducts(res);
+            })
+            .catch((error)=>{
+                console.log(error.message)
+            })
+    }, []);
+
+
+    const handleClickProductCard = (slug: string)=>{
+
+    }
+
 
     return (
         <Container className="mt-14">
@@ -79,10 +102,12 @@ const RecommentProduct = () => {
             >
                 {products.map((product) => (
                     <SwiperSlide key={product.id}>
-                        <div className="group bg-white p-3 rounded-lg   hover:shadow-lg transition">
+                        <div
+                            onClick={()=> handleClickProductCard(product.slug)}
+                            className="group bg-white p-3 rounded-lg   hover:shadow-lg transition">
                             <div className="relative overflow-hidden rounded-md">
                                 <img
-                                    src={product.image}
+                                    src={product.avatarUrl}
                                     alt={product.name}
                                     className="w-full h-auto transition-transform duration-300 group-hover:scale-105"
                                 />
@@ -95,7 +120,7 @@ const RecommentProduct = () => {
                             <div className="mt-3 flex justify-between items-center">
                                 <div>
                                     <a
-                                        href="product-detail.html"
+                                        href=""
                                         className="block text-gray-700 font-medium hover:text-fuchsia-500 transition"
                                     >
                                         {product.name}
