@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import { OrderStatus } from "@/models/order/OrderStatus";
 import { useEffect, useState } from "react";
 import { OrderVm } from "@/models/order/OrderVm";
@@ -9,12 +9,13 @@ import { DeliveryStatus } from "@/models/order/DeliveryStatus";
 import dayjs from "dayjs";
 import { DeliveryMethod } from "@/models/order/DeliveryMethod";
 import OrderCard from "./orderCard";
+
 type Props = {
-    orderStatus: OrderStatus | null
-}
+    orderStatus: OrderStatus | null;
+};
 
-
-const orderss: OrderVm[] = [
+const demoOrders: OrderVm[] = [
+    // Dữ liệu demo của mày, giữ nguyên
     {
         id: 1,
         orderStatus: OrderStatus.PENDING,
@@ -27,12 +28,12 @@ const orderss: OrderVm[] = [
                 productName: "Áo thun nam",
                 quantity: 2,
                 productPrice: 250000,
-                productAvatarUrl: "https://example.com/image1.jpg",
-                totalPrice: 500
+                productAvatarUrl: "https://preview.colorlib.com/theme/cozastore/images/product-02.jpg",
+                totalPrice: 500000,
             },
         ],
-        createdAt: dayjs("2024-03-27T10:00:00Z"),
-        deliveryMethod: DeliveryMethod.VIETTEL_POST
+        createdAt: dayjs("2024-03-27T17:00:00Z"),
+        deliveryMethod: DeliveryMethod.VIETTEL_POST,
     },
     {
         id: 2,
@@ -46,8 +47,8 @@ const orderss: OrderVm[] = [
                 productName: "Áo thun nam",
                 quantity: 2,
                 productPrice: 250000,
-                productAvatarUrl: "https://example.com/image1.jpg",
-                totalPrice: 500
+                productAvatarUrl: "https://preview.colorlib.com/theme/cozastore/images/product-01.jpg",
+                totalPrice: 500000,
             },
             {
                 id: 102,
@@ -55,64 +56,41 @@ const orderss: OrderVm[] = [
                 productName: "Giày thể thao",
                 quantity: 1,
                 productPrice: 800000,
-                productAvatarUrl: "https://example.com/image2.jpg",
-                totalPrice: 500
+                productAvatarUrl: "https://preview.colorlib.com/theme/cozastore/images/product-02.jpg",
+                totalPrice: 800000,
             },
         ],
         createdAt: dayjs("2024-03-26T15:30:00Z"),
-        deliveryMethod: DeliveryMethod.VIETTEL_POST
+        deliveryMethod: DeliveryMethod.VIETTEL_POST,
     },
-  ];
-  
-export default function OrderStatusTab({ orderStatus }: Props) {
-    const [orders, setOrders] = useState<OrderVm[]>(orderss)
+];
 
+export default function OrderStatusTab({ orderStatus }: Props) {
+    const [orders, setOrders] = useState<OrderVm[]>(demoOrders);
 
     useEffect(() => {
-        orderService.getMyOrder(orderStatus)
-            .then(async (orderVmResults) => {
-                const productIds: number[] = orderVmResults.flatMap((orderVmResult) => {
-                    return orderVmResult.orderItemVms.map(orderItem => {
-                        return orderItem.productId;
-                    })
-                })
+        setOrders(demoOrders.filter(o => !orderStatus || o.orderStatus === orderStatus)); // Filter theo tab
+    }, [orderStatus]);
 
-                if (orderVmResults.length) {
-                    const productPreviewVms: ProductPreviewVm[] = await productService.getProductsByIds(productIds);
-                    orderVmResults.forEach((orderVm) => {
-                        orderVm.orderItemVms.forEach((orderItemVm) => {
-                            const productPreview: ProductPreviewVm = productPreviewVms.find(
-                                (product) => product.id == orderItemVm.productId)!;
-                            orderItemVm.productAvatarUrl = productPreview.avatarUrl;
-
-                        })
-                    })
-                }
-                setOrders(orderVmResults);
-
-            })
-
-    }, [orderStatus])
+    if (orders.length === 0) {
+        return (
+            <div className="text-center py-12">
+                <div className="text-gray-400 mb-4">
+                    <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                </div>
+                <h3 className="text-lg font-medium text-gray-900">No Orders</h3>
+                <p className="text-gray-500 mt-1">Chưa có đơn hàng nào ở trạng thái này.</p>
+            </div>
+        );
+    }
 
     return (
-        <div>
-            {
-                orders.length ? (
-                    orders.map((order) => {
-                        return (
-                            <OrderCard order={order} key={order.id}></OrderCard>
-                        )
-                    })
-                ) :
-                    (
-                        <div>
-                            <h3 style={{ textAlign: 'center' }}>No Orders</h3>
-                        </div>
-                    )
-            }
+        <div className="space-y-6">
+            {orders.map((order) => (
+                <OrderCard key={order.id} order={order} />
+            ))}
         </div>
-
-
-
     );
 }

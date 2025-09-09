@@ -68,7 +68,7 @@ const ProductOverview = () => {
 
 
     return (
-        <Container className=" mt-16 border ">
+        <Container className=" mt-16  ">
             <div className="mb-4">
                 <h3 className="text-4xl font-bold text-gray-900">Product Overview</h3>
             </div>
