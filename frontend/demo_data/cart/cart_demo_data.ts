@@ -8,7 +8,7 @@ export const cartItems_detail_demo_data : CartItemDetailVm[] =
             quantity: 2,
             productName: "Product A",
             slug: "product-a",
-            imageUrl: "https://th.bing.com/th/id/OIP.VSnbm5qgNu_BDNvyBa0I5AHaHa?rs=1&pid=ImgDetMain",
+            avatarUrl: "https://th.bing.com/th/id/OIP.VSnbm5qgNu_BDNvyBa0I5AHaHa?rs=1&pid=ImgDetMain",
             price: 199.99,
         },
         {
@@ -16,7 +16,7 @@ export const cartItems_detail_demo_data : CartItemDetailVm[] =
             quantity: 1,
             productName: "Product B",
             slug: "product-b",
-            imageUrl: "https://th.bing.com/th/id/OIP.VSnbm5qgNu_BDNvyBa0I5AHaHa?rs=1&pid=ImgDetMain",
+            avatarUrl: "https://th.bing.com/th/id/OIP.VSnbm5qgNu_BDNvyBa0I5AHaHa?rs=1&pid=ImgDetMain",
             price: 299.99,
         },
         {
@@ -24,7 +24,7 @@ export const cartItems_detail_demo_data : CartItemDetailVm[] =
             quantity: 3,
             productName: "Product C",
             slug: "product-c",
-            imageUrl: "https://th.bing.com/th/id/OIP.VSnbm5qgNu_BDNvyBa0I5AHaHa?rs=1&pid=ImgDetMain",
+            avatarUrl: "https://th.bing.com/th/id/OIP.VSnbm5qgNu_BDNvyBa0I5AHaHa?rs=1&pid=ImgDetMain",
             price: 149.99,
         },
 

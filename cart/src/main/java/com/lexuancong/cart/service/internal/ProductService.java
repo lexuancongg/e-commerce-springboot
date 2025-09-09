@@ -2,6 +2,8 @@ package com.lexuancong.cart.service.internal;
 
 import com.lexuancong.cart.config.ServiceUrlConfig;
 import com.lexuancong.cart.viewmodel.product.ProductPreviewVm;
+import com.lexuancong.cart.viewmodel.productoption.ProductOptionValueGetVm;
+import com.lexuancong.share.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -43,6 +45,22 @@ public class ProductService {
                 .retrieve()
                 .toEntity(new ParameterizedTypeReference<List<ProductPreviewVm>>() {})
                 .getBody();
+    }
+
+    public List<ProductOptionValueGetVm> getProductOptionValueBySpecificProductIds(List<Long> productIds){
+        String jwt  = AuthenticationUtils.extractJwt();
+        URI url =UriComponentsBuilder.fromHttpUrl(this.serviceUrlConfig.product())
+                .path("/customer...")
+                .queryParam("productIds",productIds)
+                .build()
+                .toUri();
+        return this.restClient.get()
+                .uri(url)
+                .headers(httpHeaders -> httpHeaders.setBearerAuth(jwt))
+                .retrieve()
+                .toEntity(new ParameterizedTypeReference<List<ProductOptionValueGetVm>>() {})
+                .getBody();
+
     }
 
 

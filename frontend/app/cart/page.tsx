@@ -14,7 +14,7 @@ const cartItemsDemo: CartItemDetailVm[] = [
         quantity: 1,
         productName: "Shirt",
         slug: "shirt",
-        imageUrl: "https://preview.colorlib.com/theme/cozastore/images/product-01.jpg",
+        avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/product-01.jpg",
         price: 44.00,
         productOptions: [{ id: 1, optionName: "Type", value: "Cotton T-shirt" }],
     },
@@ -23,7 +23,7 @@ const cartItemsDemo: CartItemDetailVm[] = [
         quantity: 1,
         productName: "Shirt",
         slug: "cotton-shirt",
-        imageUrl: "https://preview.colorlib.com/theme/cozastore/images/product-02.jpg",
+        avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/product-02.jpg",
         price: 44.00,
         productOptions: [{ id: 2, optionName: "Type", value: "Cotton T-shirt" }],
     },
@@ -181,7 +181,7 @@ const Cart = () => {
                                             />
                                             <Link href={`/redirect?productId=${item.productId}`} className="flex-shrink-0">
                                                 <img
-                                                    src={item.imageUrl}
+                                                    src={item.avatarUrl}
                                                     alt={item.productName}
                                                     className="w-20 h-20 object-cover rounded"
                                                 />

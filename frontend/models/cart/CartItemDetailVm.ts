@@ -5,7 +5,7 @@ export type CartItemDetailVm = {
     quantity:number;
     productName: string;
     slug: string;
-    imageUrl: string;
+    avatarUrl: string;
     price: number;
     productOptions: ProductOptionValueVm[]
 }

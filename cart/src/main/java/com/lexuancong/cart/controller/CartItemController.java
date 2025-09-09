@@ -2,10 +2,7 @@ package com.lexuancong.cart.controller;
 
 import com.lexuancong.cart.constants.Constants;
 import com.lexuancong.cart.service.CartItemService;
-import com.lexuancong.cart.viewmodel.cartitem.CartItemDeleteVm;
-import com.lexuancong.cart.viewmodel.cartitem.CartItemGetVm;
-import com.lexuancong.cart.viewmodel.cartitem.CartItemPostVm;
-import com.lexuancong.cart.viewmodel.cartitem.CartItemPutVm;
+import com.lexuancong.cart.viewmodel.cartitem.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,8 +30,8 @@ public class CartItemController {
 
 
     @GetMapping("/customer/cart-items")
-    public ResponseEntity<List<CartItemGetVm>> getCartItems(){
-        List<CartItemGetVm> cartItemGetVms = cartItemService.getCartItems();
+    public ResponseEntity<List<CartItemDetailVm>> getCartItems(){
+        List<CartItemDetailVm> cartItemGetVms = cartItemService.getCartItems();
         return ResponseEntity.ok(cartItemGetVms);
     }
 

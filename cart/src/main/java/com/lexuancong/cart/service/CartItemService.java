@@ -9,6 +9,7 @@ import com.lexuancong.cart.viewmodel.cartitem.CartItemDeleteVm;
 import com.lexuancong.cart.viewmodel.cartitem.CartItemGetVm;
 import com.lexuancong.cart.viewmodel.cartitem.CartItemPostVm;
 import com.lexuancong.cart.viewmodel.cartitem.CartItemPutVm;
+import com.lexuancong.cart.viewmodel.productoption.ProductOptionValueGetVm;
 import com.lexuancong.share.exception.BadRequestException;
 import com.lexuancong.share.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
@@ -85,6 +86,15 @@ public class CartItemService {
     public List<CartItemGetVm> getCartItems(){
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         List<CartItem> cartItems = cartItemRepository.findByCustomerIdOrderByCreatedAtDesc(customerId);
+        List<Long> productIds = cartItems.stream()
+                .map(CartItem::getProductId)
+                .toList();
+
+        // fetch tới lấy options-value
+        List<ProductOptionValueGetVm> productOptionValueGetVms =
+                this.productService.getProductOptionValueBySpecificProductIds(productIds);
+
+
         return cartItemMapper.toCartItemGetVmList(cartItems);
 
     }

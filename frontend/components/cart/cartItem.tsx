@@ -47,7 +47,7 @@ const CartItem: FC<CartItemProps> = ({
                 <div className="h-100 me-3">
                     <Link href={`/redirect?productId=${item.productId}`}>
                         <img
-                            src={item.imageUrl}
+                            src={item.avatarUrl}
                             alt={item.productName}
                             style={{width: '80px', height: '80px', objectFit: 'cover'}}
                         />

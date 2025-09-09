@@ -14,4 +14,6 @@ public interface SpecificProductVariantRepository extends JpaRepository<Specific
     List<SpecificProductVariant> findAllByProduct(Product product);
 
     List<SpecificProductVariant> findAllByProduct_Parent(Product productParent);
+
+    List<SpecificProductVariant> findAllByProductIn(Collection<Product> products);
 }
