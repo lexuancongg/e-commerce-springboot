@@ -1,12 +1,14 @@
 'use client'
-import React, { ChangeEvent, useCallback, useState } from "react";
+import React, {ChangeEvent, useCallback, useEffect, useState} from "react";
 import ConfirmationDialog from "@/components/dialog/confirmDialog";
 import { CartItemDetailVm } from "@/models/cart/CartItemDetailVm";
 import Link from "next/link";
+import cartService from "@/services/cart/cartService";
+import {CartItemPutVm} from "@/models/cart/CartItemPutVm";
 
 
 
-const demo: CartItemDetailVm[] = [
+const cartItemsDemo: CartItemDetailVm[] = [
     {
         productId: 1,
         quantity: 1,
@@ -28,20 +30,38 @@ const demo: CartItemDetailVm[] = [
 ];
 
 const Cart = () => {
-    const [cartItems, setCartItems] = useState<CartItemDetailVm[]>(demo);
+    const [cartItems, setCartItems] = useState<CartItemDetailVm[]>([]);
     const [selectedProductIds, setSelectedProductIds] = useState<Set<number>>(new Set());
     const [isShowModelConfirmDelete, setIsShowModelConfirmDelete] = useState(false);
     const [productIdToRemove, setProductIdToRemove] = useState<number>(0);
     const [loadingItems, setLoadingItems] = useState<Set<number>>(new Set());
 
+    useEffect(() => {
+       loadCartItems();
+    }, []);
+
+    const loadCartItems = ()=>{
+        cartService.getCartItems()
+            .then((res)=>{
+                setCartItems(cartItemsDemo)
+            })
+            .catch((error)=>{
+                console.log(error.message)
+            })
+    }
+
+
+
+
     const handleSelectAllCartItemsChange = (event: ChangeEvent<HTMLInputElement>) => {
-        if (event.target.checked) {
+        if (selectedProductIds.size != cartItems.length) {
             const allProductIds: number[] = cartItems.map(cartItem => cartItem.productId);
             setSelectedProductIds(new Set(allProductIds));
             return;
         }
         setSelectedProductIds(new Set());
     };
+
 
     const handleSelectCartItemChange = (productId: number) => {
         setSelectedProductIds((prevSelectedProductIds) => {
@@ -55,13 +75,39 @@ const Cart = () => {
         });
     };
 
+
+
+    const  handleUpdateCartItemQuantity = async (productId : number, newQuantity: number)=>{
+        setLoadingItems((prevLoadingItems)=> {
+            const  loadingItemsNew  = new Set<number>(prevLoadingItems);
+            loadingItemsNew.add(productId)
+            return loadingItemsNew;
+        })
+        try {
+            const cartItemPutVm : CartItemPutVm = {
+                quantity : newQuantity
+            }
+           await  cartService.updateCartItemAboutQuantity(productId,cartItemPutVm)
+            loadCartItems();
+        }catch (error){
+
+        }finally {
+            setLoadingItems((prevLoadingItems)=>{
+               const  newLoadingItems = new Set(prevLoadingItems);
+               newLoadingItems.delete(productId);
+               return newLoadingItems;
+            })
+
+        }
+    }
+
     const handleIncreaseQuantity = async (productId: number) => {
         const cartItem = cartItems.find((item) => item.productId === productId);
         if (!cartItem) return;
         const newQuantity = cartItem.quantity + 1;
-        setCartItems(cartItems.map(item =>
-            item.productId === productId ? { ...item, quantity: newQuantity } : item
-        ));
+        await handleUpdateCartItemQuantity(productId, newQuantity);
+
+
     };
 
     const handleDecreaseQuantity = async (productId: number) => {
@@ -71,9 +117,7 @@ const Cart = () => {
         if (newQuantity < 1) {
             handleShowModelConfirmDelete(productId);
         } else {
-            setCartItems(cartItems.map(item =>
-                item.productId === productId ? { ...item, quantity: newQuantity } : item
-            ));
+            await handleUpdateCartItemQuantity(productId,newQuantity);
         }
     };
 
@@ -82,41 +126,18 @@ const Cart = () => {
         setIsShowModelConfirmDelete(true);
     };
 
-    const handleCartItemQuantityOnBlur = async (
-        productId: number,
-        event: React.FocusEvent<HTMLInputElement>
-    ) => {
-        const newQuantity = parseInt(event.target.value.trim(), 10);
-        if (isNaN(newQuantity) || newQuantity <= 0) return;
-        const cartItem = cartItems.find((item) => item.productId === productId);
-        if (!cartItem || newQuantity === cartItem.quantity) return;
-        setCartItems(cartItems.map(item =>
-            item.productId === productId ? { ...item, quantity: newQuantity } : item
-        ));
-    };
 
-    const handleCartItemQuantityKeyDown = (
-        productId: number,
-        event: React.KeyboardEvent<HTMLInputElement>
-    ) => {
-        const allowedKeys: string[] = ['Backspace', 'ArrowLeft', 'ArrowRight', 'Delete', 'Tab', 'Enter'];
-        const regExpNumber = /^\d$/;
-        if (!allowedKeys.includes(event.key) && !regExpNumber.test(event.key)) {
-            event.preventDefault();
-            return;
-        }
-        if (event.key === 'Enter') {
-            const newQuantity = parseInt(event.currentTarget.value.trim(), 10);
-            if (isNaN(newQuantity) || newQuantity <= 0) {
-                event.preventDefault();
-                return;
-            }
-        }
-    };
 
-    const handleDeleteCartItem = () => {
-        setCartItems(cartItems.filter(item => item.productId !== productIdToRemove));
+
+
+    const handleDeleteCartItem = async () => {
+        try {
+            await  cartService.deleteCartItem(productIdToRemove);
+        }catch (error){
+
+        }
         setIsShowModelConfirmDelete(false);
+        setProductIdToRemove(0);
     };
 
     const totalSelectedPrice = cartItems
@@ -192,9 +213,7 @@ const Cart = () => {
                                             </button>
                                             <input
                                                 type="number"
-                                                defaultValue={item.quantity}
-                                                onBlur={(e) => handleCartItemQuantityOnBlur(item.productId, e)}
-                                                onKeyDown={(e) => handleCartItemQuantityKeyDown(item.productId, e)}
+                                                value={item.quantity}
                                                 disabled={loadingItems.has(item.productId)}
                                                 className="w-12 text-center border-t border-b border-gray-300 focus:outline-none bg-white"
                                             />
