@@ -14,7 +14,7 @@ public record CartItemDetailVm(
         String slug,
         String avatarUrl,
         BigDecimal price,
-        List<ProductOptionValueVm> productOptions
+        List<ProductOptionValueVm> productOptionValue
 
 ) {
 }

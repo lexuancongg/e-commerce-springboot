@@ -33,7 +33,7 @@ public class ProductService {
     }
 
 
-    private List<ProductPreviewVm> getProductListByIds(List<Long> ids){
+    public List<ProductPreviewVm> getProductListByIds(List<Long> ids){
         final URI requestUrl = UriComponentsBuilder.fromHttpUrl(this.serviceUrlConfig.product())
                 .path("/customer/")
                 .queryParam("productIds", ids)

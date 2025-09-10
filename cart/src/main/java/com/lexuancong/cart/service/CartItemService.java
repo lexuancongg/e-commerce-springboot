@@ -5,11 +5,10 @@ import com.lexuancong.cart.mapper.CartItemMapper;
 import com.lexuancong.cart.model.CartItem;
 import com.lexuancong.cart.repository.CartItemRepository;
 import com.lexuancong.cart.service.internal.ProductService;
-import com.lexuancong.cart.viewmodel.cartitem.CartItemDeleteVm;
-import com.lexuancong.cart.viewmodel.cartitem.CartItemGetVm;
-import com.lexuancong.cart.viewmodel.cartitem.CartItemPostVm;
-import com.lexuancong.cart.viewmodel.cartitem.CartItemPutVm;
+import com.lexuancong.cart.viewmodel.cartitem.*;
+import com.lexuancong.cart.viewmodel.product.ProductPreviewVm;
 import com.lexuancong.cart.viewmodel.productoption.ProductOptionValueGetVm;
+import com.lexuancong.cart.viewmodel.productoption.ProductOptionValueVm;
 import com.lexuancong.share.exception.BadRequestException;
 import com.lexuancong.share.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
@@ -83,19 +82,56 @@ public class CartItemService {
 
 
     // api get cartItem
-    public List<CartItemGetVm> getCartItems(){
+    public List<CartItemDetailVm> getCartItems(){
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         List<CartItem> cartItems = cartItemRepository.findByCustomerIdOrderByCreatedAtDesc(customerId);
+        Map<Long , CartItem> mapCartItemByProductId = cartItems.stream()
+                .collect(Collectors.toMap(CartItem::getProductId, Function.identity()));
         List<Long> productIds = cartItems.stream()
                 .map(CartItem::getProductId)
                 .toList();
+        List<ProductPreviewVm> productIncartItems = this.productService.getProductListByIds(productIds);
+        Map<Long, ProductPreviewVm>  mapProductPreviewByProductId =  productIncartItems.stream()
+                .collect(Collectors.toMap(ProductPreviewVm::id, Function.identity()));
 
         // fetch tới lấy options-value
         List<ProductOptionValueGetVm> productOptionValueGetVms =
                 this.productService.getProductOptionValueBySpecificProductIds(productIds);
 
+        Map<Long ,CartItemDetailVm> mapCartItemDetailByProductId = new HashMap<>();
+        for (ProductOptionValueGetVm productOptionValueGetVm : productOptionValueGetVms) {
+            if(!mapCartItemDetailByProductId.containsKey(productOptionValueGetVm.productId())){
+                mapCartItemDetailByProductId.put(
+                        productOptionValueGetVm.productOptionId(),
+                        new CartItemDetailVm(
+                                productOptionValueGetVm.productId(),
+                                mapCartItemByProductId.get(productOptionValueGetVm.productId())
+                                        .getQuantity(),
+                                productOptionValueGetVm.productName(),
+                                mapProductPreviewByProductId.get(productOptionValueGetVm.productId())
+                                        .slug(),
+                                mapProductPreviewByProductId.get(productOptionValueGetVm.productId())
+                                        .avatarUrl(),
+                                mapProductPreviewByProductId.get(productOptionValueGetVm.productId())
+                                        .price(),
+                                new ArrayList<>()
 
-        return cartItemMapper.toCartItemGetVmList(cartItems);
+                        )
+
+                        );
+                continue;
+            }
+            CartItemDetailVm cartItemDetailVm = mapCartItemDetailByProductId.get(productOptionValueGetVm.productId());
+            cartItemDetailVm.productOptionValue().add(
+                    new ProductOptionValueVm(
+                            productOptionValueGetVm.id(),
+                            productOptionValueGetVm.productOptionName(),
+                            productOptionValueGetVm.value()
+                    )
+            );
+        }
+
+        return new ArrayList<>(mapCartItemDetailByProductId.values());
 
     }
 
