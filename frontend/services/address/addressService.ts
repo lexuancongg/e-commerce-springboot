@@ -3,13 +3,18 @@ import {AddressDetailVm} from "@/models/address/AddressDetailVm";
 import {address_demo_data} from "@/demo_data/address/address_demo_data";
 
 class AddressService {
-    private baseUrl: string = '/address/'
+    private baseUrl:string
+    constructor() {
+        this.baseUrl = "/api/address/customer"
+    }
 
 
 
     public async getCountries(){
-        const response = await apiClient.get('/url');
-        if(response.ok) return await response.json();
+        const response = await apiClient.get(`${this.baseUrl}`);
+        if(response.ok){
+            return await response.json();
+        }
         throw response;
     }
 

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 
-@RequestMapping("/api/customer")
 @RestController
 @RequiredArgsConstructor
 public class UserAddressController {
@@ -45,8 +44,8 @@ public class UserAddressController {
 
     // get danh sach address
     @GetMapping("/customer/addresses")
-    public ResponseEntity<List<AddressDetailVm>> getDetailAddresses(){
-        return ResponseEntity.ok(this.userAddressService.getDetailAddresses());
+    public ResponseEntity<List<AddressDetailVm>> getUserAddressDetail(){
+        return ResponseEntity.ok(this.userAddressService.getUserAddressDetail());
 
 
     }

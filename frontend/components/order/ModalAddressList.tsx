@@ -10,6 +10,39 @@ type Props = {
     handleSelectAddress: (address: AddressDetailVm) => void,
     currentAddressId?: number
 }
+
+
+const addressDemo : AddressDetailVm[] = [
+    {
+        id: 1,
+        contactName: "Nguyễn Văn A",
+        phoneNumber: "0987654321",
+        specificAddress: "123 Đường ABC",
+        districtId: 10,
+        districtName: "Quận Ba Đình",
+        provinceId: 1,
+        provinceName: "Hà Nội",
+        countryId: 84,
+        countryName: "Việt Nam",
+        isActive: true
+    },
+    {
+        id: 2,
+        contactName: "Le xuan cong",
+        phoneNumber: "0987654321",
+        specificAddress: "123 Đường ABC",
+        districtId: 10,
+        districtName: "Quận Ba Đình",
+        provinceId: 1,
+        provinceName: "Hà Nội",
+        countryId: 84,
+        countryName: "Việt Nam",
+        isActive: false
+    },
+];
+
+
+
 const ModalAddressList: FC<Props> = (
     {
         handleCloseModel,
@@ -18,12 +51,16 @@ const ModalAddressList: FC<Props> = (
         currentAddressId
     }
 ) => {
+
     const [addresses, setAddresses] = useState<AddressDetailVm[]>([])
     useEffect(() => {
         if (!isShow) return;
-        userAddressService.getDetailAddresses()
+        userAddressService.getUserAddressDetail()
             .then((responseAddressDetailVm) => {
                 setAddresses(responseAddressDetailVm)
+            })
+            .catch(error =>{
+                setAddresses(addressDemo)
             })
 
     }, [isShow]);

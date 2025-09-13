@@ -7,19 +7,21 @@ import {checkoutData} from "@/demo_data/order/checkout_demo_data";
 class OrderService {
     private baseUrl : string;
     constructor() {
-        this.baseUrl = '/orders'
+        this.baseUrl = `/api/orders/customer/checkouts/`
     }
 
     public  async getMyOrder(orderStatus : OrderStatus | null = null) :Promise<OrderVm[]>{
         const response = await apiClient.get(`${this.baseUrl}/my-orders?orderStatus=${orderStatus}`)
-        // nếu status response trả về chạy tu 200 đến 299 thì ok() trả về true
         if(response.ok) return  await response.json();  // json() method của đối tượng response để chuyển đổi thuộc tính body trả ve
         throw  response;
     }
-    public async getCheckoutById(checkout:number):Promise<CheckoutVm>{
-        const response = await apiClient.get(`${this.baseUrl}/customer/`);
-        if(response.ok) return await response.json();
-        return checkoutData;
+
+
+    public async getCheckoutById(checkoutId:number):Promise<CheckoutVm>{
+        const response = await apiClient.get(`${this.baseUrl}/${checkoutId}}`);
+        if(response.ok) {
+            return await response.json();
+        }
         throw response;
     }
 

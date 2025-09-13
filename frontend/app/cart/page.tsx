@@ -46,6 +46,7 @@ const Cart = () => {
                 setCartItems(cartItemsDemo)
             })
             .catch((error)=>{
+                setCartItems(cartItemsDemo)
                 console.log(error.message)
             })
     }

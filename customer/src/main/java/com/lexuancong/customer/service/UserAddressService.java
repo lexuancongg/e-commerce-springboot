@@ -73,7 +73,7 @@ public class UserAddressService {
 
 
     // get ds addresss
-    public List<AddressDetailVm> getDetailAddresses(){
+    public List<AddressDetailVm> getUserAddressDetail(){
         String userId = AuthenticationUtils.extractCustomerIdFromJwt();
         List<UserAddress> userAddresses = this.userAddressRepository.findAllByUserId(userId);
         List<Long> addressIds = userAddresses.stream().map(UserAddress::getAddressId).toList();

@@ -7,10 +7,10 @@ export type AddressDetailVm = {
     provinceId: number,
     countryId:number,
     // sau này có thể đưa về thêm tên
-    districtName ?: string,
-    provinceName?: string,
-    countryName?: string,
+    districtName : string,
+    provinceName: string,
+    countryName: string,
 
-    isActive?: boolean;
+    isActive: boolean;
 
 }

@@ -6,18 +6,14 @@ import paymentProviderService from "@/services/payment/PaymentProviderService";
 
 type Props = {
     checkoutItems: CheckoutItemVm[],
-    isPaymentEnabled: boolean
 }
-const CheckOutDetail: FC<Props> = ({checkoutItems, isPaymentEnabled}) => {
+const CheckOutDetail: FC<Props> = ({checkoutItems}) => {
     const [totalPrice, setTotalPrice] = useState(0);
-    // danh sách các payment hệ thống tích hợp
     const [paymentProviders, setPaymentProviders] = useState<PaymentProvider[]>([]);
-    // xem checkout có được thông qua chưa ví dụ nếu chưa có địa chỉ nhận hàng thi chặn lại k cho thanh toán
     const [isCheckoutEnabled, setIsCheckoutEnabled] = useState(false);
     const [selectedPaymentType, setSelectedPaymentType] = useState<string>();
     const [selectedPaymentProviderId, setSelectedPaymentProviderId] = useState<number>();
     useEffect(() => {
-        // get payment provider ra cho người dùng chọn
         paymentProviderService.getPaymentProviderEnable()
             .then((responsePaymentProviders) => {
                 setPaymentProviders(responsePaymentProviders)

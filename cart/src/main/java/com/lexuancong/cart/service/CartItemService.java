@@ -90,8 +90,8 @@ public class CartItemService {
         List<Long> productIds = cartItems.stream()
                 .map(CartItem::getProductId)
                 .toList();
-        List<ProductPreviewVm> productIncartItems = this.productService.getProductListByIds(productIds);
-        Map<Long, ProductPreviewVm>  mapProductPreviewByProductId =  productIncartItems.stream()
+        List<ProductPreviewVm> productInCartItems = this.productService.getProductListByIds(productIds);
+        Map<Long, ProductPreviewVm>  mapProductPreviewByProductId =  productInCartItems.stream()
                 .collect(Collectors.toMap(ProductPreviewVm::id, Function.identity()));
 
         // fetch tới lấy options-value

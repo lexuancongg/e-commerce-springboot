@@ -8,7 +8,7 @@ import { CountryVm } from "@/models/address/CountryVm";
 import { ProvinceVm } from "@/models/address/ProvinceVm";
 import { DistrictVm } from "@/models/address/DistrictVm";
 import addressService from "@/services/address/addressService";
-import { useParams, useRouter } from "next/navigation"; // ✅ Dùng đúng cho App Router
+import { useParams, useRouter } from "next/navigation";
 
 
 type Props = { isDisplay:boolean ,
@@ -19,6 +19,19 @@ type Props = { isDisplay:boolean ,
   buttonText?: string,
   setValue: UseFormSetValue<AddressDetailVm>;
 }
+
+
+
+const countriesDemo: CountryVm[] = [
+    { id: 1, name: "Vietnam" },
+    { id: 2, name: "United States" },
+    { id: 3, name: "Japan" },
+    { id: 4, name: "South Korea" },
+    { id: 5, name: "Germany" },
+];
+
+
+
 const AddressForm: FC<Props> = (
   {
     errors,
@@ -32,7 +45,6 @@ const AddressForm: FC<Props> = (
 ) => {
 
 
-  // dành cho update 
   const router = useRouter();
   const params = useParams();
 
@@ -40,12 +52,16 @@ const AddressForm: FC<Props> = (
   const [countries, setCountries] = useState<CountryVm[]>([]);
   const [provinces, setProvinces] = useState<ProvinceVm[]>([]);
   const [districts, setDistricts] = useState<DistrictVm[]>([]);
-  // đầu tiên phải lấy được danh sách countru
+
+
   useEffect(() => {
     addressService.getCountries()
       .then((resCountries) => {
         setCountries(resCountries);
       })
+        .catch((error)=>{
+            setCountries(countriesDemo)
+        })
   }, [])
 
   // trường hợp useForm hiển thị cho edit => phải lấy được district và province tương ứng
@@ -63,10 +79,8 @@ const AddressForm: FC<Props> = (
     }
   }, [id])
 
-  // sự kiện khi thay đổi onchange của countriId => cập nhật lại province
   const onchangeCountry = async (event: React.ChangeEvent<HTMLSelectElement>) => {
     setValue('countryName', event.target.selectedOptions[0].text)
-    // cập nhật lại giá trị provinces 
     const countryId = parseInt(event.target.value);
     addressService.getProvinces(countryId)
       .then((resProvinces) => {
@@ -74,7 +88,6 @@ const AddressForm: FC<Props> = (
       })
   }
 
-  // sự kiện khi thay đổi  province => cập nhật lại district
   const onchangeProvince = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setValue('provinceName', event.target.selectedOptions[0].text)
     const provinceId = parseInt(event.target.value);
