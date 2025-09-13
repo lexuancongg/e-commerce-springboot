@@ -40,15 +40,14 @@ const AddressForm: FC<Props> = (
     addressInit,
     buttonText,
     setValue,
-      isDisplay = true
+    isDisplay = true
   }
 ) => {
 
 
-  const router = useRouter();
   const params = useParams();
-
   const id = params.id; 
+
   const [countries, setCountries] = useState<CountryVm[]>([]);
   const [provinces, setProvinces] = useState<ProvinceVm[]>([]);
   const [districts, setDistricts] = useState<DistrictVm[]>([]);
@@ -67,7 +66,6 @@ const AddressForm: FC<Props> = (
   // trường hợp useForm hiển thị cho edit => phải lấy được district và province tương ứng
   useEffect(() => {
     if (addressInit) {
-      // lấy province theo country
       addressService.getProvinces(addressInit.countryId)
         .then((resProvinces) => {
           setProvinces(resProvinces);
@@ -80,7 +78,6 @@ const AddressForm: FC<Props> = (
   }, [id])
 
   const onchangeCountry = async (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setValue('countryName', event.target.selectedOptions[0].text)
     const countryId = parseInt(event.target.value);
     addressService.getProvinces(countryId)
       .then((resProvinces) => {
@@ -89,7 +86,6 @@ const AddressForm: FC<Props> = (
   }
 
   const onchangeProvince = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setValue('provinceName', event.target.selectedOptions[0].text)
     const provinceId = parseInt(event.target.value);
     addressService.getDistricts(provinceId)
       .then((resDistricts) => {
@@ -112,6 +108,8 @@ const AddressForm: FC<Props> = (
               required: { value: true, message: 'This feild is required' },
             }}
             defaultValue={addressInit?.contactName}
+            error={errors.contactName?.message}
+          
           />
         </div>
         <div className="col-lg-6">
@@ -123,6 +121,7 @@ const AddressForm: FC<Props> = (
               required: { value: true, message: 'This feild is required' },
             }}
             defaultValue={addressInit?.phoneNumber}
+            error={errors.phoneNumber?.message}
           />
         </div>
       </div>
@@ -154,6 +153,7 @@ const AddressForm: FC<Props> = (
               required: { value: true, message: 'Please select state or province' },
               onChange: onchangeProvince,
             }}
+            error={errors.provinceId?.message}
           />
         </div>
       </div>

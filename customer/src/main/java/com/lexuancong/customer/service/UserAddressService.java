@@ -1,13 +1,15 @@
 package com.lexuancong.customer.service;
 
+import com.lexuancong.customer.constants.Constants;
 import com.lexuancong.customer.mapper.UserAddressMapper;
 import com.lexuancong.customer.model.UserAddress;
 import com.lexuancong.customer.repository.UserAddressRepository;
-import com.lexuancong.customer.utils.AuthenticationUtils;
 import com.lexuancong.customer.viewmodel.address.AddressDetailVm;
 import com.lexuancong.customer.viewmodel.address.AddressPostVm;
 import com.lexuancong.customer.viewmodel.address.AddressVm;
 import com.lexuancong.customer.viewmodel.useraddress.UserAddressVm;
+import com.lexuancong.share.exception.NotFoundException;
+import com.lexuancong.share.utils.AuthenticationUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,14 +33,15 @@ public class UserAddressService {
 
 
     public UserAddressVm createUserAddress(AddressPostVm addressPostVm) {
-        String userId = AuthenticationUtils.extractCustomerIdFromJwt();
-        // check xem co address nào chưa để set isactive = true nếu first
+        String userId =AuthenticationUtils.extractCustomerIdFromJwt();
         List<UserAddress> userAddresses = userAddressRepository.findByUserId(userId);
         boolean isFirstAddress = userAddresses.isEmpty();
         // goi api sang service location de them address
         AddressVm addressVmOfAddressSaved = addressService.createAddress(addressPostVm);
         UserAddress userAddress = UserAddress.builder()
-                .userId(userId).addressId(addressVmOfAddressSaved.id()).isActive(isFirstAddress)
+                .userId(userId)
+                .addressId(addressVmOfAddressSaved.id())
+                .isActive(isFirstAddress)
                 .build();
         return userAddressMapper.toVmFromModel(userAddressRepository.save(userAddress),addressVmOfAddressSaved);
     }
@@ -56,7 +59,7 @@ public class UserAddressService {
         String userId = AuthenticationUtils.extractCustomerIdFromJwt();
         Optional<UserAddress> optionalUserAddress = userAddressRepository.findOneByUserIdAndAddressId(userId,id);
         if(optionalUserAddress.isEmpty()){
-            // throw exception
+            throw new NotFoundException(Constants.ErrorKey.ADDRESS_NOT_FOUND);
         }
         userAddressRepository.delete(optionalUserAddress.get());
 
@@ -72,12 +75,12 @@ public class UserAddressService {
     }
 
 
-    // get ds addresss
     public List<AddressDetailVm> getUserAddressDetail(){
         String userId = AuthenticationUtils.extractCustomerIdFromJwt();
         List<UserAddress> userAddresses = this.userAddressRepository.findAllByUserId(userId);
-        List<Long> addressIds = userAddresses.stream().map(UserAddress::getAddressId).toList();
-
+        List<Long> addressIds = userAddresses.stream()
+                .map(UserAddress::getAddressId)
+                .toList();
         List<AddressVm> addressVms = addressService.getAddressesByIds(addressIds);
         List<AddressDetailVm> addressDetailVms = userAddresses.stream()
                 .flatMap(userAddress ->

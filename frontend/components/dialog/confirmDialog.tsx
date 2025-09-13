@@ -6,8 +6,7 @@ type DialogProps = {
     isOpen?: boolean;
     title?: string;
     children: JSX.Element;
-    isShowOk?: boolean ;
-    isShowCancel?: boolean;
+    
     okText?: string;
     cancelText?: string;
     ok: () => void;
@@ -21,8 +20,7 @@ export default function ConfirmationDialog(props: DialogProps) {
         children,
         okText,
         cancelText,
-        isShowOk = true,
-        isShowCancel = true,
+
         ok,
         cancel,
     } = props;
@@ -43,16 +41,12 @@ export default function ConfirmationDialog(props: DialogProps) {
                 </Modal.Header>
                 <Modal.Body>{children}</Modal.Body>
                 <Modal.Footer>
-                    {isShowCancel && (
                         <Button variant="secondary" onClick={handleCancel}>
                             {cancelText}
                         </Button>
-                    )}
-                    {isShowOk && (
                         <Button variant="primary" onClick={handleOk}>
                             {okText}
                         </Button>
-                    )}
                 </Modal.Footer>
             </Modal>
         </>

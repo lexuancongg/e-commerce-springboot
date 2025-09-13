@@ -16,25 +16,27 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserAddressController {
     private final UserAddressService userAddressService;
-    // api add address
+    // CHECKED
     @PostMapping("/customer/user-address")
     public ResponseEntity<UserAddressVm> createUserAddress(@RequestBody @Valid AddressPostVm addressPostVm){
         return ResponseEntity.ok(userAddressService.createUserAddress(addressPostVm));
 
     }
-    // api get  address default
+   // CHECKED
     @GetMapping("/customer/user-address/default")
     public ResponseEntity<AddressDetailVm>  getDefaultAddress(){
         return ResponseEntity.ok(userAddressService.getDefaultAddress());
     }
 
-    // delete address
+    // CHECKED
     @DeleteMapping("/customer/user-address/{id}")
     public ResponseEntity<Void> deleteAddress(@PathVariable Long id){
         userAddressService.deleteAddress(id);
         return ResponseEntity.noContent().build();
     }
 
+
+    // CHECKED
     @PutMapping("/customer/user-address/{id}")
     public ResponseEntity<Void> chooseDefaultAddress(@PathVariable Long id){
         userAddressService.chooseDefaultAddress(id);
@@ -42,7 +44,8 @@ public class UserAddressController {
     }
 
 
-    // get danh sach address
+    // CHECKED
+    // get danh sach address => cần tối ưu độ phức tạp thuật toán
     @GetMapping("/customer/addresses")
     public ResponseEntity<List<AddressDetailVm>> getUserAddressDetail(){
         return ResponseEntity.ok(this.userAddressService.getUserAddressDetail());

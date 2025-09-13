@@ -61,7 +61,6 @@ const RecommentProduct = () => {
         productService.getProductBestSeller()
             .then((res)=>{
                 setProducts(productsDemo)
-                // setProducts(res);
             })
             .catch((error)=>{
                 console.log(error.message)

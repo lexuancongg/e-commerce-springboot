@@ -6,7 +6,6 @@ export type AddressDetailVm = {
     districtId: number,
     provinceId: number,
     countryId:number,
-    // sau này có thể đưa về thêm tên
     districtName : string,
     provinceName: string,
     countryName: string,

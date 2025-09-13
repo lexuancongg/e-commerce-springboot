@@ -35,6 +35,9 @@ const categoriesDemo : CategoryVm[] = [
     }
 ]
 
+
+
+// PASS
 const Category: NextPage = () => {
 
     const [current, setCurrent] = useState(0);
@@ -57,8 +60,8 @@ const Category: NextPage = () => {
     }
     useEffect(() => {
         categoryService.getCategories()
-            .then((responseCategoriesVms) => {
-                setCategories(responseCategoriesVms);
+            .then((resCategories) => {
+                setCategories(resCategories);
             })
             .catch((error) =>{
                 setCategories(categoriesDemo)

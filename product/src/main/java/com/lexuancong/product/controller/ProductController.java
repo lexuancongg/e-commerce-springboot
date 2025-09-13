@@ -36,7 +36,7 @@ public class ProductController {
 
     }
 
-    // ds nổi bật => đã check
+    // ds nổi bật => CHECKED
     @GetMapping("/customer/products/featured")
     public ResponseEntity<ProductPreviewPagingVm> getFeaturedProductsPaging(
             @RequestParam(value = "pageIndex", defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER) int pageIndex,

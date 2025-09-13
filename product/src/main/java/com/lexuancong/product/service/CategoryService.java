@@ -33,9 +33,6 @@ public class CategoryService {
             if (category.getImageId() != null) {
                 image = new ImageVm(category.getImageId(), imageService.getImageById(category.getImageId()).url());
             }
-            Category parent = category.getParent();
-
-            Long parentId = parent == null ? null : parent.getId();
             CategoryVm categoryVm = CategoryVm.builder()
                     .id(category.getId())
                     .name(category.getName())

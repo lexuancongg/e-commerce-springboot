@@ -8,7 +8,7 @@ import RecommentProduct from "@/components/home/recommentProducts";
 export default function Home(){
 
     return (
-        <div className="homepage ">
+        <div className="homepage">
             <MainBanner></MainBanner>
             <Category></Category>
             <FeaturedProduct></FeaturedProduct>

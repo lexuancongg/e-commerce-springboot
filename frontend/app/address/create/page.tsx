@@ -2,51 +2,57 @@
 import AddressForm from "@/components/address/addressForm";
 import ProfileLayoutComponent from "@/components/common/profileLayout";
 import { AddressDetailVm } from "@/models/address/AddressDetailVm";
-import { NavigationPathModel } from "@/models/Navigation/NavigationPathModel";
 import { useForm } from "react-hook-form";
-import {AddressPostVm} from "@/models/address/AddressPostVm";
+import { AddressPostVm } from "@/models/address/AddressPostVm";
 import customerAddressService from "@/services/customer/userAddressService";
-import {router} from "next/client";
+import { router } from "next/client";
 
 
-export default function CreateAddress (){
+export default function CreateAddress() {
     // Partial : biến các thuộc tính của T thành opational
-    const onSubmit = (data:AddressDetailVm  , event: any)=>{
+    const onSubmit = (data: AddressDetailVm, event: any) => {
         const {
-            countryName,
             specificAddress,
             countryId,
-            districtName,
             districtId,
-            isActive,
             phoneNumber,
             provinceId,
-            provinceName,
-            id,
             contactName
         } = data;
-        const addressPostVm  : AddressPostVm = {
-            contactName:contactName!,
-            countryId:countryId,
+
+        
+        const addressPostVm: AddressPostVm = {
+            contactName: contactName!,
+            countryId: countryId,
             specificAddress,
             districtId: districtId,
             phoneNumber,
-            provinceId:provinceId
+            provinceId: provinceId
         }
-        customerAddressService.createCustomerAddress(addressPostVm)
-            .then((response)=>{
+
+
+        customerAddressService.createUserAddress(addressPostVm)
+            .then((response) => {
                 router.push('/address')
 
-            }).catch(error=>console.log(error))
+            }).catch(error => console.log(error))
 
 
     }
 
-    const {register,handleSubmit,formState: {errors},setValue} = useForm<AddressDetailVm>();
-    
+    const { register, handleSubmit, formState: { errors }, setValue } = useForm<AddressDetailVm>();
+
     return (
         <ProfileLayoutComponent menuActive="address" >
-            <AddressForm  setValue={setValue} register={register} handleSubmit={handleSubmit(onSubmit)} buttonText="create" errors={errors}  ></AddressForm>
+            <AddressForm
+                setValue={setValue}
+                register={register}
+                handleSubmit={handleSubmit(onSubmit)}
+                buttonText="create"
+                errors={errors}
+                isDisplay={true}
+                >
+            </AddressForm>
         </ProfileLayoutComponent>
     )
 }

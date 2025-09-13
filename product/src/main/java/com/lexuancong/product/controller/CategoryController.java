@@ -9,9 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.security.Principal;
 import java.util.List;
-@RequestMapping("/api/product")
 @RestController
 public class CategoryController {
     private final CategoryService categoryService;
@@ -20,7 +18,7 @@ public class CategoryController {
     }
 
 
-    // đã check
+    // CHECKED
     @GetMapping({"/management/categories","/customer/categories"})
     public ResponseEntity<List<CategoryVm>> getCategories(
             @RequestParam(required = false , defaultValue = "") String categoryName

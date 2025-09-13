@@ -11,14 +11,18 @@ class UserAddressService {
     }
     public async deleteUserAddress(addressId: number) {
         const response = await apiClient.delete(`${this.baseUrl}/${addressId}`);
-        if(response.ok) return await response.json();
+        if(response.ok) {
+            return await response.json();
+        }
         throw response;
 
 
     }
-    public async createCustomerAddress(addressPostVm : AddressPostVm):Promise<UserAddressVm>{
-        const response  = await apiClient.post(`${this.baseUrl}/..`,JSON.stringify(addressPostVm));
-        if(response.ok) return await response.json();
+    public async createUserAddress(addressPostVm : AddressPostVm):Promise<UserAddressVm>{
+        const response  = await apiClient.post(`${this.baseUrl}`,JSON.stringify(addressPostVm));
+        if(response.ok) {
+            return await response.json();
+        }
         throw response;
 
     }
@@ -37,6 +41,14 @@ class UserAddressService {
             return await  response.json();
         }
         throw response;
+    }
+
+    public async chooseDefaultAddress(addressId: number){
+        const response  = await  apiClient.put(`${this.baseUrl}/${addressId}`);
+        if(response.ok){
+            return await response.json();
+        }
+        throw  response;
     }
 
 

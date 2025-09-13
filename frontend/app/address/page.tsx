@@ -8,35 +8,83 @@ import ConfirmationDialog from "@/components/dialog/confirmDialog";
 import userAddressService from "@/services/customer/userAddressService";
 
 
+const addressDemo : AddressDetailVm[] = [
+    {
+        id: 1,
+        contactName: "Nguyễn Văn A",
+        phoneNumber: "0987654321",
+        specificAddress: "123 Đường ABC",
+        districtId: 10,
+        districtName: "Quận Ba Đình",
+        provinceId: 1,
+        provinceName: "Hà Nội",
+        countryId: 84,
+        countryName: "Việt Nam",
+        isActive: true
+    },
+    {
+        id: 2,
+        contactName: "Le xuan cong",
+        phoneNumber: "0987654321",
+        specificAddress: "123 Đường ABC",
+        districtId: 10,
+        districtName: "Quận Ba Đình",
+        provinceId: 1,
+        provinceName: "Hà Nội",
+        countryId: 84,
+        countryName: "Việt Nam",
+        isActive: false
+    },
+     {
+        id: 3,
+        contactName: "Le xuan cong",
+        phoneNumber: "0987654321",
+        specificAddress: "123 Đường ABC",
+        districtId: 10,
+        districtName: "Quận Ba Đình",
+        provinceId: 1,
+        provinceName: "Hà Nội",
+        countryId: 84,
+        countryName: "Việt Nam",
+        isActive: false
+    },
+];
 
 
 const MyAddress = (): JSX.Element => {
-
-    const [addresses, setAddresses] = useState<AddressDetailVm[]>([]);
-    // show
+    const [addresses, setAddresses] = useState<AddressDetailVm[]>(addressDemo);
     const [isShowModelDelete, setIsShowModelDelete] = useState<boolean>(false);
     const [isShowModeConfirmChooseAddressDefaul, setIsShowModelConfirmChooseAddressDefault] = useState<boolean>(false);
-    const [currentDefaultAddressId, setCurrentDefaultAddressId] = useState<number>(0);
     const [addressWantDeleteId, setAddressWantDeleteId] = useState<number>(0);
     const [addressWantDefaultId, setAddressWantDefaultId] = useState<number>(0);
 
 
     useEffect(() => {
-        userAddressService.getDetailAddresses()
-            .then( responseDetailAddresses => {
-                setAddresses(responseDetailAddresses);
-                setCurrentDefaultAddressId(responseDetailAddresses.find((address) => address.isActive)?.id ?? 0)
+        
+        userAddressService.getUserAddressDetail()
+            .then( resAddressDetail => {
+                setAddresses(resAddressDetail);
+            })
+            .catch((error)=>{
+                
+                
             })
 
     }, []);
 
+
+
+
     // đồng ý xóa địa chỉ
     const handleAgreeDeleteAddressFromModel = () => {
-        // gọi api
         if (addressWantDeleteId == 0) return;
         userAddressService.deleteUserAddress(addressWantDeleteId)
             .then(() => {
                 setIsShowModelDelete(false);
+                
+            })
+            .catch((error)=>{
+                setIsShowModelDelete(false)
             })
 
     }
@@ -51,11 +99,20 @@ const MyAddress = (): JSX.Element => {
 
     // đồng ý địa chỉ mặc đingj
     const handleAgreeAddressDefaultFromModel = () => {
+        userAddressService.chooseDefaultAddress(addressWantDefaultId)
+        .then((res)=>{
+            
+        })
+        .catch((error)=>{
+            console.log(error)
+        })
+
 
 
     }
     // hủy thay đổi địa chỉ mặc định
     const handleCancelAddressDefaultFromModel = () => {
+        setIsShowModelConfirmChooseAddressDefault(false);
 
     }
 
@@ -102,7 +159,9 @@ const MyAddress = (): JSX.Element => {
                 </div>
 
             </ProfileLayoutComponent>
-            {/* model thông báo xác nhận xóa địa chỉ   */}
+
+
+
             <ConfirmationDialog
                 isOpen={isShowModelDelete}
                 cancel={handleCancelDeleteAddressFromModel}
@@ -113,7 +172,6 @@ const MyAddress = (): JSX.Element => {
                 <p>do you want to delete this address</p>
             </ConfirmationDialog>
 
-            {/* model xác nhận thay đổi địa chỉ mặc định */}
             <ConfirmationDialog
                 isOpen={isShowModeConfirmChooseAddressDefaul}
                 cancel={handleCancelAddressDefaultFromModel}

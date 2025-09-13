@@ -614,7 +614,7 @@ public class ProductService {
 
 
     public ProductPreviewPagingVm getFeaturedProductsPaging(int pageIndex, int pageSize) {
-        // interface phn trang và sx khi truy vấn db
+
         Pageable pageable = PageRequest.of(pageIndex, pageSize);
         Page<Product> productPage = this.productRepository.findAllByFeatureIsTrueAndShownSeparatelyIsTrueAndPublicIsTrueOrderByIdAsc(pageable);
         List<Product> productsContent = productPage.getContent();

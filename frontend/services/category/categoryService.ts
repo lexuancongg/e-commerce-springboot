@@ -2,10 +2,15 @@ import {CategoryVm} from "@/models/category/CategoryVm";
 import apiClient from "@/utils/api/apiClient";
 
 class CategoryService{
+    private baseUrl ;
+    constructor(){
+        this.baseUrl = "/api/product/customer/categories"
+    }
 
 
     public async getCategories():Promise<CategoryVm[]>{
-        const response = await apiClient.get(`api/product/customer/categories`);
+        const response = await apiClient.get(`${this.baseUrl}`);
+
         if(response.ok){
             return await response.json();
         }

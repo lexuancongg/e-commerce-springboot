@@ -3,7 +3,6 @@ import Link from "next/link";
 import {FC} from "react";
 import {FaTrash} from "react-icons/fa";
 import {FiEdit} from "react-icons/fi";
-import {HiCheckCircle} from "react-icons/hi";
 import {TiContacts} from "react-icons/ti";
 import {MdRadioButtonChecked} from "react-icons/md";
 
