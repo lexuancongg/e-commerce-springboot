@@ -22,6 +22,7 @@ public class Checkout extends AuditEntity {
     private Long id;
     // sau này gởi toong báo về email
     private String email;
+    private  String note;
 
 
     @Builder.Default

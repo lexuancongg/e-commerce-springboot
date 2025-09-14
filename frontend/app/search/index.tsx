@@ -8,6 +8,7 @@ import searchService from "@/services/search/SearchService";
 import {NavigationPathModel} from "@/models/Navigation/NavigationPathModel";
 
 
+
 const SearchPage = ()=>{
     const [searchParams , setSearchParams] = useState<SearchParam>({
         keyword:''

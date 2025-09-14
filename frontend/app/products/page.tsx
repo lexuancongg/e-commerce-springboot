@@ -9,102 +9,116 @@ import {CategoryVm} from "@/models/category/CategoryVm";
 import categoryService from "@/services/category/categoryService";
 import * as querystring from "node:querystring";
 import productService from "@/services/product/productService";
+import FilterProduct from "@/components/product/FilterProduct";
 
 
 const CATEGORY_SLUG = 'categorySlug';
 
-const productsDemo = [
+
+const productsDemo : ProductPreviewVm[] = [
     {
-        id: "1",
+        id: 1,
         name: "Women T-Shirt",
         price: 19.99,
-        image: "https://preview.colorlib.com/theme/cozastore/images/product-01.jpg",
-        category: "women",
+        avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/product-01.jpg",
+        slug: "women",
     },
     {
-        id: "2",
+        id: 2,
         name: "Men Jacket",
         price: 49.99,
-        image: "https://preview.colorlib.com/theme/cozastore/images/product-02.jpg",
-        category: "men",
+        avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/product-02.jpg",
+        slug: "men",
     },
     {
-        id: "3",
+        id: 3,
         name: "Leather Bag",
         price: 79.99,
-        image: "https://preview.colorlib.com/theme/cozastore/images/product-03.jpg",
-        category: "bag",
+        avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/product-03.jpg",
+        slug: "bag",
     },
     {
-        id: "4",
+        id: 4,
         name: "Running Shoes",
         price: 59.99,
-        image: "https://preview.colorlib.com/theme/cozastore/images/product-04.jpg",
-        category: "shoes",
+        avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/product-04.jpg",
+        slug: "shoes",
     },
     {
-        id: "5",
+        id: 5,
         name: "Running Shoes",
         price: 59.99,
-        image: "https://preview.colorlib.com/theme/cozastore/images/product-05.jpg",
-        category: "shoes",
+        avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/product-05.jpg",
+        slug: "shoes",
     },
     {
-        id: "6",
+        id: 6,
         name: "Running Shoes",
         price: 59.99,
-        image: "https://preview.colorlib.com/theme/cozastore/images/product-06.jpg",
-        category: "shoes",
+        avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/product-06.jpg",
+        slug: "shoes",
     },
 
 ];
 
+
+const categoriesDemo : CategoryVm[] = [
+    {
+        id: 1,
+        name: "Woment",
+        slug: "electronics",
+
+        avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/banner-01.jpg",
+    },
+    {
+        id: 2,
+        name: "Men",
+        slug: "fashion",
+        avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/banner-02.jpg",
+    },
+    {
+        id: 3,
+        name: "Kids",
+        slug: "fashion",
+        avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/banner-03.jpg",
+    },
+    {
+        id: 4,
+        name: "Fashion",
+        slug: "fashion",
+        avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/banner-05.jpg",
+    }
+]
+
 export default function ProductList() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [products, setProducts] = useState<ProductPreviewVm[]>([]);
-    const [totalPage, setTotalPage] = useState<number>(1);
+    const [products, setProducts] = useState<ProductPreviewVm[]>(productsDemo);
+    const [totalPage, setTotalPage] = useState<number>(0);
     const [pageIndex, setPageIndex] = useState<number>(0);
-    const [categories, setCategories] = useState<CategoryVm[]>([]);
+    const [categories, setCategories] = useState<CategoryVm[]>(categoriesDemo);
     const [filters, setFilters] = useState<any>(null);
-    const inputSearchRef = useRef<HTMLInputElement>(null);
-    const inputStartPriceRef = useRef<HTMLInputElement>(null);
-    const inputEndPriceRef = useRef<HTMLInputElement>(null);
     const [categoryIdActive, setCategoryIdActive] = useState<number>(0);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
 
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-    const updateFilter = (key: string, value: string | number) => {
-        // trường hợp push key và value đã có => giá trị không thaydodoiri thì không set lại page
-        const currentValue = searchParams.get(key);
-        if (currentValue && currentValue == value) {
-            return;
-        }
-        pushParamsToRouter(key, value)
-        setPageIndex(0)
-
-    }
-    const pushParamsToRouter = (key: string, value: string | number) => {
-        const params = new URLSearchParams(searchParams.toString())
-        params.set(key, String(value))
-        router.push(`?${params.toString()}`)
-    }
 
     useEffect(() => {
-        // lấy ds category để lọc
         categoryService.getCategories()
             .then((responseCategories) => {
                 let categoryId: number = 0;
-                // check xem trên query url có param nào không
                 if (Array.from(searchParams.entries()).length > 0 && searchParams.get(CATEGORY_SLUG)) {
                     const categorySlugValue: string = searchParams.get(CATEGORY_SLUG) as string;
                     categoryId = responseCategories.find(cate => cate.slug == categorySlugValue)?.id !;
 
-
                 }
-                if (categoryId) setCategoryIdActive(categoryId);
+                if (categoryId)
+                    setCategoryIdActive(categoryId);
                 setCategories(responseCategories);
             })
     }, []);
+
 
 
     useEffect(() => {
@@ -126,7 +140,6 @@ export default function ProductList() {
             return;
         }
 
-        // querystring : thư vện hổ trợ convert từ object sang query teen url
         let predicates = querystring.stringify({...filters, pageIndex: pageIndex});
         productService.getProductByMultiParams(predicates)
             .then(responseProductsPagingVm => {
@@ -137,36 +150,41 @@ export default function ProductList() {
     }, [filters])
 
 
+    const updateFilter = (key: string, value: string | number) => {
+
+        const currentValue = searchParams.get(key);
+        if (currentValue && currentValue == value) {
+            return;
+        }
+        pushParamsToRouter(key, value)
+        setPageIndex(0)
+
+    }
+    const pushParamsToRouter = (key: string, value: string | number) => {
+        const params = new URLSearchParams(searchParams.toString())
+        params.set(key, String(value))
+        router.push(`?${params.toString()}`)
+    }
+
+
+
+
+
+
+
     const changePage = ({selected}: any) => {
         setPageIndex(selected);
         pushParamsToRouter("pageIndex", selected)
     }
 
     const handleDeleteFilter = (event: any) => {
-        setPageIndex(0);
-        setCategoryIdActive(0)
-        router.push('/products')
-        if (inputSearchRef.current) {
-            inputSearchRef.current.value = '';
-        }
-        if (inputStartPriceRef.current) {
-            inputStartPriceRef.current.value = '';
-        }
-        if (inputEndPriceRef.current) {
-            inputEndPriceRef.current.value = '';
-        }
+
 
     }
 
 
 
-    const [activeTab, setActiveTab] = useState("All Products");
 
-
-    const categoriesDemo = ["All Products", "Women", "Men", "Bag", "Shoes", "Watches"];
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
-
-    const [isSearchOpen, setIsSearchOpen] = useState(false);
     return (
         <Container className="mt-16">
             <div className="mb-4">
@@ -176,16 +194,26 @@ export default function ProductList() {
             {/* Tabs */}
             <div className="flex items-center justify-between border-b pb-4 mb-8">
                 <div className="flex space-x-8">
-                    {categoriesDemo.map((cat) => (
+
+                    <button
+                        onClick={() => setCategoryIdActive(0)}
+                        className={`pb-2 border-b-2 transition-all duration-200 ${categoryIdActive === 0
+                            ? 'text-red-800 font-medium border-red-500'
+                            : 'text-gray-500 border-transparent hover:text-black hover:border-gray-300'
+                        }`}
+                    >
+                        ALL
+                    </button>
+                    {categories.map((cat) => (
                         <button
-                            key={cat}
-                            onClick={() => setActiveTab(cat)}
-                            className={`pb-2 border-b-2 transition-all duration-200 ${activeTab === cat
-                                ? 'text-black font-medium border-red-500'
+                            key={cat.id}
+                            onClick={() => setCategoryIdActive(cat.id)}
+                            className={`pb-2 border-b-2 transition-all duration-200 ${categoryIdActive === cat.id
+                                ? 'text-red-800 font-medium border-red-500'
                                 : 'text-gray-500 border-transparent hover:text-black hover:border-gray-300'
                             }`}
                         >
-                            {cat}
+                            {cat.name}
                         </button>
                     ))}
                 </div>
@@ -200,13 +228,14 @@ export default function ProductList() {
                         Filter
                     </button>
                     <button
-                        onClick={()=> setIsSearchOpen(!isSearchOpen)}
+                        onClick={() => setIsSearchOpen(!isSearchOpen)}
                         className="flex items-center border px-4 py-2 rounded hover:bg-gray-100 text-sm">
                         <span className="material-icons mr-1 text-base">search</span>
                         Search
                     </button>
                 </div>
             </div>
+
             <div
                 className={`transition-all duration-300 ease-in-out overflow-hidden ${
                     isSearchOpen ? 'max-h-[100px]' : 'max-h-0'
@@ -226,77 +255,9 @@ export default function ProductList() {
                 </div>
             </div>
 
+
             {/* Filter Panel */}
-            <div
-                className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                    isFilterOpen ? 'max-h-[300px]' : 'max-h-0'
-                }`}
-            >
-                <div className="bg-red-50 p-4 grid grid-cols-4 gap-4">
-                    {/* Sort By */}
-                    <div>
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">Sort By</h4>
-                        <ul className="space-y-1">
-                            <li className="text-sm text-gray-600 hover:text-black">Default</li>
-                            <li className="text-sm text-gray-600 hover:text-black">Popularity</li>
-                            <li className="text-sm text-gray-600 hover:text-black">Average rating</li>
-                            <li className="text-sm text-gray-600 hover:text-black">Newness</li>
-                            <li className="text-sm text-gray-600 hover:text-black">Price: Low to High</li>
-                            <li className="text-sm text-gray-600 hover:text-black">Price: High to Low</li>
-                        </ul>
-                    </div>
-
-                    {/* Price */}
-                    <div>
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">Price</h4>
-                        <ul className="space-y-1">
-                            <li className="text-sm text-gray-600 hover:text-black">All</li>
-                            <li className="text-sm text-gray-600 hover:text-black">$0.00 - $50.00</li>
-                            <li className="text-sm text-gray-600 hover:text-black">$50.00 - $100.00</li>
-                            <li className="text-sm text-gray-600 hover:text-black">$100.00 - $150.00</li>
-                            <li className="text-sm text-gray-600 hover:text-black">$150.00 - $200.00</li>
-                            <li className="text-sm text-gray-600 hover:text-black">$200.00+</li>
-                        </ul>
-                    </div>
-
-                    {/* Color */}
-                    <div>
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">Color</h4>
-                        <ul className="space-y-1">
-                            <li className="flex items-center">
-                                <span className="w-4 h-4 bg-black rounded-full mr-2"></span> Black
-                            </li>
-                            <li className="flex items-center">
-                                <span className="w-4 h-4 bg-blue-500 rounded-full mr-2"></span> Blue
-                            </li>
-                            <li className="flex items-center">
-                                <span className="w-4 h-4 bg-gray-400 rounded-full mr-2"></span> Grey
-                            </li>
-                            <li className="flex items-center">
-                                <span className="w-4 h-4 bg-green-500 rounded-full mr-2"></span> Green
-                            </li>
-                            <li className="flex items-center">
-                                <span className="w-4 h-4 bg-red-500 rounded-full mr-2"></span> Red
-                            </li>
-                            <li className="flex items-center">
-                                <span className="w-4 h-4 bg-white border rounded-full mr-2"></span> White
-                            </li>
-                        </ul>
-                    </div>
-
-                    {/* Tags */}
-                    <div>
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">Tags</h4>
-                        <ul className="space-y-1">
-                            <li className="text-sm text-gray-600 hover:text-black">Fashion</li>
-                            <li className="text-sm text-gray-600 hover:text-black">Lifestyle</li>
-                            <li className="text-sm text-gray-600 hover:text-black">Denim</li>
-                            <li className="text-sm text-gray-600 hover:text-black">Streetstyle</li>
-                            <li className="text-sm text-gray-600 hover:text-black">Crafts</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+            <FilterProduct isShow={isFilterOpen}></FilterProduct>
 
             {/* Products grid */}
             <div className="row isotope-grid gap-y-8 mt-8">
@@ -309,7 +270,7 @@ export default function ProductList() {
                             {/* Ảnh + overlay */}
                             <div className="relative overflow-hidden rounded-md">
                                 <img
-                                    src={product.image}
+                                    src={product.avatarUrl}
                                     alt={product.name}
                                     className="w-full h-auto transition-transform duration-300 group-hover:scale-105"
                                 />
@@ -329,7 +290,7 @@ export default function ProductList() {
                             <div className="mt-3 flex justify-between items-center">
                                 <div>
                                     <a
-                                        href="product-detail.html"
+                                        href=""
                                         className="block text-gray-700 font-medium hover:text-fuchsia-500 transition"
                                     >
                                         {product.name}
