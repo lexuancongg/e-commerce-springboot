@@ -148,8 +148,8 @@ public class ProductController {
 
 
     @GetMapping({"/internal-order/products"})
-    public ResponseEntity<List<ProductCheckoutPreviewVm> > getProductCheckouts(  @RequestParam(name = "ids") List<Long> productIds){
-        return ResponseEntity.ok(this.productService.getProductCheckouts(productService));
+    public ResponseEntity<List<ProductCheckoutPreviewVm> > getProductCheckouts( @RequestParam(name = "ids") List<Long> productIds){
+        return ResponseEntity.ok(this.productService.getProductCheckouts(productIds));
     }
 
 

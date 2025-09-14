@@ -7,14 +7,13 @@ import {product_variant_demo_data} from "@/demo_data/product/variant/product_var
 import {ProductDetailVm} from "@/models/product/productDetailVm";
 import {Product_detail_demo_data} from "@/demo_data/product/product_detail_demo_data";
 import {ProductOptionValueVm} from "@/models/product/options/ProductOptionValueVm";
-import {Product_option_value_demo_data} from "@/demo_data/product/product_options/product_option_value_demo_data";
+import {SpecificProductVariantVm} from "@/models/product/specific_variant/SpecificProductVariantGetVm";
 
 class ProductService {
-    // process.env : biến của nodejs => object toàn cục chứa các biến môi trường
-    private baseUrl:string = `${process.env.API_BASE_URL_PRODUCT}`
+    private baseUrl:string ;
 
     constructor() {
-        console.log("constructor ",this.baseUrl)
+         this.baseUrl = "/api/product/customer/products"
     }
     public async getProductsByIds(ids : number[]):Promise<ProductPreviewVm[]>{
         const response = await apiClient.get(`${this.baseUrl}/customer/products?productIds=${ids}`)
@@ -28,18 +27,10 @@ class ProductService {
 
 
 
-    public async getFeaturedProductsMakeSlide():Promise<ProductPreviewVm[]>{
-        console.log(this.baseUrl)
-        const response = await  apiClient.get(`${this.baseUrl}/customer/products/featured/slide`);
-        if(response.ok) {
-            return  await  response.json();
-        }
-        throw response;
-    }
 
 
     public async  getFeaturedProductsPaging(pageIndex: number):Promise<ProductPreviewPagingVm>{
-        const response = await apiClient.get(`/api/product/customer/products/featured?pageIndex=${pageIndex}`);
+        const response = await apiClient.get(`${this.baseUrl}/featured?pageIndex=${pageIndex}`);
         if(response.ok) {
             return await  response.json();
         }
@@ -58,27 +49,78 @@ class ProductService {
 
 
     public async getProductVariationsByParentId(parentProductId: number) : Promise<ProductVariantVm[]>{
-        const response = await  apiClient.get(`http://localhost:3000/customer/product-variations/${parentProductId}`);
-        if(response.ok) return await response.json();
         return product_variant_demo_data;
+        const response = await  apiClient.get(`${this.baseUrl}/product-variations/${parentProductId}`);
+        if(response.ok) {
+            return  await response.json();
+        }
+
         throw  response;
 
 
     }
     public  async  getDetailProductBySlug(slug: string):Promise<ProductDetailVm>{
-        console.log("method ", this.baseUrl)
-        const response = await apiClient.get(`http://localhost:3000/customer`);
-        if(response.ok) return await response.json();
         return Product_detail_demo_data;
+        const response = await apiClient.get(`${this.baseUrl}/${slug}`);
+        if(response.ok){
+            return await response.json();
+        }
+
         throw  response;
 
     }
 
-    public async getProductOptionValues(parentProductId: number):Promise<ProductOptionValueVm[]>{
-        const response = await apiClient.get(`http://localhost:3000/customer/product-option-combinations/${parentProductId}`)
-        if(response.ok) return await response.json();
-        return Product_option_value_demo_data;
-        throw response;
+    public async getSpecificProductVariantsByProductId(parentProductId: number):Promise<SpecificProductVariantVm[]>{
+        // const response = await apiClient.get(`${this.baseUrl}/specific-product-variants/${parentProductId}`)
+        // if(response.ok) return await response.json();
+        return [
+            {
+                id: 10001,
+                productOptionId: 101,
+                productId: 1001,
+                productOptionName: "Màu sắc",
+                productOptionValue: "Trắng",
+            },
+            {
+                id: 10002,
+                productOptionId: 102,
+                productId: 1001,
+                productOptionName: "Kích thước",
+                productOptionValue: "M",
+            },
+            {
+                id: 10003, // variant: áo trắng size L
+                productOptionId: 101,
+                productId: 1002,
+                productOptionName: "Màu sắc",
+                productOptionValue: "Trắng",
+            },
+            {
+                id: 10004,
+                productOptionId: 102,
+                productId: 1002,
+                productOptionName: "Kích thước",
+                productOptionValue: "L",
+            },
+
+            // Áo thun đen
+            {
+                id: 10005, // variant: áo đen size M
+                productOptionId: 101,
+                productId: 1003,
+                productOptionName: "Màu sắc",
+                productOptionValue: "Đen",
+            },
+            {
+                id: 10006,
+                productOptionId: 102,
+                productId: 1003,
+                productOptionName: "Kích thước",
+                productOptionValue: "M",
+            },
+
+        ];
+        // throw response;
     }
     public async  getProductBestSeller():Promise<ProductPreviewVm[]>{
         return  [];

@@ -13,7 +13,7 @@ type ProductContextType = {
 export const ProductDetailContext = createContext<ProductContextType | null>(null);
 
 export const useProductDetailContext = () => {
-    return useContext(ProductDetailContext)
+    return useContext(ProductDetailContext);
 }
 
 export default function ProductDetailProvider(

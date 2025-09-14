@@ -17,13 +17,15 @@ import java.util.List;
 public class SpecificProductVariantController {
     private final SpecificProductVariantService specificProductVariantService;
 
-    // lấy danh sách để hiển thị options => đã check
+    // lấy thông tin biến thể cụ thể dựa vào sản phẩm cha
     @GetMapping("/customer/specific-product-variants/{productId}")
     public ResponseEntity<List<SpecificProductVariantGetVm>> getSpecificProductVariantsByProductId(@PathVariable Long productId) {
         return ResponseEntity.ok(this.specificProductVariantService.getSpecificProductVariantsByProductId(productId));
     }
 
 
+
+    // lấy option cụ thể tương ứng vs mỗi biến tể
 
     @GetMapping("/customer/specific-product-variants/option-values")
     ResponseEntity< List<ProductOptionValueGetVm>> getProductOptionValuesOfSpecificProductVariants(

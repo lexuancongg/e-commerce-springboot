@@ -4,7 +4,7 @@ export const Product_detail_demo_data : ProductDetailVm =
     {
         id: 1,
         name: "Áo thun unisex basic",
-        brandName: "Coolmate",
+        brandName: "gucchi",
         categories: ["Thời trang", "Áo thun"],
         attributeGroupValues: [
             {
@@ -27,12 +27,13 @@ export const Product_detail_demo_data : ProductDetailVm =
         specifications: "Chất liệu: Cotton | Cân nặng mẫu mặc: 70kg | Size M",
         price: 199000,
         hasOptions: true,
-        avatarUrl: "https://example.com/avatar.jpg",
+        avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/product-01.jpg",
 
         isFeatured: true,
         isPublic: true,
         isOrderEnable: true,
         productImageUrls: [
-            "https://example.com/image1.jpg", "https://example.com/image1.jpg"
+            "https://preview.colorlib.com/theme/cozastore/images/product-01.jpg",
+            "https://preview.colorlib.com/theme/cozastore/images/product-02.jpg"
         ],
     };

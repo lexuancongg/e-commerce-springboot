@@ -26,14 +26,14 @@ public class SpecificProductVariantService {
     public List<SpecificProductVariantGetVm> getSpecificProductVariantsByProductId(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(()-> new NotFoundException(Constants.ErrorKey.PRODUCT_NOT_FOUND,productId));
-        List<SpecificProductVariantGetVm> specificProductVariantGetVms = this.specificProductVariantRepository
+
+        return this.specificProductVariantRepository
                 .findAllByProduct_Parent(product)
                 .stream()
                 .map(SpecificProductVariantGetVm::fromModel)
                 .toList();
-
-        return specificProductVariantGetVms;
     }
+
 
 
     public List<ProductOptionValueGetVm> getProductOptionValuesOfSpecificProductVariants(List<Long> productIds){

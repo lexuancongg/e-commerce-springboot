@@ -10,6 +10,7 @@ import categoryService from "@/services/category/categoryService";
 import * as querystring from "node:querystring";
 import productService from "@/services/product/productService";
 import FilterProduct from "@/components/product/FilterProduct";
+import {SlUser} from "react-icons/sl";
 
 
 const CATEGORY_SLUG = 'categorySlug';
@@ -102,6 +103,7 @@ export default function ProductList() {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const inputSearchRef = useRef<HTMLInputElement>(null);
 
 
     useEffect(() => {
@@ -113,8 +115,9 @@ export default function ProductList() {
                     categoryId = responseCategories.find(cate => cate.slug == categorySlugValue)?.id !;
 
                 }
-                if (categoryId)
+                if (categoryId){
                     setCategoryIdActive(categoryId);
+                }
                 setCategories(responseCategories);
             })
     }, []);
@@ -132,7 +135,6 @@ export default function ProductList() {
 
     }, [searchParams.toString()])
 
-    // khi filter thay đổi thì load lại product
     useEffect(() => {
 
 
@@ -207,7 +209,10 @@ export default function ProductList() {
                     {categories.map((cat) => (
                         <button
                             key={cat.id}
-                            onClick={() => setCategoryIdActive(cat.id)}
+                            onClick={() => {
+                                setCategoryIdActive(cat.id);
+                                updateFilter(CATEGORY_SLUG , cat.slug)
+                            }}
                             className={`pb-2 border-b-2 transition-all duration-200 ${categoryIdActive === cat.id
                                 ? 'text-red-800 font-medium border-red-500'
                                 : 'text-gray-500 border-transparent hover:text-black hover:border-gray-300'
@@ -244,11 +249,15 @@ export default function ProductList() {
                 <div className="bg-gray-50 p-4">
                     <div className="flex items-center">
                         <input
+                            ref={inputSearchRef}
                             type="text"
                             placeholder="Search products..."
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
-                        <button className="ml-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                        <button className="ml-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+                        onClick={()=>{
+                            updateFilter("productName",inputSearchRef.current!.value)
+                        }}>
                             Search
                         </button>
                     </div>
@@ -256,7 +265,6 @@ export default function ProductList() {
             </div>
 
 
-            {/* Filter Panel */}
             <FilterProduct isShow={isFilterOpen}></FilterProduct>
 
             {/* Products grid */}
