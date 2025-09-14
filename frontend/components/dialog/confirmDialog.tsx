@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button';
 import {JSX} from "react";
 
 type DialogProps = {
-    isOpen?: boolean;
+    isShow?: boolean;
     title?: string;
     children: JSX.Element;
     
@@ -15,7 +15,7 @@ type DialogProps = {
 
 export default function ConfirmationDialog(props: DialogProps) {
     const {
-        isOpen,
+        isShow,
         title,
         children,
         okText,
@@ -35,7 +35,7 @@ export default function ConfirmationDialog(props: DialogProps) {
 
     return (
         <>
-            <Modal show={isOpen} onHide={cancel}>
+            <Modal show={isShow} onHide={cancel}>
                 <Modal.Header closeButton>
                     <Modal.Title>{title}</Modal.Title>
                 </Modal.Header>

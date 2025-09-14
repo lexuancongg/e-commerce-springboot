@@ -4,32 +4,50 @@ import { useEffect, useState } from "react";
 import { AddressDetailVm } from "@/models/address/AddressDetailVm";
 import { useForm } from "react-hook-form";
 import addressService from "@/services/address/addressService";
-import ProfileLayoutComponent from "@/components/common/profileLayout";
 import AddressForm from "@/components/address/addressForm";
 import { AddressPostVm } from "@/models/address/AddressPostVm";
+import ProfileLayoutComponent from "@/components/profile/profileLayout";
+import { AddressFormValues } from "@/models/address/AddressFormValues ";
+
+const addressDemo : AddressDetailVm =   {
+        id: 1,
+        contactName: "Nguyễn Văn A",
+        phoneNumber: "0987654321",
+        specificAddress: "123 Đường ABC",
+        districtId: 10,
+        districtName: "Quận Ba Đình",
+        provinceId: 1,
+        provinceName: "Hà Nội",
+        countryId: 84,
+        countryName: "Việt Nam",
+        isActive: true
+    }
 
 const EditAddress = () => {
     const params = useParams();
     const id = params.id;
-    const [address, setAddress] = useState<AddressDetailVm>();
+    const [address, setAddress] = useState<AddressDetailVm>(addressDemo);
 
     const {
         register,
         handleSubmit,
         formState: { errors },
         setValue
-    } = useForm<AddressDetailVm>();
+    } = useForm<AddressFormValues>();
 
     useEffect(() => {
         if (id) {
             addressService.getAddressById(parseInt(id as string))
-                .then((responseAddress) => {
-                    setAddress(responseAddress)
-                }).catch(error => console.log(error))
+                .then((resAddress) => {
+                    setAddress(resAddress)
+                })
+                .catch(error => console.log(error))
         }
     }, [id]);
-    // khi update
-    const onSubmit = (data: AddressDetailVm, event: any) => {
+
+
+
+    const onSubmit = (data: AddressFormValues, event: any) => {
         const {
             countryId,
             districtId,

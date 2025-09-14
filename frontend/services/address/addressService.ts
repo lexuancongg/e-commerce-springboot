@@ -6,7 +6,7 @@ import { AddressPostVm } from "@/models/address/AddressPostVm";
 class AddressService {
     private baseUrl:string
     constructor() {
-        this.baseUrl = "/api/address/customer"
+        this.baseUrl = "/api/address/customer/addresses"
     }
 
 
@@ -31,16 +31,20 @@ class AddressService {
         throw response;
     }
 
+
     public async getAddressById(addressId :number):Promise<AddressDetailVm>{
-        const response  = await apiClient.get(`${this.baseUrl}/customer/`);
-        if(response.ok) return await response.json();
-        return address_demo_data[0];
+        const response  = await apiClient.get(`${this.baseUrl}/${addressId}`);
+        if(response.ok) {
+            return await response.json();
+        }
         throw response;
 
     }
     public async updateAddressById(addressId:number, addressPostVm : AddressPostVm ):Promise<void>{
-        const response  = await apiClient.put(`${this.baseUrl}/customer/`);
-        if(response.ok) return  await response.json();
+        const response  = await apiClient.put(`${this.baseUrl}/${addressId}`, JSON.stringify(addressPostVm));
+        if(response.ok){
+             return  await response.json();
+        }
         throw response;
     }
 }

@@ -2,7 +2,7 @@
 
 import { FC } from "react";
 
-import ProfileLeftSideBar from "./profileLeftSideBar";
+import ProfileLeftSideBar from "../profile/profileLeftSideBar";
 
 
 // Props type

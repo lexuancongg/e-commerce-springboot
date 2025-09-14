@@ -1,21 +1,63 @@
 'use client'
-import {NavigationPathModel} from "@/models/Navigation/NavigationPathModel";
-import {useRouter} from "next/navigation";
+import {useRouter, useSearchParams} from "next/navigation";
 import {ChangeEvent, useEffect, useRef, useState} from "react";
 import {ProductPreviewVm} from "@/models/product/ProductPreviewVm";
 import {Container, Row} from "react-bootstrap";
-import Head from "next/head";
-import NavigationComponent from "@/components/common/navigationComponent";
-import ProductCard from "@/components/product/productCard";
+
 import ReactPaginate from "react-paginate";
 import {CategoryVm} from "@/models/category/CategoryVm";
 import categoryService from "@/services/category/categoryService";
-import {usePathname, useSearchParams} from 'next/navigation'
 import * as querystring from "node:querystring";
 import productService from "@/services/product/productService";
 
 
 const CATEGORY_SLUG = 'categorySlug';
+
+const productsDemo = [
+    {
+        id: "1",
+        name: "Women T-Shirt",
+        price: 19.99,
+        image: "https://preview.colorlib.com/theme/cozastore/images/product-01.jpg",
+        category: "women",
+    },
+    {
+        id: "2",
+        name: "Men Jacket",
+        price: 49.99,
+        image: "https://preview.colorlib.com/theme/cozastore/images/product-02.jpg",
+        category: "men",
+    },
+    {
+        id: "3",
+        name: "Leather Bag",
+        price: 79.99,
+        image: "https://preview.colorlib.com/theme/cozastore/images/product-03.jpg",
+        category: "bag",
+    },
+    {
+        id: "4",
+        name: "Running Shoes",
+        price: 59.99,
+        image: "https://preview.colorlib.com/theme/cozastore/images/product-04.jpg",
+        category: "shoes",
+    },
+    {
+        id: "5",
+        name: "Running Shoes",
+        price: 59.99,
+        image: "https://preview.colorlib.com/theme/cozastore/images/product-05.jpg",
+        category: "shoes",
+    },
+    {
+        id: "6",
+        name: "Running Shoes",
+        price: 59.99,
+        image: "https://preview.colorlib.com/theme/cozastore/images/product-06.jpg",
+        category: "shoes",
+    },
+
+];
 
 export default function ProductList() {
     const router = useRouter();
@@ -31,7 +73,6 @@ export default function ProductList() {
     const [categoryIdActive, setCategoryIdActive] = useState<number>(0);
 
 
-    // khi nhung param query thay doi thi set lai page 0
     const updateFilter = (key: string, value: string | number) => {
         // trường hợp push key và value đã có => giá trị không thaydodoiri thì không set lại page
         const currentValue = searchParams.get(key);
@@ -118,51 +159,7 @@ export default function ProductList() {
     }
 
 
-    const productsDemo = [
-        {
-            id: "1",
-            name: "Women T-Shirt",
-            price: 19.99,
-            image: "https://preview.colorlib.com/theme/cozastore/images/product-01.jpg",
-            category: "women",
-        },
-        {
-            id: "2",
-            name: "Men Jacket",
-            price: 49.99,
-            image: "https://preview.colorlib.com/theme/cozastore/images/product-02.jpg",
-            category: "men",
-        },
-        {
-            id: "3",
-            name: "Leather Bag",
-            price: 79.99,
-            image: "https://preview.colorlib.com/theme/cozastore/images/product-03.jpg",
-            category: "bag",
-        },
-        {
-            id: "4",
-            name: "Running Shoes",
-            price: 59.99,
-            image: "https://preview.colorlib.com/theme/cozastore/images/product-04.jpg",
-            category: "shoes",
-        },
-        {
-            id: "5",
-            name: "Running Shoes",
-            price: 59.99,
-            image: "https://preview.colorlib.com/theme/cozastore/images/product-05.jpg",
-            category: "shoes",
-        },
-        {
-            id: "6",
-            name: "Running Shoes",
-            price: 59.99,
-            image: "https://preview.colorlib.com/theme/cozastore/images/product-06.jpg",
-            category: "shoes",
-        },
 
-    ];
     const [activeTab, setActiveTab] = useState("All Products");
 
 
@@ -350,6 +347,9 @@ export default function ProductList() {
                     </div>
                 ))}
             </div>
+
+
+
 
 
             {totalPage > 1 && (

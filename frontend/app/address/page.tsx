@@ -1,11 +1,11 @@
 'use client'
 import React, {JSX, useEffect, useState} from "react";
 import {AddressDetailVm} from "@/models/address/AddressDetailVm";
-import ProfileLayoutComponent from "@/components/common/profileLayout";
 import {BiPlusMedical} from "react-icons/bi";
 import CardAddress from "@/components/address/cardAddress";
 import ConfirmationDialog from "@/components/dialog/confirmDialog";
 import userAddressService from "@/services/customer/userAddressService";
+import ProfileLayoutComponent from "@/components/profile/profileLayout";
 
 
 const addressDemo : AddressDetailVm[] = [
@@ -66,8 +66,7 @@ const MyAddress = (): JSX.Element => {
                 setAddresses(resAddressDetail);
             })
             .catch((error)=>{
-                
-                
+                console.log(error.message)
             })
 
     }, []);
@@ -163,7 +162,7 @@ const MyAddress = (): JSX.Element => {
 
 
             <ConfirmationDialog
-                isOpen={isShowModelDelete}
+                isShow={isShowModelDelete}
                 cancel={handleCancelDeleteAddressFromModel}
                 ok={handleAgreeDeleteAddressFromModel}
                 cancelText="cancel"
@@ -173,7 +172,7 @@ const MyAddress = (): JSX.Element => {
             </ConfirmationDialog>
 
             <ConfirmationDialog
-                isOpen={isShowModeConfirmChooseAddressDefaul}
+                isShow={isShowModeConfirmChooseAddressDefaul}
                 cancel={handleCancelAddressDefaultFromModel}
                 ok={handleAgreeAddressDefaultFromModel}
                 cancelText="No"

@@ -69,7 +69,7 @@ export default function OrderStatusTab({ orderStatus }: Props) {
     const [orders, setOrders] = useState<OrderVm[]>(demoOrders);
 
     useEffect(() => {
-        setOrders(demoOrders.filter(o => !orderStatus || o.orderStatus === orderStatus)); // Filter theo tab
+        setOrders(demoOrders.filter(o => !orderStatus || o.orderStatus === orderStatus));
     }, [orderStatus]);
 
     if (orders.length === 0) {

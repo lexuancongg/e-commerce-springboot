@@ -7,16 +7,6 @@ import {useSearchParams} from "next/navigation";
 import searchService from "@/services/search/SearchService";
 import {NavigationPathModel} from "@/models/Navigation/NavigationPathModel";
 
-const  navigationPaths:NavigationPathModel[] = [
-    {
-        pageName:'Home',
-        url:''
-    },
-    {
-        pageName:'Search',
-        url:''
-    }
-]
 
 const SearchPage = ()=>{
     const [searchParams , setSearchParams] = useState<SearchParam>({

@@ -9,15 +9,16 @@ import { ProvinceVm } from "@/models/address/ProvinceVm";
 import { DistrictVm } from "@/models/address/DistrictVm";
 import addressService from "@/services/address/addressService";
 import { useParams, useRouter } from "next/navigation";
+import { AddressFormValues } from "@/models/address/AddressFormValues ";
 
 
 type Props = { isDisplay:boolean ,
-  register: UseFormRegister<AddressDetailVm>,
+  register: UseFormRegister<AddressFormValues>,
   handleSubmit: () => void,
-  errors: FieldErrors<AddressDetailVm>,
+  errors: FieldErrors<AddressFormValues>,
   addressInit?: AddressDetailVm ,
   buttonText?: string,
-  setValue: UseFormSetValue<AddressDetailVm>;
+  setValue: UseFormSetValue<AddressFormValues>;
 }
 
 
@@ -63,7 +64,6 @@ const AddressForm: FC<Props> = (
         })
   }, [])
 
-  // trường hợp useForm hiển thị cho edit => phải lấy được district và province tương ứng
   useEffect(() => {
     if (addressInit) {
       addressService.getProvinces(addressInit.countryId)

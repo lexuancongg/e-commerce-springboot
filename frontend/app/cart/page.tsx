@@ -16,7 +16,10 @@ const cartItemsDemo: CartItemDetailVm[] = [
         slug: "shirt",
         avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/product-01.jpg",
         price: 44.00,
-        productOptions: [{ id: 1, optionName: "Type", value: "Cotton T-shirt" }],
+        productOptions: [
+            { id: 1, optionName: "Type", value: "Cotton T-shirt" },
+             {id:2, optionName:"Size", value:"L"}
+            ],
     },
     {
         productId: 2,
@@ -30,7 +33,7 @@ const cartItemsDemo: CartItemDetailVm[] = [
 ];
 
 const Cart = () => {
-    const [cartItems, setCartItems] = useState<CartItemDetailVm[]>([]);
+    const [cartItems, setCartItems] = useState<CartItemDetailVm[]>(cartItemsDemo);
     const [selectedProductIds, setSelectedProductIds] = useState<Set<number>>(new Set());
     const [isShowModelConfirmDelete, setIsShowModelConfirmDelete] = useState(false);
     const [productIdToRemove, setProductIdToRemove] = useState<number>(0);
@@ -46,7 +49,6 @@ const Cart = () => {
                 setCartItems(cartItemsDemo)
             })
             .catch((error)=>{
-                setCartItems(cartItemsDemo)
                 console.log(error.message)
             })
     }
@@ -88,7 +90,7 @@ const Cart = () => {
             const cartItemPutVm : CartItemPutVm = {
                 quantity : newQuantity
             }
-           await  cartService.updateCartItemAboutQuantity(productId,cartItemPutVm)
+            await  cartService.updateCartItemAboutQuantity(productId,cartItemPutVm)
             loadCartItems();
         }catch (error){
 
@@ -217,6 +219,7 @@ const Cart = () => {
                                                 value={item.quantity}
                                                 disabled={loadingItems.has(item.productId)}
                                                 className="w-12 text-center border-t border-b border-gray-300 focus:outline-none bg-white"
+                                                onChange={()=>{}}
                                             />
                                             <button
                                                 onClick={() => handleIncreaseQuantity(item.productId)}
@@ -273,7 +276,7 @@ const Cart = () => {
                 </div>
             </div>
             <ConfirmationDialog
-                isOpen={isShowModelConfirmDelete}
+                isShow={isShowModelConfirmDelete}
                 okText="Remove"
                 cancelText="Cancel"
                 cancel={() => setIsShowModelConfirmDelete(false)}

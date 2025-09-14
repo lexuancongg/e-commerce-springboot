@@ -1,5 +1,5 @@
 'use client'
-import  * as yup from 'yup';
+import * as yup from 'yup';
 import {useParams} from "next/navigation";
 import {useEffect, useState} from "react";
 import {CheckoutVm} from "@/models/order/checkout/CheckoutVm";
@@ -19,11 +19,10 @@ import addressService from "@/services/address/addressService";
 import {CheckoutItemVm} from "@/models/order/checkout/CheckoutItemVm";
 import {AddressPostVm} from "@/models/address/AddressPostVm";
 import CheckOutDetail from "@/components/order/checkout/CheckOutDetail";
+import {AddressFormValues} from '@/models/address/AddressFormValues ';
 
 
-
-
-const addressDefaultDemo : AddressDetailVm =  {
+const addressDefaultDemo: AddressDetailVm = {
     id: 1,
     contactName: "Nguyễn Văn A",
     phoneNumber: "0987654321",
@@ -37,6 +36,30 @@ const addressDefaultDemo : AddressDetailVm =  {
     isActive: true
 }
 
+ const checkoutItemsDemo: CheckoutItemVm[] = [
+    {
+        id: 1,
+        productId: 101,
+        productName: "Áo Thun Nam Basic",
+        quantity: 2,
+        productPrice: 150000,
+    },
+    {
+        id: 2,
+        productId: 102,
+        productName: "Quần Jean Nữ",
+        quantity: 1,
+        productPrice: 400000,
+    }
+];
+
+ const  checkoutDemo: CheckoutVm = {
+    id: 999,
+    email: "khachhang@example.com",
+    note: "giao hàng vào ban ngày",
+    totalAmount: 700000,
+    checkoutItemVms: checkoutItemsDemo
+};
 
 
 const phoneRegExp =
@@ -44,100 +67,104 @@ const phoneRegExp =
 
 const addressShippingSchema = yup.object({
     contactName: yup.string().required('contactName is Require'),
-    phoneNumber:yup.string().matches(phoneRegExp ,'phoneNumber is not valid').required(''),
+    phoneNumber: yup.string().matches(phoneRegExp, 'phoneNumber is not valid').required(''),
     specificAddress: yup.string().required("specificAddress is require"),
     districtId: yup.number().required('District is required'),
     countryId: yup.number().required('Country is required'),
-    provinceId :yup.number().required('Country is required'),
+    provinceId: yup.number().required('Country is required'),
+
 })
 
 
-const Checkout = ()=>{
+const Checkout = () => {
     const params = useParams();
     const id = params.id;
 
-    const [checkout,setCheckout] = useState<CheckoutVm>()
+    const [checkout, setCheckout] = useState<CheckoutVm>(checkoutDemo)
 
-    const [checkoutItems,setCheckoutItems] = useState<CheckoutItemVm[]>([])
-    const [shippingAddress, setShippingAddress] = useState<AddressDetailVm>();
-    const [isAddShippingAddress,setIsAddShippingAddress] = useState<boolean>(false);
-    const  [isShowModalShippingAddress,setIsShowModalShippingAddress] = useState<boolean>(false);
-    const [currentAddressId,setCurrentAddressId] = useState<number>()
+    const [checkoutItems, setCheckoutItems] = useState<CheckoutItemVm[]>(checkoutItemsDemo)
+    const [shippingAddress, setShippingAddress] = useState<AddressDetailVm>(addressDefaultDemo);
+    const [isAddShippingAddress, setIsAddShippingAddress] = useState<boolean>(false);
+    const [isShowModalShippingAddress, setIsShowModalShippingAddress] = useState<boolean>(false);
+    const [currentAddressId, setCurrentAddressId] = useState<number>()
 
 
     const {
-        register:registerShippingAddress,
-        handleSubmit :handleSubmitShippingAddress,
-        formState:{errors:errorsShippingAddress},
-        setValue:setValueShippingAddress
-    } = useForm<AddressDetailVm>(
+        register: registerShippingAddress,
+        handleSubmit: handleSubmitShippingAddress,
+        formState: {errors: errorsShippingAddress},
+        setValue: setValueShippingAddress
+    } = useForm<AddressFormValues>(
         {
-            resolver:yupResolver(addressShippingSchema)
+            resolver: yupResolver(addressShippingSchema)
         }
-        )
+    )
+
     const {
-        handleSubmit :handleSubmitOrder,
-        register:registerOrder,
-        formState: { errors:errorsOrder },
-        watch:watchOrder,
+        handleSubmit: handleSubmitOrder,
+        register: registerOrder,
+        formState: {errors: errorsOrder},
+        watch: watchOrder,
     } = useForm<OrderDetailVm>();
 
 
     useEffect(() => {
         userAddressService.getDefaultAddress()
-            .then((resAddressDefault)=>{
+            .then((resAddressDefault) => {
                 setShippingAddress(resAddressDefault);
-            }).catch((error)=>{
-                setShippingAddress(addressDefaultDemo)
+                setCurrentAddressId(resAddressDefault.id);
+            }).catch((error) => {
                 setIsAddShippingAddress(true)
         })
     }, []);
 
     useEffect(() => {
-        if(id){
+        if (id) {
             orderService.getCheckoutById(parseInt(id as string))
-                .then((responseCheckoutVm)=>{
+                .then((responseCheckoutVm) => {
                     setCheckout(responseCheckoutVm)
                     setCheckoutItems(responseCheckoutVm.checkoutItemVms);
+                })
+                .catch((error)=>{
+                    console.log(error.message);
                 })
         }
     }, [id]);
 
 
-    const handleCloseModalShippingAddress = ()=>{
+    const handleCloseModalShippingAddress = () => {
         setIsShowModalShippingAddress(false)
     }
 
-    const handleSelectedShippingAddress = (address:AddressDetailVm)=>{
+    const handleSelectedShippingAddress = (address: AddressDetailVm) => {
         setIsAddShippingAddress(false)
         setShippingAddress(address);
         setCurrentAddressId(address.id)
     }
 
 
-    const onSubmitShippingAddress = async (data:AddressDetailVm)=>{
+    const onSubmitShippingAddress = async (data: AddressFormValues) => {
         const newAddress = await performCreateUserAddress(data);
         setShippingAddress(newAddress);
         setIsAddShippingAddress(false)
 
     }
 
-    const performCreateUserAddress =async (address:AddressDetailVm):Promise<AddressDetailVm>=>{
-        let addressCreated ;
+    const performCreateUserAddress = async (address: AddressFormValues): Promise<AddressDetailVm> => {
+        let addressCreated;
         try {
-            const {addressVm : newAddress} = await userAddressService.createCustomerAddress(address as AddressPostVm)
+            const {addressVm: newAddress} = await userAddressService.createUserAddress(address as AddressPostVm)
             addressCreated = newAddress;
-        }catch (error){
-
+        } catch (error) {
             console.log(error)
         }
-        let addressDetailCreated : AddressDetailVm = addressCreated as AddressDetailVm;
+        let addressDetailCreated: AddressDetailVm = addressCreated as AddressDetailVm;
         try {
             if (addressDetailCreated.id != null) {
                 addressDetailCreated = await addressService.getAddressById(addressDetailCreated.id);
             }
 
-        }catch (error){
+        } catch (error) {
             console.log(error)
         }
         return addressDetailCreated;
@@ -145,98 +172,96 @@ const Checkout = ()=>{
     }
 
 
-
-
-
     return (
         <Container>
             <section className="checkout spad">
-                    <div className="checkout__form">
-                        <form onSubmit={(event) => {}}>
-                            <div className="row">
-                                <div className="col-lg-8 col-md-6">
-                                    <h4>Shipping Address</h4>
-                                    <div className="row mb-4">
-                                        <div className="checkout__input">
-                                            <button
-                                                type="button"
-                                                className="btn btn-outline-primary fw-bold btn-sm me-2"
-                                                onClick={() => {
-                                                    setIsAddShippingAddress(false);
-                                                    setIsShowModalShippingAddress(true);
-                                                }}
-                                            >
-                                                Change address <i className="bi bi-plus-circle-fill"></i>
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className={`btn btn-outline-primary fw-bold btn-sm ${
-                                                    isAddShippingAddress ? `active` : ``
-                                                }`}
-                                                onClick={() => setIsAddShippingAddress(true)}
-                                            >
-                                                Add new address <i className="bi bi-plus-circle-fill"></i>
-                                            </button>
-                                        </div>
-
-                                        <div className="checkout-address-card">
-                                            <CheckOutAddress address={shippingAddress} isDisplay={!isAddShippingAddress}/>
-
-                                            <AddressForm
-                                                handleSubmit={handleSubmitShippingAddress(onSubmitShippingAddress)}
-                                                isDisplay={isAddShippingAddress}
-                                                register={registerShippingAddress}
-                                                setValue={setValueShippingAddress}
-                                                errors={errorsShippingAddress}
-                                                addressInit={undefined}
-                                                buttonText="Use this address"
-                                            />
-                                        </div>
+                <div className="checkout__form">
+                    <form >
+                        <div className="row">
+                            <div className="col-lg-7 col-md-6">
+                                <h4>Shipping Address</h4>
+                                <div className="row mb-4">
+                                    <div className="checkout__input">
+                                        <button
+                                            type="button"
+                                            className="btn btn-outline-primary fw-bold btn-sm me-2"
+                                            onClick={() => {
+                                                setIsAddShippingAddress(false);
+                                                setIsShowModalShippingAddress(true);
+                                            }}
+                                        >
+                                            Change address <i className="bi bi-plus-circle-fill"></i>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className={`btn btn-outline-primary fw-bold btn-sm ${
+                                                isAddShippingAddress ? `active` : ``
+                                            }`}
+                                            onClick={() => setIsAddShippingAddress(true)}
+                                        >
+                                            Add new address <i className="bi bi-plus-circle-fill"></i>
+                                        </button>
                                     </div>
 
+                                    <div className="checkout-address-card">
+                                        <CheckOutAddress address={shippingAddress} isDisplay={!isAddShippingAddress}/>
 
-                                    <h4>Additional Information</h4>
-                                    <div className="row mb-4">
-                                        <div className="checkout__input">
-                                            <Input
-                                                labelText="Order Notes"
-                                                fieldName="note"
-                                                register={registerOrder}
-                                                placeholder="Notes about your order"
-                                                error={errorsOrder.note?.message}
-                                            />
-                                        </div>
-                                        <div className="checkout__input">
-                                            <Input
-                                                labelText="Email"
-                                                fieldName="email"
-                                                register={registerOrder}
-                                                defaultValue={checkout?.email}
-                                                error={errorsOrder.email?.message}
-                                                disabled={true}
-                                            />
-                                        </div>
+                                        <AddressForm
+                                            handleSubmit={handleSubmitShippingAddress(onSubmitShippingAddress)}
+                                            isDisplay={isAddShippingAddress}
+                                            register={registerShippingAddress}
+                                            setValue={setValueShippingAddress}
+                                            errors={errorsShippingAddress}
+                                            addressInit={undefined}
+                                            buttonText="Use this address"
+                                        />
                                     </div>
                                 </div>
 
 
-                                <div className="col-lg-4 col-md-6">
-                                    <CheckOutDetail checkoutItems={checkoutItems} ></CheckOutDetail>
-
+                                <h4>Additional Information</h4>
+                                <div className="row mb-4">
+                                    <div className="checkout__input">
+                                        <Input
+                                            labelText="Order Notes"
+                                            fieldName="note"
+                                            register={registerOrder}
+                                            placeholder="Notes about your order"
+                                            error={errorsOrder.note?.message}
+                                            defaultValue={checkout.note}
+                                        />
+                                    </div>
+                                    <div className="checkout__input">
+                                        <Input
+                                            labelText="Email"
+                                            fieldName="email"
+                                            register={registerOrder}
+                                            defaultValue={checkout?.email}
+                                            error={errorsOrder.email?.message}
+                                            disabled={true}
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                        </form>
 
 
-                        <ModalAddressList
-                            isShow={isShowModalShippingAddress}
-                            handleCloseModel={handleCloseModalShippingAddress}
-                            handleSelectAddress={handleSelectedShippingAddress}
-                            currentAddressId = {currentAddressId}
+                            <div className="col-lg-5 col-md-6">
+                                <CheckOutDetail checkoutItems={checkoutItems}></CheckOutDetail>
 
-                        />
+                            </div>
+                        </div>
+                    </form>
 
-                    </div>
+
+                    <ModalAddressList
+                        isShow={isShowModalShippingAddress}
+                        handleCloseModel={handleCloseModalShippingAddress}
+                        handleSelectAddress={handleSelectedShippingAddress}
+                        currentAddressId={currentAddressId}
+
+                    />
+
+                </div>
             </section>
         </Container>
     )
