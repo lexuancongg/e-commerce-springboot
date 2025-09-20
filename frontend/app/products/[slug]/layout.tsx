@@ -64,6 +64,7 @@ export default async function ProductDetailLayout(
 
     const product = await fetchDetailProduct(slug as string);
 
+
     if(product == null){
         return ;
     }
@@ -76,7 +77,9 @@ export default async function ProductDetailLayout(
                 return option.name == specificProductVariant.productOptionName;
             })
             if (index > -1) {
-                productOptions[index].value.push(specificProductVariant.productOptionValue)
+                if(!productOptions[index].value.includes(specificProductVariant.productOptionValue)){
+                    productOptions[index].value.push(specificProductVariant.productOptionValue)
+                }
                 continue
             }
             const newOption: ProductOptionValuesVm = {
@@ -86,30 +89,18 @@ export default async function ProductDetailLayout(
             }
             productOptions.push(newOption);
         }
+
         productVariations = await fetchProductVariations(product.id);
     }
 
 
 
 
+
+
     return (
-        // đây là server component mà conentext na l client compoennt => trực tiếp => lôĩ
-        // <ProductDetailContext.Provider
-        //     value={{
-        //         productDetail: product,
-        //         productVariations: productVariations,
-        //         productOptionValues: options
-        //     }}
-        // >
-        //     {children}
-        // </ProductDetailContext.Provider>
-            // <ClientProductDetailLayout
-            //     productDetail={product}
-            //     productOptionValues={options}
-            //     productVariations={productVariations}
-            // >
-            //     {children}
-            // </ClientProductDetailLayout>
+
+        // không dùng provider trực tiếp vì cái này server compoentn
         <ProductDetailProvider value={{
             productDetail:product,
             productVariations:productVariations,
