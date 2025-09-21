@@ -12,7 +12,7 @@ import java.util.Optional;
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
 public class EntityAuditConfig {
     @Bean
-    // thuộc thu viện data-jpa
+    // auditting trong JPa
     public AuditorAware<String> auditorAware(){
         return ()->{
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

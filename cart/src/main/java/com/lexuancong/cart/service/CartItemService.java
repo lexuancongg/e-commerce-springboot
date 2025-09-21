@@ -10,6 +10,7 @@ import com.lexuancong.cart.viewmodel.product.ProductPreviewVm;
 import com.lexuancong.cart.viewmodel.productoption.ProductOptionValueGetVm;
 import com.lexuancong.cart.viewmodel.productoption.ProductOptionValueVm;
 import com.lexuancong.share.exception.BadRequestException;
+import com.lexuancong.share.exception.NotFoundException;
 import com.lexuancong.share.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,35 +25,32 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class CartItemService {
     private final CartItemRepository cartItemRepository;
     private final CartItemMapper cartItemMapper;
     private final ProductService productService;
     public CartItemGetVm addCartItem(CartItemPostVm cartItemPostVm){
         this.validateProduct(cartItemPostVm.productId());
-        String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
-        CartItem cartItem = performAddCartItem(cartItemPostVm,customerId);
-        return cartItemMapper.toCartItemGetVm(cartItem);
+        CartItem cartItem = this.performAddCartItem(cartItemPostVm);
+        return CartItemGetVm.fromModel(cartItem);
 
     }
     private void validateProduct(Long productId){
         if(!productService.checkExistById(productId)){
-
-
+            throw new NotFoundException(Constants.ErrorKey.PRODUCT_NOT_FOUND, productId);
         }
     }
 
-    @Transactional
-    public CartItem performAddCartItem(CartItemPostVm cartItemPostVm,String customerId){
+    public CartItem performAddCartItem(CartItemPostVm cartItemPostVm){
+        String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         try{
             return cartItemRepository.findByCustomerIdAndProductId(customerId,cartItemPostVm.productId())
-                    // map nayf dungf ánh xạ giá trị cua optionl chứa
                     .map(existingCartItem -> updateForCaseExistingCartItem(cartItemPostVm,existingCartItem))
-                    // có chức năng tuowg t nhuw orElse nhưng nó thực thi theo cơ chế Lazi
                     .orElseGet(()-> createNewCartItem(cartItemPostVm,customerId));
 
         }catch (PessimisticLockingFailureException e){
-            // throw exeption
+
             return null;
         }
 
@@ -62,7 +60,7 @@ public class CartItemService {
         return cartItemRepository.save(existingCartItem);
     }
     private CartItem createNewCartItem(CartItemPostVm cartItemPostVm,String customerId){
-        CartItem cartItemEntity = this.cartItemMapper.toCartItem(cartItemPostVm,customerId);
+        CartItem cartItemEntity =  cartItemPostVm.toModel(customerId);
         return cartItemRepository.save(cartItemEntity);
 
     }
@@ -74,9 +72,9 @@ public class CartItemService {
     public CartItemGetVm updateCartItem(Long productId, CartItemPutVm cartItemPutVm){
         this.validateProduct(productId);
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
-        CartItem cartItem = cartItemMapper.toCartItem(customerId,productId, cartItemPutVm.quantity());
+        CartItem cartItem =  cartItemPutVm.toModel(customerId,productId);
         CartItem cartItemSaved = cartItemRepository.save(cartItem);
-        return cartItemMapper.toCartItemGetVm(cartItemSaved);
+        return CartItemGetVm.fromModel(cartItemSaved);
 
     }
 
@@ -146,6 +144,7 @@ public class CartItemService {
 
     public List<CartItemGetVm> updateCartItemAfterOrder(List<CartItemDeleteVm> cartItemDeleteVms){
         this.validateDuplicatedProductIdInCartItemDelete(cartItemDeleteVms);
+
         List<Long> productIds = cartItemDeleteVms.stream()
                 .map(CartItemDeleteVm::productId)
                 .toList();
@@ -158,10 +157,12 @@ public class CartItemService {
         for (CartItemDeleteVm cartItemDeleteVm : cartItemDeleteVms){
             Optional<CartItem> optionalCartItem=
                     Optional.ofNullable(mapCartItemByProductId.get(cartItemDeleteVm.productId()));
+
             optionalCartItem.ifPresent(cartItem -> {
                 if(cartItem.getQuantity() <= cartItemDeleteVm.quantity()){
                     cartItemsToDelete.add(cartItem);
                 }else{
+                    cartItem.setQuantity(cartItem.getQuantity() - cartItemDeleteVm.quantity());
                     cartItemsToUpdateQuantity.add(cartItem);
                 }
             });
@@ -174,6 +175,7 @@ public class CartItemService {
                 .toList();
 
     }
+
 
     private void  validateDuplicatedProductIdInCartItemDelete(List<CartItemDeleteVm> cartItemDeleteVms){
         Map<Long,Integer> mapProductIdToQuantity = new HashMap<>();

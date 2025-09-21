@@ -28,6 +28,8 @@ public class SecurityConfig {
                 .build();
     }
 
+
+
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverterForKeycloak(){
         Converter<Jwt, Collection<GrantedAuthority>> jwtGrantedAuthoritiesConverter = jwt->{

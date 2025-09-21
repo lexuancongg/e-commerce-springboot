@@ -8,4 +8,5 @@ public record CartItemGetVm(String customerId, Long productId, int quantity) {
     public static CartItemGetVm fromModel(CartItem cartItem) {
         return new CartItemGetVm(cartItem.getCustomerId(), cartItem.getProductId(), cartItem.getQuantity());
     }
+
 }

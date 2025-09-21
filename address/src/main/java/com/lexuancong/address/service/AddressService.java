@@ -82,7 +82,8 @@ public class AddressService {
 
     public List<AddressDetailVm> getAddresses(List<Long> ids){
         List<Address> addresses = addressRepository.findAllByIdIn(ids);
-        return addresses.stream().map(AddressDetailVm::fromModel).collect(Collectors.toList());
+        return addresses.stream().map(AddressDetailVm::fromModel)
+                .collect(Collectors.toList());
     }
     public void deleteAddress(Long id){
         Address address = addressRepository

@@ -72,7 +72,7 @@ public class CountryService {
 
     public void updateCountry(Long id,CountryPostVm countryPostVm){
        Country country = countryRepository.findById(id)
-               .orElseThrow(()-> new NotFoundException(Constants.ErrorKey.Country.COUNTRY_NOT_FOUND, id));
+               .orElseThrow(()-> new NotFoundException(Constants.ErrorKey.COUNTRY_NOT_FOUND, id));
        this.validateExitedName(countryPostVm.name(),id);
        country.setName(countryPostVm.name());
        countryRepository.save(country);
@@ -81,8 +81,9 @@ public class CountryService {
     public void deleteCountry(Long id){
         boolean isExistedCountry = countryRepository.existsById(id);
         if(!isExistedCountry){
-            throw new NotFoundException(Constants.ErrorKey.Country.COUNTRY_NOT_FOUND, id);
+            throw new NotFoundException(Constants.ErrorKey.COUNTRY_NOT_FOUND, id);
         }
+        // sẽ bị bắn ra ngoại lệ
         countryRepository.deleteById(id);
     }
 

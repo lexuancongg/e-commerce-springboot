@@ -24,7 +24,7 @@ public class DistrictService {
         // check provinceId
         boolean isExitedProvince = provinceRepository.existsById(provinceId);
         if (!isExitedProvince) {
-           throw new NotFoundException(Constants.ErrorKey.Province.PROVINCE_NOT_FOUND,provinceId);
+           throw new NotFoundException(Constants.ErrorKey.PROVINCE_NOT_FOUND,provinceId);
         }
         List<District> districts = districtRepository.findAllByProvinceIdOrderByNameAsc(provinceId);
         return districts.stream()

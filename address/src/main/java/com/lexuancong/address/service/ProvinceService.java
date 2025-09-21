@@ -60,7 +60,7 @@ public class ProvinceService {
         Long countryId = provincePostVm.countryId();
         boolean isExistCountryId = countryRepository.existsById(countryId);
         if(!isExistCountryId){
-             throw new NotFoundException(Constants.ErrorKey.Country.COUNTRY_NOT_FOUND,provincePostVm.countryId());
+             throw new NotFoundException(Constants.ErrorKey.COUNTRY_NOT_FOUND,provincePostVm.countryId());
         }
         // nếu cùng quốc gia mà trùng tên thì lỗi
         this.validateExitedName(provincePostVm,null);
@@ -86,7 +86,7 @@ public class ProvinceService {
 
     public void updateProvince(Long id,ProvincePostVm provincePostVm){
         Province province = provinceRepository.findById(id)
-                .orElseThrow(()-> new NotFoundException(Constants.ErrorKey.Province.PROVINCE_NOT_FOUND,id));
+                .orElseThrow(()-> new NotFoundException(Constants.ErrorKey.PROVINCE_NOT_FOUND,id));
         // chỉ cho phép trùng tên với cái id chỉnh sửa hiện tại
         this.validateExitedName(provincePostVm, id);
         province.setName(provincePostVm.name());
@@ -97,7 +97,7 @@ public class ProvinceService {
     public void deleteProvince(Long id){
         boolean isExistedProvince = this.provinceRepository.existsById(id);
         if(!isExistedProvince){
-            throw  new NotFoundException(Constants.ErrorKey.Province.PROVINCE_NOT_FOUND,id);
+            throw  new NotFoundException(Constants.ErrorKey.PROVINCE_NOT_FOUND,id);
         }
         provinceRepository.deleteById(id);
     }
