@@ -31,7 +31,6 @@ public class FeedbackService {
     private final OrderService orderService;
     public FeedbackVm createFeedback(FeedbackPostVm feedbackPostVm){
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
-        // check xem có đánh giá của user này chưa
         boolean exitedRating = this.feedbackRepository.existsByCreatedByAndProductId(customerId, feedbackPostVm.productId());
         if(exitedRating){
             throw new IllegalStateException(Constants.ErrorKey.FEEDBACK_EXITED);

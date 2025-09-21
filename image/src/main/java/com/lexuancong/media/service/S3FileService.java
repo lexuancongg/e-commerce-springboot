@@ -68,7 +68,7 @@ public class S3FileService {
                     image.getDescription(),
                     image.getFileName(),
                     image.getImageType(),
-                    url.toString()
+                    null
             );
 
         } catch (Exception e) {

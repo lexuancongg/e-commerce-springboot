@@ -70,9 +70,6 @@ public class StockService {
 
 
     public void updateQuantityProductInStock(List<StockPutQuantityVm> stockPutQuantityVms){
-        List<Long> productIds = stockPutQuantityVms.parallelStream()
-                .map(StockPutQuantityVm::productId)
-                .toList();
 
         List<Long> stockIds = stockPutQuantityVms.parallelStream()
                 .map(StockPutQuantityVm::stockId)
@@ -89,7 +86,6 @@ public class StockService {
                 continue;
             stock.setQuantity(stockPutQuantityVm.quantity());
         }
-        // tham chiếu nên stocks được cập nhật
         this.stockRepository.saveAll(stocks);
     }
 

@@ -38,7 +38,6 @@ public class imageService {
     }
 
     public String saveFileInFilesystem(String fileName, byte[] contentFile){
-        // tạo object đại diện cho thư mục
         File directory = new File(filesystemConfig.getDirectory());
         this.checkIsExitedDirectory(directory);
         this.validateFileName(fileName);
