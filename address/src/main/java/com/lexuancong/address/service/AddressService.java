@@ -15,7 +15,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.html.Option;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,35 +33,49 @@ public class AddressService {
 
     public AddressGetVm createAddress(AddressPostVm addressPostVm){
         Address address = addressPostVm.toModel();
-        Country country = countryRepository.findById(addressPostVm.countryId())
-                .orElseThrow(() ->
-                        new NotFoundException(Constants.ErrorKey.Country.COUNTRY_NOT_FOUND, addressPostVm.countryId()));
-        address.setCountry(country);
-        provinceRepository.findById(addressPostVm.provinceId())
-                .ifPresent(address::setProvince);
-
-        districtRepository.findById(addressPostVm.districtId()).ifPresent(address::setDistrict);
+        this.performSetEntityIfExistsOrThrow(address,addressPostVm);
         return AddressGetVm.fromModel(addressRepository.save(address));
     }
 
     public void updateAddress(Long id, AddressPostVm addressPostVm){
         // throw exception
         Address address = addressRepository.findById(id)
-                .orElseThrow(() ->  new NotFoundException(Constants.ErrorKey.Address.ADDRESS_NOT_FOUND,id));
+                .orElseThrow(() ->  new NotFoundException(Constants.ErrorKey.ADDRESS_NOT_FOUND,id));
+        this.performSetEntityIfExistsOrThrow(address,addressPostVm);
         address.setContactName(addressPostVm.contactName());
         address.setSpecificAddress(addressPostVm.specificAddress());
         address.setPhoneNumber(addressPostVm.phoneNumber());
 
-        countryRepository.findById(addressPostVm.countryId()).ifPresent(address::setCountry);
-        provinceRepository.findById(addressPostVm.provinceId()).ifPresent(address::setProvince);
-        districtRepository.findById(addressPostVm.districtId()).ifPresent(address::setDistrict);
+
         addressRepository.save(address);
     }
+
+    private void performSetEntityIfExistsOrThrow(Address address, AddressPostVm addressPostVm ){
+        this.setEntityIfExistsOrThrow(addressPostVm.countryId(),countryRepository::findById ,
+                Constants.ErrorKey.COUNTRY_NOT_FOUND, address::setCountry);
+        this.setEntityIfExistsOrThrow(addressPostVm.provinceId(),provinceRepository::findById,
+                Constants.ErrorKey.PROVINCE_NOT_FOUND , address::setProvince);
+        this.setEntityIfExistsOrThrow(addressPostVm.districtId(),districtRepository::findById,
+                Constants.ErrorKey.DISTRICT_NOT_FOUND, address::setDistrict);
+    }
+
+
+    public <E> void setEntityIfExistsOrThrow(Long id, Function<Long, Optional<E>> repositoryFindById ,
+                                             String errorKey , Consumer<E>  setter){
+        Optional<E> optional = repositoryFindById.apply(id);
+        if(optional.isEmpty()){
+            throw  new NotFoundException(errorKey, id);
+        }
+        setter.accept(optional.get());
+
+    }
+
+
 
     public AddressDetailVm getAddressById(Long id){
         // throw exception
         Address address = addressRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(Constants.ErrorKey.Address.ADDRESS_NOT_FOUND,id));
+                .orElseThrow(() -> new NotFoundException(Constants.ErrorKey.ADDRESS_NOT_FOUND,id));
         return AddressDetailVm.fromModel(address);
 
     }
@@ -65,11 +83,10 @@ public class AddressService {
     public List<AddressDetailVm> getAddresses(List<Long> ids){
         List<Address> addresses = addressRepository.findAllByIdIn(ids);
         return addresses.stream().map(AddressDetailVm::fromModel).collect(Collectors.toList());
-
     }
     public void deleteAddress(Long id){
         Address address = addressRepository
-                .findById(id).orElseThrow(() -> new NotFoundException(Constants.ErrorKey.Address.ADDRESS_NOT_FOUND,id));
+                .findById(id).orElseThrow(() -> new NotFoundException(Constants.ErrorKey.ADDRESS_NOT_FOUND,id));
         addressRepository.delete(address);
     }
 }

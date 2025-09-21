@@ -14,7 +14,7 @@ import java.util.Optional;
 public class EntityAuditConfig {
     @Bean
     public AuditorAware<String> auditorAware() {
-        return ()->{
+        return ()-> {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if(authentication==null || !authentication.isAuthenticated() || authentication.getName().equals("anonymousUser")) {
                 return Optional.of("");

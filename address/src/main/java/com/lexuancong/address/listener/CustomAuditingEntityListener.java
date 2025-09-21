@@ -7,7 +7,7 @@ import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.data.auditing.AuditingHandler;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-// inject dep dù nó không phải là bean mà dùng new
+// inject dep dù nó không phải là bean mà dùng new thủ công
 @Configurable
 public class CustomAuditingEntityListener extends AuditingEntityListener {
     public CustomAuditingEntityListener( ObjectFactory<AuditingHandler> handler) {

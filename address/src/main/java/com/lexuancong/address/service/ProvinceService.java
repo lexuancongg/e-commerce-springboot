@@ -5,6 +5,7 @@ import com.lexuancong.address.model.Province;
 import com.lexuancong.address.repository.CountryRepository;
 import com.lexuancong.address.repository.ProvinceRepository;
 import com.lexuancong.address.specification.ProvinceSpecification;
+import com.lexuancong.address.viewmodel.country.CountryPostVm;
 import com.lexuancong.address.viewmodel.province.ProvincePagingVm;
 import com.lexuancong.address.viewmodel.province.ProvincePostVm;
 import com.lexuancong.address.viewmodel.province.ProvinceGetVm;
@@ -62,13 +63,22 @@ public class ProvinceService {
              throw new NotFoundException(Constants.ErrorKey.Country.COUNTRY_NOT_FOUND,provincePostVm.countryId());
         }
         // nếu cùng quốc gia mà trùng tên thì lỗi
-        if(provinceRepository.existsByNameIgnoreCaseAndCountryId(provincePostVm.name(),countryId)){
-            throw new DuplicatedException(Constants.ErrorKey.NAME_ALREADY_EXITED,provincePostVm.name());
-        }
+        this.validateExitedName(provincePostVm,null);
         Province province = provincePostVm.toModel(countryRepository.getReferenceById(countryId));
         return ProvinceGetVm.fromModel(provinceRepository.save(province));
     }
 
+
+    private void validateExitedName(ProvincePostVm provincePostVm , Long provinceIdExited ){
+        if(this.checkExitedName(provincePostVm,provinceIdExited)){
+            throw  new DuplicatedException(Constants.ErrorKey.NAME_ALREADY_EXITED,provincePostVm.name());
+        }
+    }
+    private boolean checkExitedName(ProvincePostVm provincePostVm , Long provinceIdExited){
+        return this.provinceRepository.existsByNameIgnoreCaseAndCountryIdAndIdNot(
+                provincePostVm.name(),provincePostVm.countryId(),provinceIdExited
+        );
+    }
 
 
 
@@ -78,11 +88,7 @@ public class ProvinceService {
         Province province = provinceRepository.findById(id)
                 .orElseThrow(()-> new NotFoundException(Constants.ErrorKey.Province.PROVINCE_NOT_FOUND,id));
         // chỉ cho phép trùng tên với cái id chỉnh sửa hiện tại
-        if(provinceRepository.existsByNameIgnoreCaseAndCountryIdAndIdNot(
-                provincePostVm.name(), provincePostVm.countryId(), id)
-        ){
-            throw  new DuplicatedException(Constants.ErrorKey.NAME_ALREADY_EXITED,provincePostVm.name());
-        }
+        this.validateExitedName(provincePostVm, id);
         province.setName(provincePostVm.name());
         province.setType(provincePostVm.type());
         provinceRepository.save(province);
