@@ -1,7 +1,6 @@
 package com.lexuancong.customer.service;
 
 import com.lexuancong.customer.constants.Constants;
-import com.lexuancong.customer.mapper.UserAddressMapper;
 import com.lexuancong.customer.model.UserAddress;
 import com.lexuancong.customer.repository.UserAddressRepository;
 import com.lexuancong.customer.viewmodel.address.AddressDetailVm;
@@ -23,12 +22,10 @@ import java.util.Optional;
 public class UserAddressService {
     private final UserAddressRepository userAddressRepository;
     private final AddressService addressService;
-    private final UserAddressMapper userAddressMapper;
 
-    public UserAddressService(UserAddressRepository userAddressRepository, AddressService locationService, UserAddressMapper userAddressMapper) {
+    public UserAddressService(UserAddressRepository userAddressRepository, AddressService locationService) {
         this.userAddressRepository = userAddressRepository;
         this.addressService = locationService;
-        this.userAddressMapper = userAddressMapper;
     }
 
 
@@ -43,14 +40,14 @@ public class UserAddressService {
                 .addressId(addressVmOfAddressSaved.id())
                 .isActive(isFirstAddress)
                 .build();
-        return userAddressMapper.toVmFromModel(userAddressRepository.save(userAddress),addressVmOfAddressSaved);
+        return UserAddressVm.fromModel(userAddressRepository.save(userAddress),addressVmOfAddressSaved);
     }
 
     public AddressDetailVm getDefaultAddress(){
         String userId = AuthenticationUtils.extractCustomerIdFromJwt();
         UserAddress userAddress = userAddressRepository.findByUserIdAndIsActiveTrue(userId)
                 // ban ra ngoai le here
-                .orElseThrow(()-> null );
+                .orElseThrow(()->  new NotFoundException(Constants.ErrorKey.ADDRESS_DEFAULT_NOT_FOUND) );
         return  addressService.getAddressById(userAddress.getAddressId());
 
     }
@@ -61,6 +58,7 @@ public class UserAddressService {
         if(optionalUserAddress.isEmpty()){
             throw new NotFoundException(Constants.ErrorKey.ADDRESS_NOT_FOUND);
         }
+        this.addressService.deleteAddress(id);
         userAddressRepository.delete(optionalUserAddress.get());
 
     }

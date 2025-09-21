@@ -18,7 +18,7 @@ public class KeycloakClientConfig {
                 .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
                 // url server keycloak laays token
                 .serverUrl(keycloakPropsConfig.getAuthServerUrl())
-                // reaml mặc định được thao tác
+                // realm lấy accces token
                 .realm(keycloakPropsConfig.getRealm())
                 // đại diện id ưứng dụng đăng ký trong keycloak để kết nối
                 .clientId(keycloakPropsConfig.getClientId())

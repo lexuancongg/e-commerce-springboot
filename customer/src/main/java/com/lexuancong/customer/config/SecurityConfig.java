@@ -48,25 +48,6 @@ public class SecurityConfig {
         return jwtAuthenticationConverter;
 
     }
-//    @Bean
-//    public JwtDecoder jwtDecoder() {
-//        String issuerUri = "http://localhost:8080/realms/xuancong-ecommerce"; // Thay bằng issuer của bạn
-//
-//        // đôi tượng giải max và check tính hợp lệ token
-//        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri(issuerUri + "/protocol/openid-connect/certs").build();
-//
-//        return new JwtDecoder() {
-//            @Override
-//            public Jwt decode(String token) throws JwtException {
-//                try {
-//                    return jwtDecoder.decode(token);
-//                } catch (JwtException e) {
-//                    System.err.println("Lỗi giải mã JWT: " + e.getMessage()); // Ghi log lỗi
-//                    throw e; // Ném lỗi để Spring xử lý
-//                }
-//            }
-//        };
-//    }
 
 
 }

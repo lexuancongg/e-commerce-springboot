@@ -14,6 +14,10 @@ public class AddressService {
         return null;
     }
 
+    public void deleteAddress(Long id){
+
+    }
+
     public AddressDetailVm getAddressById(Long id){
         return null;
     }

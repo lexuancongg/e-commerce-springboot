@@ -6,6 +6,7 @@ import com.lexuancong.customer.viewmodel.customer.CustomerPostVm;
 import com.lexuancong.customer.viewmodel.customer.CustomerProfilePutVm;
 import com.lexuancong.customer.viewmodel.customer.CustomerVm;
 import com.lexuancong.share.exception.AccessDeniedException;
+import com.lexuancong.share.exception.DuplicatedException;
 import com.lexuancong.share.utils.AuthenticationUtils;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.Response;
@@ -14,11 +15,13 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 // keycloak lưu thông tin người dùng mặc điịnh có các thuộc tính như firstname, lastname, email... , nếu thêm thuộc tính khác thì thêm vào phần attribute
 @Service
@@ -45,13 +48,15 @@ public class CustomerService {
 
     }
 
+
+
     public CustomerVm createCustomer(CustomerPostVm customerPostVm){
         RealmResource realmResource = keycloak.realm(keycloakPropsConfig.getRealm());
         if(this.checkUsernameExistInRealm(realmResource,customerPostVm.username())){
-            // bắn ngoại lệ
+             throw  new DuplicatedException(Constants.ErrorKey.USERNAME_ALREADY_EXISTS);
         }
         if(this.checkEmailExistInRealm(realmResource,customerPostVm.email())){
-            // băn ra ngoại le
+            throw  new DuplicatedException(Constants.ErrorKey.EMAIL_ALREADY_EXISTS);
         }
 
         UserRepresentation user = new UserRepresentation();
@@ -67,13 +72,16 @@ public class CustomerService {
         user.setEnabled(true);
         Response  responseCreateUser = realmResource.users().create(user);
         String userId = CreatedResponseUtil.getCreatedId(responseCreateUser);
-        // khác khi làm vc db, nó không tự động có id
-        user.setId(userId);
+
         UserResource userResource = realmResource.users().get(userId);
 
-        // sau này xử lý role trường hợp admin ta tài khoản cho nhân viên ở đây
-        return customerMapper.toCustomerVmFromUserRepresentation(user);
+        RoleRepresentation role = realmResource.roles().get(customerPostVm.role()).toRepresentation();
 
+        List<RoleRepresentation> roles = Collections.singletonList(role);
+
+        userResource.roles().realmLevel().add(roles);
+
+        return  CustomerVm.fromKeycloakUserRes(user);
     }
     private boolean checkUsernameExistInRealm(RealmResource realmResource,String username){
         // phân biệt hoa thường khong
@@ -109,8 +117,21 @@ public class CustomerService {
             }
 
         }catch (ForbiddenException forbiddenException){
-            throw forbiddenException;
+            throw new AccessDeniedException(Constants.ErrorKey.ACCESS_DENIED_KEYCLOAK);
         }
 
+    }
+
+    public List<CustomerVm> getCustomers(){
+        try {
+            return this.keycloak.realm(keycloakPropsConfig.getRealm()).users()
+                    .search(null,0,100)
+                    .stream()
+                    .filter(UserRepresentation::isEmailVerified)
+                    .map(CustomerVm::fromKeycloakUserRes)
+                    .toList();
+        }catch (ForbiddenException forbiddenException){
+            throw  new AccessDeniedException(Constants.ErrorKey.ACCESS_DENIED_KEYCLOAK);
+        }
     }
 }

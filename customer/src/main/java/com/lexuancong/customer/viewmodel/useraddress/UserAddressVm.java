@@ -1,5 +1,6 @@
 package com.lexuancong.customer.viewmodel.useraddress;
 
+import com.lexuancong.customer.model.UserAddress;
 import com.lexuancong.customer.viewmodel.address.AddressVm;
 import lombok.Builder;
 
@@ -11,4 +12,13 @@ public record UserAddressVm(
         AddressVm addressVm,
         boolean isActive
 ){
+
+    public static UserAddressVm fromModel(UserAddress userAddress, AddressVm addressVm) {
+        return new UserAddressVm(
+                userAddress.getId(),
+                userAddress.getUserId(),
+                addressVm,
+                userAddress.isActive()
+        );
+    }
 }

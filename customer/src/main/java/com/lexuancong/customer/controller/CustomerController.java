@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.List;
+
 @RestController
 public class CustomerController {
     private final CustomerService customerService;
@@ -23,8 +25,7 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.getCustomerProfile());
     }
 
-    // sửa lại sau vì keycloak tự tạo user cho
-    @PostMapping("/customer/customer")
+    @PostMapping("/management/customer")
     public ResponseEntity<CustomerVm> createCustomer(@RequestBody @Valid CustomerPostVm customerPostVm,
                                                      UriComponentsBuilder uriComponentsBuilder) {
         CustomerVm customerVm = customerService.createCustomer(customerPostVm);
@@ -35,6 +36,12 @@ public class CustomerController {
     public ResponseEntity<Void> updateCustomerProfile(@RequestBody CustomerProfilePutVm customerProfilePutVm){
         this.customerService.updateCustomerProfile(customerProfilePutVm);
         return ResponseEntity.noContent().build();
+    }
+
+
+    @GetMapping("/management/customers")
+    public ResponseEntity<List<CustomerVm>> getCustomers() {
+        return ResponseEntity.ok(this.customerService.getCustomers());
     }
 
 
