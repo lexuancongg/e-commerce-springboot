@@ -1,5 +1,5 @@
 import {CartItemDetailVm} from "@/models/cart/CartItemDetailVm";
-import {CartItemVm} from "@/models/cart/CartItemVm";
+
 import apiClient from "@/utils/api/apiClient";
 import productService from "@/services/product/productService";
 import {ProductPreviewVm} from "@/models/product/ProductPreviewVm";
@@ -26,7 +26,7 @@ class CartService{
     }
 
     public async  getCartItems():Promise<CartItemDetailVm[]>{
-        const response = await apiClient.get("api/cart/customer/cart-items")
+        const response = await apiClient.get("/api/cart/customer/cart-items")
         if(response.ok){
             return await  response.json();
         }

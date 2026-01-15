@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Configuration
-public class SecurityConfig {
+public class   SecurityConfig {
 
 
     @Bean

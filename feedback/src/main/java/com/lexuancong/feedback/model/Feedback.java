@@ -21,7 +21,7 @@ public class Feedback extends AuditEntity{
 
 
 
-//    // hai thuôc tính người dùng  của keycloak =>  nếu lưu như này thì nó cố định k update theo
+
 
     private String lastName;
 

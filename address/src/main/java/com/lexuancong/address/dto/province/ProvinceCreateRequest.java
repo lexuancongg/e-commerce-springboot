@@ -1,4 +1,4 @@
-package com.lexuancong.address.viewmodel.province;
+package com.lexuancong.address.dto.province;
 
 import com.lexuancong.address.model.Country;
 import com.lexuancong.address.model.Province;
@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 @Builder
-public record ProvincePostVm(
+public record ProvinceCreateRequest(
         @NotBlank @Size(min = 1,max = 100) String name,
         String type,
         @NotNull Long countryId

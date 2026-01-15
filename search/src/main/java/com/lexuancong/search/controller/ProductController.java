@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-// tìm kiếm sp
 @RestController
 public class ProductController {
     private final SearchProductService searchProductService;

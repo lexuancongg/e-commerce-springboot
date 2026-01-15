@@ -25,24 +25,24 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.getCustomerProfile());
     }
 
-    @PostMapping("/management/customer")
-    public ResponseEntity<CustomerVm> createCustomer(@RequestBody @Valid CustomerPostVm customerPostVm,
-                                                     UriComponentsBuilder uriComponentsBuilder) {
-        CustomerVm customerVm = customerService.createCustomer(customerPostVm);
-        return ResponseEntity.ok(customerVm);
-
-    }
-    @PutMapping("/customer/customer/profile")
-    public ResponseEntity<Void> updateCustomerProfile(@RequestBody CustomerProfilePutVm customerProfilePutVm){
-        this.customerService.updateCustomerProfile(customerProfilePutVm);
-        return ResponseEntity.noContent().build();
-    }
-
-
-    @GetMapping("/management/customers")
-    public ResponseEntity<List<CustomerVm>> getCustomers() {
-        return ResponseEntity.ok(this.customerService.getCustomers());
-    }
+//    @PostMapping("/management/customer")
+//    public ResponseEntity<CustomerVm> createCustomer(@RequestBody @Valid CustomerPostVm customerPostVm,
+//                                                     UriComponentsBuilder uriComponentsBuilder) {
+//        CustomerVm customerVm = customerService.createCustomer(customerPostVm);
+//        return ResponseEntity.ok(customerVm);
+//
+//    }
+//    @PutMapping("/customer/customer/profile")
+//    public ResponseEntity<Void> updateCustomerProfile(@RequestBody CustomerProfilePutVm customerProfilePutVm){
+//        this.customerService.updateCustomerProfile(customerProfilePutVm);
+//        return ResponseEntity.noContent().build();
+//    }
+//
+//
+//    @GetMapping("/management/customers")
+//    public ResponseEntity<List<CustomerVm>> getCustomers() {
+//        return ResponseEntity.ok(this.customerService.getCustomers());
+//    }
 
 
 }

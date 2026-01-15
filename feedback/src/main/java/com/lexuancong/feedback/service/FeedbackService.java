@@ -2,6 +2,7 @@ package com.lexuancong.feedback.service;
 
 import com.lexuancong.feedback.constants.Constants;
 import com.lexuancong.feedback.model.Feedback;
+import com.lexuancong.feedback.repostitory.FeedbackRepository;
 import com.lexuancong.feedback.service.internal.CustomerService;
 import com.lexuancong.feedback.service.internal.OrderService;
 import com.lexuancong.feedback.viewmodel.customer.CustomerVm;
@@ -67,20 +68,20 @@ public class FeedbackService {
 
     }
 
-    public FeedbackPagingVm getRatingByProductId(Long productId , int pageIndex, int pageSize){
-        Pageable pageable = PageRequest.of(pageIndex, pageSize , Sort.by("createdAt").descending());
-        Page<Feedback> ratingPage = this.feedbackRepository.findAllByProductId(productId, pageable);
-        List<Feedback> feedbacks = ratingPage.getContent();
-        List<FeedbackVm> feedbackVms = feedbacks.stream()
-                .map(FeedbackVm::fromModel)
-                .toList();
-        return new FeedbackPagingVm(
-                feedbackVms, pageIndex,pageSize,
-                (int) ratingPage.getTotalElements(),
-                ratingPage.getTotalPages(),
-                ratingPage.isLast());
+        public FeedbackPagingVm getRatingByProductId(Long productId , int pageIndex, int pageSize){
+            Pageable pageable = PageRequest.of(pageIndex, pageSize , Sort.by("createdAt").descending());
+            Page<Feedback> ratingPage = this.feedbackRepository.findAllByProductId(productId, pageable);
+            List<Feedback> feedbacks = ratingPage.getContent();
+            List<FeedbackVm> feedbackVms = feedbacks.stream()
+                    .map(FeedbackVm::fromModel)
+                    .toList();
+            return new FeedbackPagingVm(
+                    feedbackVms, pageIndex,pageSize,
+                    (int) ratingPage.getTotalElements(),
+                    ratingPage.getTotalPages(),
+                    ratingPage.isLast());
 
-    }
+        }
 
     private boolean checkUserHasBoughtProductCompleted(Long productId){
         return  this.orderService.checkUserHasBoughtProductCompleted(productId)

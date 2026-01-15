@@ -2,6 +2,7 @@ package com.lexuancong.oder.viewmodel.orderitem;
 
 import com.lexuancong.oder.model.Order;
 import com.lexuancong.oder.model.OrderItem;
+import com.lexuancong.oder.viewmodel.inventory.InventorySubtract;
 
 import java.math.BigDecimal;
 
@@ -21,5 +22,10 @@ public record OrderItemPostVm(
                 .productName(productName)
                 .order(order)
                 .build();
+    }
+
+
+    public InventorySubtract toInventorySubtract(){
+        return new InventorySubtract(this.productId(), this.quantity);
     }
 }

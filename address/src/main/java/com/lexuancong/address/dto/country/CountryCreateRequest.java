@@ -1,13 +1,13 @@
-package com.lexuancong.address.viewmodel.country;
+package com.lexuancong.address.dto.country;
 
 import com.lexuancong.address.model.Country;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public record CountryPostVm(
+public record CountryCreateRequest(
         @NotBlank @Size(min = 1, max = 100) String name
 ) {
-    public Country toModel(){
+    public Country toCountry(){
         return Country.builder().name(this.name).build();
     }
 }

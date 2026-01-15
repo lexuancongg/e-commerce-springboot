@@ -7,3 +7,4 @@ public record ProductSubtractQuantityVm(Long productId, int quantity) {
         return new ProductSubtractQuantityVm(orderItem.getProductId(), orderItem.getQuantity());
     }
 }
+

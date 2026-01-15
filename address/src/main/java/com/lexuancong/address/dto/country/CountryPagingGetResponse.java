@@ -1,9 +1,9 @@
-package com.lexuancong.address.viewmodel.country;
+package com.lexuancong.address.dto.country;
 
 import java.util.List;
 
-public record CountryPagingVm(
-        List<CountryGetVm> countryPayload,
+public record CountryPagingGetResponse(
+        List<CountryGetResponse> countryPayload,
         int pageIndex,
         int pageSize,
         int totalElements,

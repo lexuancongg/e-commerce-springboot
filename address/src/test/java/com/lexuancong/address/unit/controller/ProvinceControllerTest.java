@@ -4,10 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.lexuancong.address.controller.ProvinceController;
 import com.lexuancong.address.service.ProvinceService;
-import com.lexuancong.address.viewmodel.country.CountryPagingVm;
-import com.lexuancong.address.viewmodel.province.ProvinceGetVm;
-import com.lexuancong.address.viewmodel.province.ProvincePagingVm;
-import com.lexuancong.address.viewmodel.province.ProvincePostVm;
+import com.lexuancong.address.dto.province.ProvinceGetResponse;
+import com.lexuancong.address.dto.province.ProvincePagingGetResponse;
+import com.lexuancong.address.dto.province.ProvinceCreateRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,8 +43,8 @@ public class ProvinceControllerTest {
 
     @Test
     public void testGetProvincesPaging_whenValidRequest_thenReturnOk() throws Exception {
-        ProvincePagingVm provincePagingVm = new ProvincePagingVm(List.of(), 1, 10, 0, 10, true);
-        given(this.provinceService.getProvincesPaging(1,10,null)).willReturn(provincePagingVm);
+        ProvincePagingGetResponse provincePagingGetResponse = new ProvincePagingGetResponse(List.of(), 1, 10, 0, 10, true);
+        given(this.provinceService.getProvincesPaging(1,10,null)).willReturn(provincePagingGetResponse);
         mockMvc.perform(get("/address/management/provinces/paging")
                         .param("pageIndex", "1")
                         .param("pageSize", "10"))
@@ -55,8 +54,8 @@ public class ProvinceControllerTest {
 
     @Test
     public void TestGetProvincesByCountryId_whenValidRequest_thenReturnOk() throws Exception {
-        List<ProvinceGetVm> provinceGetVms = List.of(new ProvinceGetVm(5L,"VietNam",5L,"country"));
-        given(this.provinceService.getProvincesByCountryId(5L)).willReturn(provinceGetVms);
+        List<ProvinceGetResponse> provinceGetResponses = List.of(new ProvinceGetResponse(5L,"VietNam",5L,"country"));
+        given(this.provinceService.getProvincesByCountryId(5L)).willReturn(provinceGetResponses);
         mockMvc.perform(get("/address/management/provinces/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -64,16 +63,16 @@ public class ProvinceControllerTest {
 
     @Test
     public void TestCreateProvince_whenValidRequest_thenReturnOk() throws Exception {
-        ProvincePostVm provincePostVm = ProvincePostVm.builder()
+        ProvinceCreateRequest provinceCreateRequest = ProvinceCreateRequest.builder()
                 .type("country")
                 .countryId(1L)
                 .name("Quang Tri")
                 .build();
-        String requestBody = this.objectWriter.writeValueAsString(provincePostVm);
-        ProvinceGetVm provinceGetVm =ProvinceGetVm.builder()
+        String requestBody = this.objectWriter.writeValueAsString(provinceCreateRequest);
+        ProvinceGetResponse provinceGetResponse = ProvinceGetResponse.builder()
                 .countryId(1L)
                 .build();
-        given(this.provinceService.createProvince(provincePostVm)).willReturn(provinceGetVm);
+        given(this.provinceService.createProvince(provinceCreateRequest)).willReturn(provinceGetResponse);
         this.mockMvc.perform(post("/address/management/provinces")
         .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))

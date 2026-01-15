@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.lexuancong.address.controller.CountryController;
 import com.lexuancong.address.service.CountryService;
-import com.lexuancong.address.viewmodel.country.CountryGetVm;
-import com.lexuancong.address.viewmodel.country.CountryPagingVm;
-import com.lexuancong.address.viewmodel.country.CountryPostVm;
+import com.lexuancong.address.dto.country.CountryGetResponse;
+import com.lexuancong.address.dto.country.CountryPagingGetResponse;
+import com.lexuancong.address.dto.country.CountryCreateRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -52,7 +52,7 @@ public class CountryControllerTest {
     @Test
     void testGetCountriesPaging_whenValidRequest_thenReturnOk() throws Exception {
         // Mock response
-        CountryPagingVm mockPagingVm = new CountryPagingVm(List.of(), 1, 10, 0, 10, true);
+        CountryPagingGetResponse mockPagingVm = new CountryPagingGetResponse(List.of(), 1, 10, 0, 10, true);
         given(countryService.getCountriesPaging(1, 10)).willReturn(mockPagingVm);
 
         mockMvc.perform(get("/address/management/countries/paging")
@@ -64,7 +64,7 @@ public class CountryControllerTest {
     // pass
     @Test
     void testGetCountries_whenValidRequest_thenReturnOk() throws Exception {
-        List<CountryGetVm> mockResult = List.of(new CountryGetVm(1L, "VietNam"));
+        List<CountryGetResponse> mockResult = List.of(new CountryGetResponse(1L, "VietNam"));
         given(countryService.getCountries()).willReturn(mockResult);
         this.mockMvc.perform(MockMvcRequestBuilders.get("/address/management/countries")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -78,10 +78,10 @@ public class CountryControllerTest {
     // pass
     @Test
     void testCreateCountry_whenValidRequest_thenReturnOk() throws Exception {
-        CountryGetVm mockResult = new CountryGetVm(1L, "VietNam");
-        CountryPostVm countryPostVm = new CountryPostVm("VietNam");
-        String bodyRequest = this.objectWriter.writeValueAsString(countryPostVm);
-        given(countryService.createCountry(countryPostVm)).willReturn(mockResult);
+        CountryGetResponse mockResult = new CountryGetResponse(1L, "VietNam");
+        CountryCreateRequest countryCreateRequest = new CountryCreateRequest("VietNam");
+        String bodyRequest = this.objectWriter.writeValueAsString(countryCreateRequest);
+        given(countryService.createCountry(countryCreateRequest)).willReturn(mockResult);
         this.mockMvc.perform(post("/address/management/countries")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(bodyRequest)
@@ -95,9 +95,9 @@ public class CountryControllerTest {
     // pass
     @Test
     void testCreateCountry_WhenNameIsBlank_thenReturnBadRequest() throws Exception {
-        CountryGetVm mockResult = new CountryGetVm(1L, "VietNam");
-        CountryPostVm countryPostVm = new CountryPostVm("");
-        String bodyRequest = this.objectWriter.writeValueAsString(countryPostVm);
+        CountryGetResponse mockResult = new CountryGetResponse(1L, "VietNam");
+        CountryCreateRequest countryCreateRequest = new CountryCreateRequest("");
+        String bodyRequest = this.objectWriter.writeValueAsString(countryCreateRequest);
         this.mockMvc.perform(post("/address/management/countries")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(bodyRequest))
@@ -110,8 +110,8 @@ public class CountryControllerTest {
     // pass
     @Test
     void testUpdateCountry_WhenValidRequest_thenReturnOk() throws Exception {
-        CountryPostVm countryPostVm = new CountryPostVm("VietNam");
-        String bodyRequest = this.objectWriter.writeValueAsString(countryPostVm);
+        CountryCreateRequest countryCreateRequest = new CountryCreateRequest("VietNam");
+        String bodyRequest = this.objectWriter.writeValueAsString(countryCreateRequest);
         this.mockMvc.perform(put("/address/management/countries/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(bodyRequest)
@@ -122,8 +122,8 @@ public class CountryControllerTest {
     // pass
     @Test
     void testUpdateCountry_WhenNameIsBlank_thenReturnBadRequest() throws Exception {
-        CountryPostVm countryPostVm = new CountryPostVm("");
-        String bodyRequest = this.objectWriter.writeValueAsString(countryPostVm);
+        CountryCreateRequest countryCreateRequest = new CountryCreateRequest("");
+        String bodyRequest = this.objectWriter.writeValueAsString(countryCreateRequest);
         this.mockMvc.perform(put("/address/management/countries/1")
         .contentType(MediaType.APPLICATION_JSON)
                         .content(bodyRequest)

@@ -40,6 +40,7 @@ public class UserAddressService {
                 .addressId(addressVmOfAddressSaved.id())
                 .isActive(isFirstAddress)
                 .build();
+
         return UserAddressVm.fromModel(userAddressRepository.save(userAddress),addressVmOfAddressSaved);
     }
 

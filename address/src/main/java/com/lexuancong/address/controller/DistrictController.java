@@ -1,7 +1,7 @@
 package com.lexuancong.address.controller;
 
 import com.lexuancong.address.service.DistrictService;
-import com.lexuancong.address.viewmodel.district.DistrictGetVm;
+import com.lexuancong.address.dto.district.DistrictGetResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,8 +18,8 @@ public class DistrictController {
 
     // lấy district dựa vào province => checked
     @GetMapping({"/management/districts/{provinceId}","/customer/districts/{provinceId}"})
-    public ResponseEntity<List<DistrictGetVm>>  getDistrictByProvinceId(@PathVariable long provinceId){
-        List<DistrictGetVm> districtGetVms = districtService.getDistrictByProvinceId(provinceId);
-        return ResponseEntity.ok(districtGetVms);
+    public ResponseEntity<List<DistrictGetResponse>>  getDistrictByProvinceId(@PathVariable long provinceId){
+        List<DistrictGetResponse> districtGetResponses = districtService.getDistrictByProvinceId(provinceId);
+        return ResponseEntity.ok(districtGetResponses);
     }
 }

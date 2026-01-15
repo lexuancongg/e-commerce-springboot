@@ -46,7 +46,7 @@ public class UserAddressController {
 
     // CHECKED
     // get danh sach address => cần tối ưu độ phức tạp thuật toán
-    @GetMapping("/customer/addresses")
+    @GetMapping("/customer/user-address/addresses")
     public ResponseEntity<List<AddressDetailVm>> getUserAddressDetail(){
         return ResponseEntity.ok(this.userAddressService.getUserAddressDetail());
 

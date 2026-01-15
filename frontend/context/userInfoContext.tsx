@@ -33,6 +33,8 @@ export function UserInfoProvider({children}: React.PropsWithChildren): ReactElem
             })
     }, [])
 
+
+
     const userInfo: UserInfo = useMemo(() => (
             {
                 firstName,

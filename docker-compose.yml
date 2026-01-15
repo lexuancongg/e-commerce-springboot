@@ -43,10 +43,6 @@ services:
       KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
       KC_DB_USERNAME: xuancong
       KC_DB_PASSWORD: xuancong
-      JAVA_OPTS: "-Dkeycloak.profile=preview"
-
-      #      cho nó chạy cổng 80 trong container
-      KC_HTTP_PORT: 80
     ports:
       - "8080:80"
     depends_on:

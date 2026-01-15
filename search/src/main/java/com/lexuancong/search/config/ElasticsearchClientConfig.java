@@ -26,6 +26,7 @@ public class ElasticsearchClientConfig  extends ElasticsearchConfiguration {
 
 
 
+
 }
 
 

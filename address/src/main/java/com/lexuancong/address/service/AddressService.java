@@ -2,20 +2,18 @@ package com.lexuancong.address.service;
 
 import com.lexuancong.address.constants.Constants;
 import com.lexuancong.address.model.Address;
-import com.lexuancong.address.model.Country;
 import com.lexuancong.address.repository.AddressRepository;
 import com.lexuancong.address.repository.CountryRepository;
 import com.lexuancong.address.repository.DistrictRepository;
 import com.lexuancong.address.repository.ProvinceRepository;
-import com.lexuancong.address.viewmodel.address.AddressDetailVm;
-import com.lexuancong.address.viewmodel.address.AddressPostVm;
-import com.lexuancong.address.viewmodel.address.AddressGetVm;
+import com.lexuancong.address.dto.address.AddressDetailGetResponse;
+import com.lexuancong.address.dto.address.AddressCreateRequest;
+import com.lexuancong.address.dto.address.AddressGetResponse;
 import com.lexuancong.share.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -31,31 +29,31 @@ public class AddressService {
     private final ProvinceRepository provinceRepository;
     private final DistrictRepository districtRepository;
 
-    public AddressGetVm createAddress(AddressPostVm addressPostVm){
-        Address address = addressPostVm.toModel();
-        this.performSetEntityIfExistsOrThrow(address,addressPostVm);
-        return AddressGetVm.fromModel(addressRepository.save(address));
+    public AddressGetResponse createAddress(AddressCreateRequest addressCreateRequest){
+        Address address = addressCreateRequest.toAddressBase();
+        this.performSetEntityIfExistsOrThrow(address, addressCreateRequest);
+        return AddressGetResponse.fromAddress(addressRepository.save(address));
     }
 
-    public void updateAddress(Long id, AddressPostVm addressPostVm){
-        // throw exception
+
+
+    public void updateAddress(Long id, AddressCreateRequest addressCreateRequest){
         Address address = addressRepository.findById(id)
                 .orElseThrow(() ->  new NotFoundException(Constants.ErrorKey.ADDRESS_NOT_FOUND,id));
-        this.performSetEntityIfExistsOrThrow(address,addressPostVm);
-        address.setContactName(addressPostVm.contactName());
-        address.setSpecificAddress(addressPostVm.specificAddress());
-        address.setPhoneNumber(addressPostVm.phoneNumber());
-
+        this.performSetEntityIfExistsOrThrow(address, addressCreateRequest);
+        address.setContactName(addressCreateRequest.contactName());
+        address.setSpecificAddress(addressCreateRequest.specificAddress());
+        address.setPhoneNumber(addressCreateRequest.phoneNumber());
 
         addressRepository.save(address);
     }
 
-    private void performSetEntityIfExistsOrThrow(Address address, AddressPostVm addressPostVm ){
-        this.setEntityIfExistsOrThrow(addressPostVm.countryId(),countryRepository::findById ,
+    private void performSetEntityIfExistsOrThrow(Address address, AddressCreateRequest addressCreateRequest){
+        this.setEntityIfExistsOrThrow(addressCreateRequest.countryId(),countryRepository::findById ,
                 Constants.ErrorKey.COUNTRY_NOT_FOUND, address::setCountry);
-        this.setEntityIfExistsOrThrow(addressPostVm.provinceId(),provinceRepository::findById,
+        this.setEntityIfExistsOrThrow(addressCreateRequest.provinceId(),provinceRepository::findById,
                 Constants.ErrorKey.PROVINCE_NOT_FOUND , address::setProvince);
-        this.setEntityIfExistsOrThrow(addressPostVm.districtId(),districtRepository::findById,
+        this.setEntityIfExistsOrThrow(addressCreateRequest.districtId(),districtRepository::findById,
                 Constants.ErrorKey.DISTRICT_NOT_FOUND, address::setDistrict);
     }
 
@@ -72,19 +70,20 @@ public class AddressService {
 
 
 
-    public AddressDetailVm getAddressById(Long id){
-        // throw exception
+    public AddressDetailGetResponse getAddressById(Long id){
         Address address = addressRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(Constants.ErrorKey.ADDRESS_NOT_FOUND,id));
-        return AddressDetailVm.fromModel(address);
+        return AddressDetailGetResponse.fromAddress(address);
 
     }
 
-    public List<AddressDetailVm> getAddresses(List<Long> ids){
+    public List<AddressDetailGetResponse> getAddresses(List<Long> ids){
         List<Address> addresses = addressRepository.findAllByIdIn(ids);
-        return addresses.stream().map(AddressDetailVm::fromModel)
+        return addresses.stream().map(AddressDetailGetResponse::fromAddress)
                 .collect(Collectors.toList());
     }
+
+
     public void deleteAddress(Long id){
         Address address = addressRepository
                 .findById(id).orElseThrow(() -> new NotFoundException(Constants.ErrorKey.ADDRESS_NOT_FOUND,id));

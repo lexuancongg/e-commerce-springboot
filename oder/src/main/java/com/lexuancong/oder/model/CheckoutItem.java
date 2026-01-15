@@ -19,7 +19,6 @@ public class CheckoutItem {
     private Long id;
     private Long productId;
     private int quantity;
-    // snapshort giá và name lại
     private String productName;
     private BigDecimal price;
 

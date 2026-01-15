@@ -1,7 +1,6 @@
 package com.lexuancong.cart.service;
 
 import com.lexuancong.cart.constants.Constants;
-import com.lexuancong.cart.mapper.CartItemMapper;
 import com.lexuancong.cart.model.CartItem;
 import com.lexuancong.cart.repository.CartItemRepository;
 import com.lexuancong.cart.service.internal.ProductService;
@@ -28,7 +27,6 @@ import java.util.stream.Collectors;
 @Transactional
 public class CartItemService {
     private final CartItemRepository cartItemRepository;
-    private final CartItemMapper cartItemMapper;
     private final ProductService productService;
     public CartItemGetVm addCartItem(CartItemPostVm cartItemPostVm){
         this.validateProduct(cartItemPostVm.productId());

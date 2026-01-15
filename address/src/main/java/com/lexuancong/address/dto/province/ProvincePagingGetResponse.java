@@ -1,11 +1,11 @@
-package com.lexuancong.address.viewmodel.province;
+package com.lexuancong.address.dto.province;
 
 import lombok.Builder;
 
 import java.util.List;
 @Builder
-public record ProvincePagingVm(
-        List<ProvinceGetVm> provincePayload,
+public record ProvincePagingGetResponse(
+        List<ProvinceGetResponse> provincePayload,
         int pageIndex,
         int pageSize,
         int totalElements,

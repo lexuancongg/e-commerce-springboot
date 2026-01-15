@@ -1,9 +1,9 @@
 package com.lexuancong.address.controller;
 
 import com.lexuancong.address.service.CountryService;
-import com.lexuancong.address.viewmodel.country.CountryPagingVm;
-import com.lexuancong.address.viewmodel.country.CountryPostVm;
-import com.lexuancong.address.viewmodel.country.CountryGetVm;
+import com.lexuancong.address.dto.country.CountryPagingGetResponse;
+import com.lexuancong.address.dto.country.CountryCreateRequest;
+import com.lexuancong.address.dto.country.CountryGetResponse;
 import com.lexuancong.share.constants.Constants;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,7 @@ public class CountryController {
     // checked
 
     @GetMapping("/management/countries/paging")
-    public ResponseEntity<CountryPagingVm> getCountriesPaging(
+    public ResponseEntity<CountryPagingGetResponse> getCountriesPaging(
             @RequestParam(name ="pageIndex" ,defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER,required = false)
             final int pageIndex,
             @RequestParam(name = "pageSize" ,defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE,required = false)
@@ -36,20 +36,20 @@ public class CountryController {
 
     // checked
     @GetMapping({"/management/countries","/customer/countries"})
-    public ResponseEntity<List<CountryGetVm>> getCountries(){
+    public ResponseEntity<List<CountryGetResponse>> getCountries(){
         return ResponseEntity.ok(countryService.getCountries());
     }
 
     // checked
     @PostMapping("/management/countries")
-    public ResponseEntity<CountryGetVm> createCountry(
-            @RequestBody @Valid final CountryPostVm countryPostVm,
+    public ResponseEntity<CountryGetResponse> createCountry(
+            @RequestBody @Valid final CountryCreateRequest countryCreateRequest,
             final UriComponentsBuilder uriComponentsBuilder
             ){
-        CountryGetVm countrySaved = countryService.createCountry(countryPostVm);
+        CountryGetResponse countrySaved = countryService.createCountry(countryCreateRequest);
         return ResponseEntity.created(
                         uriComponentsBuilder
-                                .replacePath("/countries/{id}")
+                                .replacePath("/management/countries/{id}")
                                 .buildAndExpand(countrySaved.id())
                                 .toUri())
                 .body(countrySaved);
@@ -59,8 +59,8 @@ public class CountryController {
 
     @PutMapping("/management/countries/{id}")
     public ResponseEntity<Void> updateCountry(@PathVariable Long id,
-                                              @RequestBody @Valid final CountryPostVm countryPostVm){
-        countryService.updateCountry(id,countryPostVm);
+                                              @RequestBody @Valid final CountryCreateRequest countryCreateRequest){
+        countryService.updateCountry(id, countryCreateRequest);
         return ResponseEntity.noContent().build();
     }
 

@@ -25,6 +25,11 @@ public class Category extends AuditEntity {
     // avatar category
     private Long imageId;
 
+    private Short displayIndex;
+
+    private String metaKeywords;
+
+    private String metaDescription;
 
     @ManyToOne()
     @JoinColumn(name = "parent_id")

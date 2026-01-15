@@ -1,13 +1,13 @@
 'use client'
-import { NextPage } from "next";
-import { useEffect, useState } from "react";
+import {NextPage} from "next";
+import {useEffect, useState} from "react";
 import {CategoryVm} from "@/models/category/CategoryVm";
-import { Container } from "react-bootstrap";
+import {Container} from "react-bootstrap";
 import categoryService from "@/services/category/categoryService";
-import { useRouter } from "next/navigation";
+import {useRouter} from "next/navigation";
 import LoadImageSafe from "../common/loadImageSafe";
 
-const categoriesDemo : CategoryVm[] = [
+const categoriesDemo: CategoryVm[] = [
     {
         id: 1,
         name: "Woment",
@@ -19,22 +19,21 @@ const categoriesDemo : CategoryVm[] = [
         id: 2,
         name: "Men",
         slug: "fashion",
-            avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/banner-02.jpg",
+        avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/banner-02.jpg",
     },
     {
         id: 3,
         name: "Kids",
         slug: "fashion",
-            avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/banner-03.jpg",
+        avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/banner-03.jpg",
     },
     {
         id: 4,
         name: "Fashion",
         slug: "fashion",
-            avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/banner-05.jpg",
+        avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/banner-05.jpg",
     }
 ]
-
 
 
 // PASS
@@ -63,7 +62,7 @@ const Category: NextPage = () => {
             .then((resCategories) => {
                 setCategories(resCategories);
             })
-            .catch((error) =>{
+            .catch((error) => {
                 setCategories(categoriesDemo)
                 console.log(error.message)
             })
@@ -76,18 +75,18 @@ const Category: NextPage = () => {
             <div
                 className="flex transition-transform duration-500 ease-out"
                 style={{
-                    transform: `translateX(calc(-${current * (100 / 3)}% - ${current * (1/3 )}rem))`, 
-                    gap: "1rem", 
+                    transform: `translateX(calc(-${current * (100 / 3)}% - ${current * (1 / 3)}rem))`,
+                    gap: "1rem",
                 }}
             >
                 {categories.map((category) => (
                     <div
-                        onClick={()=> handleClickCategoryCard(category.slug)}
+                        onClick={() => handleClickCategoryCard(category.slug)}
                         key={category.id}
                         className="flex-none relative overflow-hidden cursor-pointer group rounded-xl border border-gray-300 "
                         style={{
-                            width: "calc((100% - 2rem) / 3)", 
-                            aspectRatio: "4/3", 
+                            width: "calc((100% - 2rem) / 3)",
+                            aspectRatio: "4/3",
                         }}
                     >
                         <LoadImageSafe
@@ -96,21 +95,25 @@ const Category: NextPage = () => {
                             className="w-full h-full object-cover"
                         />
 
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent pointer-events-none"></div>
+                        <div
+                            className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent pointer-events-none"></div>
 
                         <a
                             href={`/category/${category.slug}`}
                             className="absolute inset-0 flex flex-col justify-between p-6"
                         >
                             <div className="flex flex-col space-y-1">
-                                <span className="text-black text-2xl font-bold transition-all group-hover:-translate-y-1 group-hover:text-yellow-400">
+                                <span
+                                    className="text-black text-2xl font-bold transition-all group-hover:-translate-y-1 group-hover:text-yellow-400">
                                     {category.name}
                                 </span>
-                                <span className="text-black-100 text-xs transition-all group-hover:-translate-y-1 group-hover:text-yellow-300">
+                                <span
+                                    className="text-black-100 text-xs transition-all group-hover:-translate-y-1 group-hover:text-yellow-300">
                                     Spring 2018
                                 </span>
                             </div>
-                            <div className="text-white font-semibold transition-all group-hover:-translate-y-1 group-hover:text-white">
+                            <div
+                                className="text-white font-semibold transition-all group-hover:-translate-y-1 group-hover:text-white">
                                 Shop Now
                             </div>
                         </a>

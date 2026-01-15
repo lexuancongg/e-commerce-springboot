@@ -3,9 +3,9 @@ package com.lexuancong.address.service;
 import com.lexuancong.address.constants.Constants;
 import com.lexuancong.address.model.Country;
 import com.lexuancong.address.repository.CountryRepository;
-import com.lexuancong.address.viewmodel.country.CountryPagingVm;
-import com.lexuancong.address.viewmodel.country.CountryPostVm;
-import com.lexuancong.address.viewmodel.country.CountryGetVm;
+import com.lexuancong.address.dto.country.CountryPagingGetResponse;
+import com.lexuancong.address.dto.country.CountryCreateRequest;
+import com.lexuancong.address.dto.country.CountryGetResponse;
 import com.lexuancong.share.exception.DuplicatedException;
 import com.lexuancong.share.exception.NotFoundException;
 import org.springframework.data.domain.Page;
@@ -28,15 +28,15 @@ public class CountryService {
         this.countryRepository = countryRepository;
     }
 
-    public CountryPagingVm getCountriesPaging(final int pageIndex,final int pageSize){
+    public CountryPagingGetResponse getCountriesPaging(final int pageIndex, final int pageSize){
         final Pageable pageable = PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.ASC,"name"));
         final Page<Country> countryPage = countryRepository.findAll(pageable);
         List<Country> countries = countryPage.getContent();
 
-        List<CountryGetVm> countryPayload = countries.stream()
-                .map(CountryGetVm::fromModel)
+        List<CountryGetResponse> countryPayload = countries.stream()
+                .map(CountryGetResponse::fromCountry)
                 .toList();
-        return new CountryPagingVm(
+        return new CountryPagingGetResponse(
                 countryPayload,
                 countryPage.getNumber(),
                 countryPage.getSize(),
@@ -49,16 +49,16 @@ public class CountryService {
 
 
 
-    public List<CountryGetVm> getCountries(){
+    public List<CountryGetResponse> getCountries(){
         return countryRepository.findAll(Sort.by(Sort.Direction.ASC,"name"))
                 .stream()
-                .map(CountryGetVm::fromModel)
+                .map(CountryGetResponse::fromCountry)
                 .toList();
     }
 
-    public CountryGetVm createCountry(CountryPostVm countryPostVm){
-        this.validateExitedName(countryPostVm.name(),null);
-        return CountryGetVm.fromModel(countryRepository.save(countryPostVm.toModel()));
+    public CountryGetResponse createCountry(CountryCreateRequest countryCreateRequest){
+        this.validateExitedName(countryCreateRequest.name(),null);
+        return CountryGetResponse.fromCountry(countryRepository.save(countryCreateRequest.toCountry()));
     }
 
     private void validateExitedName(String name,Long exitedId){
@@ -70,11 +70,11 @@ public class CountryService {
         return this.countryRepository.existsByNameIgnoreCaseAndIdNot(name, exitedId);
     }
 
-    public void updateCountry(Long id,CountryPostVm countryPostVm){
+    public void updateCountry(Long id, CountryCreateRequest countryCreateRequest){
        Country country = countryRepository.findById(id)
                .orElseThrow(()-> new NotFoundException(Constants.ErrorKey.COUNTRY_NOT_FOUND, id));
-       this.validateExitedName(countryPostVm.name(),id);
-       country.setName(countryPostVm.name());
+       this.validateExitedName(countryCreateRequest.name(),id);
+       country.setName(countryCreateRequest.name());
        countryRepository.save(country);
 
     }
@@ -83,7 +83,6 @@ public class CountryService {
         if(!isExistedCountry){
             throw new NotFoundException(Constants.ErrorKey.COUNTRY_NOT_FOUND, id);
         }
-        // sẽ bị bắn ra ngoại lệ
         countryRepository.deleteById(id);
     }
 

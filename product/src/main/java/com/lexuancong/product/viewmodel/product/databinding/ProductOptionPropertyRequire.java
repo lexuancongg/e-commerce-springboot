@@ -5,5 +5,5 @@ import java.util.Map;
 
 public interface ProductOptionPropertyRequire {
     Long productOptionId();
-    Map<Long,String> values();
+    List<String> values();
 }

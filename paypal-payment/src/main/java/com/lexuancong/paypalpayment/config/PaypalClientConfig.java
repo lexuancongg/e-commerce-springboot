@@ -26,7 +26,7 @@ public class PaypalClientConfig {
     @Value("${paypal.mode}")
     private String mode;
 
-    // bean đại diện cho client khi thao tác với sdk paypal nhu gọi api cho kiểu cũ
+    // bean đại diện cho client khi thao tác với sdk paypal nhu gọi api cho kiểu cũ => kiểu cũ là kiểu dun API context
     @Bean
     public PayPalHttpClient payPalHttpClient() {
         if (this.mode.equals("sanbox")) {

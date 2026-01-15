@@ -4,7 +4,7 @@ import com.lexuancong.address.constants.Constants;
 import com.lexuancong.address.model.District;
 import com.lexuancong.address.repository.DistrictRepository;
 import com.lexuancong.address.repository.ProvinceRepository;
-import com.lexuancong.address.viewmodel.district.DistrictGetVm;
+import com.lexuancong.address.dto.district.DistrictGetResponse;
 import com.lexuancong.share.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +20,7 @@ public class DistrictService {
         this.provinceRepository = provinceRepository;
     }
 
-    public List<DistrictGetVm> getDistrictByProvinceId(Long provinceId) {
+    public List<DistrictGetResponse> getDistrictByProvinceId(Long provinceId) {
         // check provinceId
         boolean isExitedProvince = provinceRepository.existsById(provinceId);
         if (!isExitedProvince) {
@@ -28,7 +28,7 @@ public class DistrictService {
         }
         List<District> districts = districtRepository.findAllByProvinceIdOrderByNameAsc(provinceId);
         return districts.stream()
-                .map(DistrictGetVm::fromModel)
+                .map(DistrictGetResponse::fromDistrict)
                 .toList();
     }
 }

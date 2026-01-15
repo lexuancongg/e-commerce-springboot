@@ -105,7 +105,7 @@ public class ProductController {
 
 
 
-    //
+
     @GetMapping("/customer/products")
     public ResponseEntity<ProductPagingVm> getProductByMultiParams(
             @RequestParam(value = "pageIndex" ,required = false , defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE) int pageIndex,

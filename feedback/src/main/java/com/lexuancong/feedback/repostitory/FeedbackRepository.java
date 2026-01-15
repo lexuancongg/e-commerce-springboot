@@ -1,4 +1,4 @@
-package com.lexuancong.feedback.service;
+package com.lexuancong.feedback.repostitory;
 
 import com.lexuancong.feedback.model.Feedback;
 import org.springframework.data.domain.Page;

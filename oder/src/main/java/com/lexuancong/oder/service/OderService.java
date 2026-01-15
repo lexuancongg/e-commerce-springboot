@@ -6,9 +6,11 @@ import com.lexuancong.oder.model.enum_status.OrderStatus;
 import com.lexuancong.oder.repository.OrderRepository;
 import com.lexuancong.oder.repository.OrderItemRepository;
 import com.lexuancong.oder.service.internal.CartService;
+import com.lexuancong.oder.service.internal.InventoryService;
 import com.lexuancong.oder.service.internal.ProductService;
 import com.lexuancong.oder.specification.OrderSpecification;
 import com.lexuancong.oder.constants.Constants;
+import com.lexuancong.oder.viewmodel.inventory.InventorySubtract;
 import com.lexuancong.oder.viewmodel.order.*;
 import com.lexuancong.oder.viewmodel.product.ProductVariantPreviewVm;
 import com.lexuancong.share.exception.NotFoundException;
@@ -21,6 +23,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,21 +34,27 @@ public class OderService {
     private final OrderItemRepository orderItemRepository;
     private final CartService cartService;
     private final ProductService productService;
-    public OderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository, CartService cartService, ProductService productService) {
+    private final InventoryService inventoryService;
+    public OderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository, CartService cartService, ProductService productService, InventoryService inventoryService) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.cartService = cartService;
         this.productService = productService;
+        this.inventoryService = inventoryService;
     }
 
     public OrderVm createOrder(OrderPostVm orderPostVm){
+        List<InventorySubtract> inventorySubtracts = new ArrayList<>();
         Order order = orderPostVm.toModel();
         String userId = AuthenticationUtils.extractCustomerIdFromJwt();
         order.setCustomerId(userId);
 
         this.orderRepository.save(order);
         List<OrderItem> orderItemSet = orderPostVm.orderItemPostVms().stream()
-                .map(orderItemPostVm -> orderItemPostVm.toModel(order))
+                .map(orderItemPostVm -> {
+                    inventorySubtracts.add(orderItemPostVm.toInventorySubtract());
+                    return  orderItemPostVm.toModel(order);
+                })
                 .toList();
         // save orderItems
         this.orderItemRepository.saveAll(orderItemSet);
@@ -55,10 +64,13 @@ public class OderService {
 
         this.cartService.deleteCartItems(orderItemSet);
         this.productService.updateQuantityProductAfterOrder(orderItemSet);
+        this.inventoryService.subtractQuantityProduct(inventorySubtracts);
         return orderVm;
 
 
     }
+
+
     private void updateOderStatus(Long orderId, OrderStatus orderStatus){
         Order order = this.orderRepository.findById(orderId)
                 .orElseThrow(()->new RuntimeException("Order not found"));

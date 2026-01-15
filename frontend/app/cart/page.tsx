@@ -1,11 +1,10 @@
 'use client'
 import React, {ChangeEvent, useCallback, useEffect, useState} from "react";
 import ConfirmationDialog from "@/components/dialog/confirmDialog";
-import { CartItemDetailVm } from "@/models/cart/CartItemDetailVm";
+import {CartItemDetailVm} from "@/models/cart/CartItemDetailVm";
 import Link from "next/link";
 import cartService from "@/services/cart/cartService";
 import {CartItemPutVm} from "@/models/cart/CartItemPutVm";
-
 
 
 const cartItemsDemo: CartItemDetailVm[] = [
@@ -17,9 +16,9 @@ const cartItemsDemo: CartItemDetailVm[] = [
         avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/product-01.jpg",
         price: 44.00,
         productOptions: [
-            { id: 1, optionName: "Type", value: "Cotton T-shirt" },
-             {id:2, optionName:"Size", value:"L"}
-            ],
+            {id: 1, optionName: "Type", value: "Cotton T-shirt"},
+            {id: 2, optionName: "Size", value: "L"}
+        ],
     },
     {
         productId: 2,
@@ -28,7 +27,7 @@ const cartItemsDemo: CartItemDetailVm[] = [
         slug: "cotton-shirt",
         avatarUrl: "https://preview.colorlib.com/theme/cozastore/images/product-02.jpg",
         price: 44.00,
-        productOptions: [{ id: 2, optionName: "Type", value: "Cotton T-shirt" }],
+        productOptions: [{id: 2, optionName: "Type", value: "Cotton T-shirt"}],
     },
 ];
 
@@ -40,20 +39,18 @@ const Cart = () => {
     const [loadingItems, setLoadingItems] = useState<Set<number>>(new Set());
 
     useEffect(() => {
-       loadCartItems();
+        loadCartItems();
     }, []);
 
-    const loadCartItems = ()=>{
+    const loadCartItems = () => {
         cartService.getCartItems()
-            .then((res)=>{
+            .then((res) => {
                 setCartItems(cartItemsDemo)
             })
-            .catch((error)=>{
+            .catch((error) => {
                 console.log(error.message)
             })
     }
-
-
 
 
     const handleSelectAllCartItemsChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -79,26 +76,25 @@ const Cart = () => {
     };
 
 
-
-    const  handleUpdateCartItemQuantity = async (productId : number, newQuantity: number)=>{
-        setLoadingItems((prevLoadingItems)=> {
-            const  loadingItemsNew  = new Set<number>(prevLoadingItems);
+    const handleUpdateCartItemQuantity = async (productId: number, newQuantity: number) => {
+        setLoadingItems((prevLoadingItems) => {
+            const loadingItemsNew = new Set<number>(prevLoadingItems);
             loadingItemsNew.add(productId)
             return loadingItemsNew;
         })
         try {
-            const cartItemPutVm : CartItemPutVm = {
-                quantity : newQuantity
+            const cartItemPutVm: CartItemPutVm = {
+                quantity: newQuantity
             }
-            await  cartService.updateCartItemAboutQuantity(productId,cartItemPutVm)
+            await cartService.updateCartItemAboutQuantity(productId, cartItemPutVm)
             loadCartItems();
-        }catch (error){
+        } catch (error) {
 
-        }finally {
-            setLoadingItems((prevLoadingItems)=>{
-               const  newLoadingItems = new Set(prevLoadingItems);
-               newLoadingItems.delete(productId);
-               return newLoadingItems;
+        } finally {
+            setLoadingItems((prevLoadingItems) => {
+                const newLoadingItems = new Set(prevLoadingItems);
+                newLoadingItems.delete(productId);
+                return newLoadingItems;
             })
 
         }
@@ -120,7 +116,7 @@ const Cart = () => {
         if (newQuantity < 1) {
             handleShowModelConfirmDelete(productId);
         } else {
-            await handleUpdateCartItemQuantity(productId,newQuantity);
+            await handleUpdateCartItemQuantity(productId, newQuantity);
         }
     };
 
@@ -130,13 +126,10 @@ const Cart = () => {
     };
 
 
-
-
-
     const handleDeleteCartItem = async () => {
         try {
-            await  cartService.deleteCartItem(productIdToRemove);
-        }catch (error){
+            await cartService.deleteCartItem(productIdToRemove);
+        } catch (error) {
 
         }
         setIsShowModelConfirmDelete(false);
@@ -182,7 +175,8 @@ const Cart = () => {
                                                 onChange={() => handleSelectCartItemChange(item.productId)}
                                                 className="h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
                                             />
-                                            <Link href={`/redirect?productId=${item.productId}`} className="flex-shrink-0">
+                                            <Link href={`/redirect?productId=${item.productId}`}
+                                                  className="flex-shrink-0">
                                                 <img
                                                     src={item.avatarUrl}
                                                     alt={item.productName}
@@ -219,7 +213,8 @@ const Cart = () => {
                                                 value={item.quantity}
                                                 disabled={loadingItems.has(item.productId)}
                                                 className="w-12 text-center border-t border-b border-gray-300 focus:outline-none bg-white"
-                                                onChange={()=>{}}
+                                                onChange={() => {
+                                                }}
                                             />
                                             <button
                                                 onClick={() => handleIncreaseQuantity(item.productId)}
@@ -264,12 +259,14 @@ const Cart = () => {
                                     className="p-2 border border-gray-300 rounded w-1/2"
                                 />
                             </div>
-                            <div className="flex justify-between font-bold text-gray-800 mt-4 pt-2 border-t border-gray-200">
+                            <div
+                                className="flex justify-between font-bold text-gray-800 mt-4 pt-2 border-t border-gray-200">
                                 <span>TOTAL PRICE</span>
                                 <span>€{totalSelectedPrice.toFixed(2)}</span>
                             </div>
                         </div>
-                        <button className="w-full mt-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition duration-300">
+                        <button
+                            className="w-full mt-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition duration-300">
                             PROCESS CHECKOUT
                         </button>
                     </div>
