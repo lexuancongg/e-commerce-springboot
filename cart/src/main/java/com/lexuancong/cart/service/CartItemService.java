@@ -1,13 +1,13 @@
 package com.lexuancong.cart.service;
 
 import com.lexuancong.cart.constants.Constants;
+import com.lexuancong.cart.dto.productoption.ProductOptionValueDetailGetResponse;
 import com.lexuancong.cart.model.CartItem;
 import com.lexuancong.cart.repository.CartItemRepository;
 import com.lexuancong.cart.service.internal.ProductService;
-import com.lexuancong.cart.viewmodel.cartitem.*;
-import com.lexuancong.cart.viewmodel.product.ProductPreviewVm;
-import com.lexuancong.cart.viewmodel.productoption.ProductOptionValueGetVm;
-import com.lexuancong.cart.viewmodel.productoption.ProductOptionValueVm;
+import com.lexuancong.cart.dto.cartitem.*;
+import com.lexuancong.cart.dto.product.ProductPreviewGetResponse;
+import com.lexuancong.cart.dto.productoption.ProductOptionValueGetResponse;
 import com.lexuancong.share.exception.BadRequestException;
 import com.lexuancong.share.exception.NotFoundException;
 import com.lexuancong.share.utils.AuthenticationUtils;
@@ -28,10 +28,10 @@ import java.util.stream.Collectors;
 public class CartItemService {
     private final CartItemRepository cartItemRepository;
     private final ProductService productService;
-    public CartItemGetVm addCartItem(CartItemPostVm cartItemPostVm){
-        this.validateProduct(cartItemPostVm.productId());
-        CartItem cartItem = this.performAddCartItem(cartItemPostVm);
-        return CartItemGetVm.fromModel(cartItem);
+    public CartItemGetResponse addCartItem(CartItemCreateRequest cartItemCreateRequest){
+        this.validateProduct(cartItemCreateRequest.productId());
+        CartItem cartItem = this.performAddCartItem(cartItemCreateRequest);
+        return CartItemGetResponse.fromCartItem(cartItem);
 
     }
     private void validateProduct(Long productId){
@@ -40,12 +40,12 @@ public class CartItemService {
         }
     }
 
-    public CartItem performAddCartItem(CartItemPostVm cartItemPostVm){
+    public CartItem performAddCartItem(CartItemCreateRequest cartItemCreateRequest){
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         try{
-            return cartItemRepository.findByCustomerIdAndProductId(customerId,cartItemPostVm.productId())
-                    .map(existingCartItem -> updateForCaseExistingCartItem(cartItemPostVm,existingCartItem))
-                    .orElseGet(()-> createNewCartItem(cartItemPostVm,customerId));
+            return cartItemRepository.findByCustomerIdAndProductId(customerId, cartItemCreateRequest.productId())
+                    .map(existingCartItem -> updateForCaseExistingCartItem(cartItemCreateRequest,existingCartItem))
+                    .orElseGet(()-> createNewCartItem(cartItemCreateRequest,customerId));
 
         }catch (PessimisticLockingFailureException e){
 
@@ -53,12 +53,12 @@ public class CartItemService {
         }
 
     }
-    private CartItem updateForCaseExistingCartItem(CartItemPostVm cartItemPostVm, CartItem existingCartItem){
-        existingCartItem.setQuantity(existingCartItem.getQuantity() + cartItemPostVm.quantity());
+    private CartItem updateForCaseExistingCartItem(CartItemCreateRequest cartItemCreateRequest, CartItem existingCartItem){
+        existingCartItem.setQuantity(existingCartItem.getQuantity() + cartItemCreateRequest.quantity());
         return cartItemRepository.save(existingCartItem);
     }
-    private CartItem createNewCartItem(CartItemPostVm cartItemPostVm,String customerId){
-        CartItem cartItemEntity =  cartItemPostVm.toModel(customerId);
+    private CartItem createNewCartItem(CartItemCreateRequest cartItemCreateRequest, String customerId){
+        CartItem cartItemEntity =  cartItemCreateRequest.toCartItem(customerId);
         return cartItemRepository.save(cartItemEntity);
 
     }
@@ -67,18 +67,17 @@ public class CartItemService {
 
 
     // api put cartItem about quantity
-    public CartItemGetVm updateCartItem(Long productId, CartItemPutVm cartItemPutVm){
+    public CartItemGetResponse updateCartItem(Long productId, CartItemUpdateRequest cartItemUpdateRequest){
         this.validateProduct(productId);
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
-        CartItem cartItem =  cartItemPutVm.toModel(customerId,productId);
+        CartItem cartItem =  cartItemUpdateRequest.toCartItem(customerId,productId);
         CartItem cartItemSaved = cartItemRepository.save(cartItem);
-        return CartItemGetVm.fromModel(cartItemSaved);
+        return CartItemGetResponse.fromCartItem(cartItemSaved);
 
     }
 
 
-    // api get cartItem
-    public List<CartItemDetailVm> getCartItems(){
+    public List<CartItemDetailGetResponse> getCartItems(){
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         List<CartItem> cartItems = cartItemRepository.findByCustomerIdOrderByCreatedAtDesc(customerId);
         Map<Long , CartItem> mapCartItemByProductId = cartItems.stream()
@@ -86,29 +85,29 @@ public class CartItemService {
         List<Long> productIds = cartItems.stream()
                 .map(CartItem::getProductId)
                 .toList();
-        List<ProductPreviewVm> productInCartItems = this.productService.getProductListByIds(productIds);
-        Map<Long, ProductPreviewVm>  mapProductPreviewByProductId =  productInCartItems.stream()
-                .collect(Collectors.toMap(ProductPreviewVm::id, Function.identity()));
+        List<ProductPreviewGetResponse> productInCartItems = this.productService.getProductListByIds(productIds);
+        Map<Long, ProductPreviewGetResponse>  mapProductPreviewByProductId =  productInCartItems.stream()
+                .collect(Collectors.toMap(ProductPreviewGetResponse::id, Function.identity()));
 
         // fetch tới lấy options-value
-        List<ProductOptionValueGetVm> productOptionValueGetVms =
+        List<ProductOptionValueDetailGetResponse> productOptionValueDetailResponses =
                 this.productService.getProductOptionValueBySpecificProductIds(productIds);
 
-        Map<Long ,CartItemDetailVm> mapCartItemDetailByProductId = new HashMap<>();
-        for (ProductOptionValueGetVm productOptionValueGetVm : productOptionValueGetVms) {
-            if(!mapCartItemDetailByProductId.containsKey(productOptionValueGetVm.productId())){
+        Map<Long , CartItemDetailGetResponse> mapCartItemDetailByProductId = new HashMap<>();
+        for (ProductOptionValueDetailGetResponse productOptionValueDetailGetResponse : productOptionValueDetailResponses) {
+            if(!mapCartItemDetailByProductId.containsKey(productOptionValueDetailGetResponse.productId())){
                 mapCartItemDetailByProductId.put(
-                        productOptionValueGetVm.productOptionId(),
-                        new CartItemDetailVm(
-                                productOptionValueGetVm.productId(),
-                                mapCartItemByProductId.get(productOptionValueGetVm.productId())
+                        productOptionValueDetailGetResponse.productOptionId(),
+                        new CartItemDetailGetResponse(
+                                productOptionValueDetailGetResponse.productId(),
+                                mapCartItemByProductId.get(productOptionValueDetailGetResponse.productId())
                                         .getQuantity(),
-                                productOptionValueGetVm.productName(),
-                                mapProductPreviewByProductId.get(productOptionValueGetVm.productId())
+                                productOptionValueDetailGetResponse.productName(),
+                                mapProductPreviewByProductId.get(productOptionValueDetailGetResponse.productId())
                                         .slug(),
-                                mapProductPreviewByProductId.get(productOptionValueGetVm.productId())
+                                mapProductPreviewByProductId.get(productOptionValueDetailGetResponse.productId())
                                         .avatarUrl(),
-                                mapProductPreviewByProductId.get(productOptionValueGetVm.productId())
+                                mapProductPreviewByProductId.get(productOptionValueDetailGetResponse.productId())
                                         .price(),
                                 new ArrayList<>()
 
@@ -117,12 +116,12 @@ public class CartItemService {
                         );
                 continue;
             }
-            CartItemDetailVm cartItemDetailVm = mapCartItemDetailByProductId.get(productOptionValueGetVm.productId());
-            cartItemDetailVm.productOptionValue().add(
-                    new ProductOptionValueVm(
-                            productOptionValueGetVm.id(),
-                            productOptionValueGetVm.productOptionName(),
-                            productOptionValueGetVm.value()
+            CartItemDetailGetResponse cartItemDetailGetResponse = mapCartItemDetailByProductId.get(productOptionValueDetailGetResponse.productId());
+            cartItemDetailGetResponse.productOptionValue().add(
+                    new ProductOptionValueGetResponse(
+                            productOptionValueDetailGetResponse.id(),
+                            productOptionValueDetailGetResponse.productOptionName(),
+                            productOptionValueDetailGetResponse.value()
                     )
             );
         }
@@ -140,11 +139,11 @@ public class CartItemService {
     }
 
 
-    public List<CartItemGetVm> updateCartItemAfterOrder(List<CartItemDeleteVm> cartItemDeleteVms){
-        this.validateDuplicatedProductIdInCartItemDelete(cartItemDeleteVms);
+    public List<CartItemGetResponse> updateCartItemAfterOrder(List<CartItemDeletRequest> cartItemDeletRequests){
+        this.validateDuplicatedProductIdInCartItemDelete(cartItemDeletRequests);
 
-        List<Long> productIds = cartItemDeleteVms.stream()
-                .map(CartItemDeleteVm::productId)
+        List<Long> productIds = cartItemDeletRequests.stream()
+                .map(CartItemDeletRequest::productId)
                 .toList();
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         List<CartItem> cartItems = this.cartItemRepository.findByCustomerIdAndProductIdIn(customerId,productIds);
@@ -152,15 +151,15 @@ public class CartItemService {
                 .collect(Collectors.toMap(CartItem::getProductId, Function.identity()));
         List<CartItem> cartItemsToDelete = new ArrayList<>();
         List<CartItem> cartItemsToUpdateQuantity = new ArrayList<>();
-        for (CartItemDeleteVm cartItemDeleteVm : cartItemDeleteVms){
+        for (CartItemDeletRequest cartItemDeletRequest : cartItemDeletRequests){
             Optional<CartItem> optionalCartItem=
-                    Optional.ofNullable(mapCartItemByProductId.get(cartItemDeleteVm.productId()));
+                    Optional.ofNullable(mapCartItemByProductId.get(cartItemDeletRequest.productId()));
 
             optionalCartItem.ifPresent(cartItem -> {
-                if(cartItem.getQuantity() <= cartItemDeleteVm.quantity()){
+                if(cartItem.getQuantity() <= cartItemDeletRequest.quantity()){
                     cartItemsToDelete.add(cartItem);
                 }else{
-                    cartItem.setQuantity(cartItem.getQuantity() - cartItemDeleteVm.quantity());
+                    cartItem.setQuantity(cartItem.getQuantity() - cartItemDeletRequest.quantity());
                     cartItemsToUpdateQuantity.add(cartItem);
                 }
             });
@@ -169,20 +168,20 @@ public class CartItemService {
         this.cartItemRepository.deleteAll(cartItemsToDelete);
         this.cartItemRepository.saveAll(cartItemsToUpdateQuantity);
         return cartItemsToUpdateQuantity.stream()
-                .map(CartItemGetVm::fromModel)
+                .map(CartItemGetResponse::fromCartItem)
                 .toList();
 
     }
 
 
-    private void  validateDuplicatedProductIdInCartItemDelete(List<CartItemDeleteVm> cartItemDeleteVms){
+    private void  validateDuplicatedProductIdInCartItemDelete(List<CartItemDeletRequest> cartItemDeletRequests){
         Map<Long,Integer> mapProductIdToQuantity = new HashMap<>();
-        for (CartItemDeleteVm cartItemDeleteVm : cartItemDeleteVms){
-            Integer quantityProduct =  mapProductIdToQuantity.get(cartItemDeleteVm.productId());
-            if(!Objects.isNull(quantityProduct) && !quantityProduct.equals(cartItemDeleteVm.quantity())){
+        for (CartItemDeletRequest cartItemDeletRequest : cartItemDeletRequests){
+            Integer quantityProduct =  mapProductIdToQuantity.get(cartItemDeletRequest.productId());
+            if(!Objects.isNull(quantityProduct) && !quantityProduct.equals(cartItemDeletRequest.quantity())){
                 throw  new BadRequestException(Constants.ErrorKey.DUPLICATED_CART_ITEMS_TO_DELETE);
             }
-            mapProductIdToQuantity.put(cartItemDeleteVm.productId(), cartItemDeleteVm.quantity());
+            mapProductIdToQuantity.put(cartItemDeletRequest.productId(), cartItemDeletRequest.quantity());
         }
     }
 }

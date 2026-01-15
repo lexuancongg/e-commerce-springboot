@@ -1,6 +1,6 @@
-package com.lexuancong.cart.viewmodel.productoption;
+package com.lexuancong.cart.dto.productoption;
 
-public record ProductOptionValueGetVm(
+public record ProductOptionValueDetailGetResponse(
         Long productId ,
         Long id ,
         String productName,

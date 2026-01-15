@@ -1,12 +1,12 @@
-package com.lexuancong.cart.viewmodel.cartitem;
+package com.lexuancong.cart.dto.cartitem;
 
 import com.lexuancong.cart.model.CartItem;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
-public record CartItemPutVm(@NotNull @Min(1) int quantity) {
+public record CartItemUpdateRequest(@NotNull @Min(1) int quantity) {
 
-    public  CartItem toModel(String customerId, Long productId){
+    public  CartItem toCartItem(String customerId, Long productId){
         return  CartItem.builder()
                 .customerId(customerId)
                 .productId(productId)

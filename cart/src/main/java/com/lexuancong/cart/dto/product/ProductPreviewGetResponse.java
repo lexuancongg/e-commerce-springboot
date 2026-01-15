@@ -1,8 +1,8 @@
-package com.lexuancong.cart.viewmodel.product;
+package com.lexuancong.cart.dto.product;
 
 import java.math.BigDecimal;
 
-public record ProductPreviewVm(
+public record ProductPreviewGetResponse(
         Long id, String name, String slug, BigDecimal price , String avatarUrl) {
 
 
