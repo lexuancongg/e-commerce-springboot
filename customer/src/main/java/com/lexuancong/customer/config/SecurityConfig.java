@@ -25,8 +25,8 @@ public class SecurityConfig {
         return http
                 // caaus hình quyền truy cập http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/storefront/**").permitAll()
-                        .requestMatchers("/backoffice/**").hasRole("ADMIN")
+                        .requestMatchers("/customer/**").permitAll()
+                        .requestMatchers("/management/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .csrf(AbstractHttpConfigurer::disable)

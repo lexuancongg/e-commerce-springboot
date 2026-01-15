@@ -3,10 +3,10 @@ package com.lexuancong.customer.service;
 import com.lexuancong.customer.constants.Constants;
 import com.lexuancong.customer.model.UserAddress;
 import com.lexuancong.customer.repository.UserAddressRepository;
-import com.lexuancong.customer.viewmodel.address.AddressDetailVm;
-import com.lexuancong.customer.viewmodel.address.AddressPostVm;
-import com.lexuancong.customer.viewmodel.address.AddressVm;
-import com.lexuancong.customer.viewmodel.useraddress.UserAddressVm;
+import com.lexuancong.customer.viewmodel.address.AddressDetailGetResponse;
+import com.lexuancong.customer.viewmodel.address.AddressCreateRequest;
+import com.lexuancong.customer.viewmodel.address.AddressGetResponse;
+import com.lexuancong.customer.viewmodel.useraddress.UserAddressGetResponse;
 import com.lexuancong.share.exception.NotFoundException;
 import com.lexuancong.share.utils.AuthenticationUtils;
 import org.springframework.stereotype.Service;
@@ -29,25 +29,24 @@ public class UserAddressService {
     }
 
 
-    public UserAddressVm createUserAddress(AddressPostVm addressPostVm) {
+    public UserAddressGetResponse createUserAddress(AddressCreateRequest addressCreateRequest) {
         String userId =AuthenticationUtils.extractCustomerIdFromJwt();
         List<UserAddress> userAddresses = userAddressRepository.findByUserId(userId);
         boolean isFirstAddress = userAddresses.isEmpty();
         // goi api sang service location de them address
-        AddressVm addressVmOfAddressSaved = addressService.createAddress(addressPostVm);
+        AddressGetResponse addressVmOfAddressSaved = addressService.createAddress(addressCreateRequest);
         UserAddress userAddress = UserAddress.builder()
                 .userId(userId)
                 .addressId(addressVmOfAddressSaved.id())
                 .isActive(isFirstAddress)
                 .build();
 
-        return UserAddressVm.fromModel(userAddressRepository.save(userAddress),addressVmOfAddressSaved);
+        return UserAddressGetResponse.fromUserAddress(userAddressRepository.save(userAddress),addressVmOfAddressSaved);
     }
 
-    public AddressDetailVm getDefaultAddress(){
+    public AddressDetailGetResponse getDefaultAddress(){
         String userId = AuthenticationUtils.extractCustomerIdFromJwt();
         UserAddress userAddress = userAddressRepository.findByUserIdAndIsActiveTrue(userId)
-                // ban ra ngoai le here
                 .orElseThrow(()->  new NotFoundException(Constants.ErrorKey.ADDRESS_DEFAULT_NOT_FOUND) );
         return  addressService.getAddressById(userAddress.getAddressId());
 
@@ -74,29 +73,29 @@ public class UserAddressService {
     }
 
 
-    public List<AddressDetailVm> getUserAddressDetail(){
+    public List<AddressDetailGetResponse> getUserAddressDetail(){
         String userId = AuthenticationUtils.extractCustomerIdFromJwt();
         List<UserAddress> userAddresses = this.userAddressRepository.findAllByUserId(userId);
         List<Long> addressIds = userAddresses.stream()
                 .map(UserAddress::getAddressId)
                 .toList();
-        List<AddressVm> addressVms = addressService.getAddressesByIds(addressIds);
-        List<AddressDetailVm> addressDetailVms = userAddresses.stream()
+        List<AddressGetResponse> addressGetResponses = addressService.getAddressesByIds(addressIds);
+        List<AddressDetailGetResponse> addressDetailGetResponses = userAddresses.stream()
                 .flatMap(userAddress ->
-                        addressVms.stream()
-                                .filter(addressVm -> addressVm.id().equals(userAddress.getAddressId()) )
-                                .map(addressVmFiltered ->
-                                        new AddressDetailVm(
-                                                addressVmFiltered.id(),
-                                                addressVmFiltered.contactName(),
-                                                addressVmFiltered.phoneNumber(),
-                                                addressVmFiltered.specificAddress(),
-                                                addressVmFiltered.districtId(),
-                                                addressVmFiltered.districtName(),
-                                                addressVmFiltered.provinceId(),
-                                                addressVmFiltered.provinceName(),
-                                                addressVmFiltered.countryId(),
-                                                addressVmFiltered.countryName(),
+                        addressGetResponses.stream()
+                                .filter(addressGetResponse -> addressGetResponse.id().equals(userAddress.getAddressId()) )
+                                .map(addressGetResponseFiltered ->
+                                        new AddressDetailGetResponse(
+                                                addressGetResponseFiltered.id(),
+                                                addressGetResponseFiltered.contactName(),
+                                                addressGetResponseFiltered.phoneNumber(),
+                                                addressGetResponseFiltered.specificAddress(),
+                                                addressGetResponseFiltered.districtId(),
+                                                addressGetResponseFiltered.districtName(),
+                                                addressGetResponseFiltered.provinceId(),
+                                                addressGetResponseFiltered.provinceName(),
+                                                addressGetResponseFiltered.countryId(),
+                                                addressGetResponseFiltered.countryName(),
                                                 userAddress.isActive()
                                         )
                                 )
@@ -105,8 +104,8 @@ public class UserAddressService {
         // sxep lai
         // Comparable : muốn so sánh thì class T phải implement nó , như collectTions.sort(list)
         // comparator : dùng để so sánh ngoài như collections.strem.sorted()
-        Comparator<AddressDetailVm> comparator = Comparator.comparing(AddressDetailVm::isActive).reversed();
-        return addressDetailVms.stream().sorted(comparator).toList();
+        Comparator<AddressDetailGetResponse> comparator = Comparator.comparing(AddressDetailGetResponse::isActive).reversed();
+        return addressDetailGetResponses.stream().sorted(comparator).toList();
     }
 
 

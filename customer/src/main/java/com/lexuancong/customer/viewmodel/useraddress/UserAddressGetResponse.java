@@ -1,23 +1,23 @@
 package com.lexuancong.customer.viewmodel.useraddress;
 
 import com.lexuancong.customer.model.UserAddress;
-import com.lexuancong.customer.viewmodel.address.AddressVm;
+import com.lexuancong.customer.viewmodel.address.AddressGetResponse;
 import lombok.Builder;
 
 @Builder
-public record UserAddressVm(
+public record UserAddressGetResponse(
         Long id,
         String userId,
         // object chua thong tin dia chi
-        AddressVm addressVm,
+        AddressGetResponse addressGetResponse,
         boolean isActive
 ){
 
-    public static UserAddressVm fromModel(UserAddress userAddress, AddressVm addressVm) {
-        return new UserAddressVm(
+    public static UserAddressGetResponse fromUserAddress(UserAddress userAddress, AddressGetResponse addressGetResponse) {
+        return new UserAddressGetResponse(
                 userAddress.getId(),
                 userAddress.getUserId(),
-                addressVm,
+                addressGetResponse,
                 userAddress.isActive()
         );
     }

@@ -2,9 +2,9 @@ package com.lexuancong.customer.service;
 
 import com.lexuancong.customer.config.KeycloakPropsConfig;
 import com.lexuancong.customer.constants.Constants;
-import com.lexuancong.customer.viewmodel.customer.CustomerPostVm;
-import com.lexuancong.customer.viewmodel.customer.CustomerProfilePutVm;
-import com.lexuancong.customer.viewmodel.customer.CustomerVm;
+import com.lexuancong.customer.viewmodel.customer.CustomerCreateRequest;
+import com.lexuancong.customer.viewmodel.customer.CustomerProfileUpdateRequest;
+import com.lexuancong.customer.viewmodel.customer.CustomerGetResponse;
 import com.lexuancong.share.exception.AccessDeniedException;
 import com.lexuancong.share.exception.DuplicatedException;
 import com.lexuancong.share.utils.AuthenticationUtils;
@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 // keycloak lưu thông tin người dùng mặc điịnh có các thuộc tính như firstname, lastname, email... , nếu thêm thuộc tính khác thì thêm vào phần attribute
 @Service
@@ -34,14 +33,14 @@ public class CustomerService {
         this.keycloakPropsConfig = keycloakPropsConfig;
     }
 
-    public CustomerVm getCustomerProfile(){
+    public CustomerGetResponse getCustomerProfile(){
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         try {
             UserRepresentation userFromKeycloak = keycloak.realm(keycloakPropsConfig.getRealm())
                     .users()
                     .get(customerId)
                     .toRepresentation();
-            return CustomerVm.fromKeycloakUserRes(userFromKeycloak);
+            return CustomerGetResponse.fromKeycloakUserRes(userFromKeycloak);
         }catch (ForbiddenException forbiddenException){
             throw new AccessDeniedException(Constants.ErrorKey.ACCESS_DENIED_KEYCLOAK);
         }
@@ -50,23 +49,23 @@ public class CustomerService {
 
 
 
-    public CustomerVm createCustomer(CustomerPostVm customerPostVm){
+    public CustomerGetResponse createCustomer(CustomerCreateRequest customerCreateRequest){
         RealmResource realmResource = keycloak.realm(keycloakPropsConfig.getRealm());
-        if(this.checkUsernameExistInRealm(realmResource,customerPostVm.username())){
+        if(this.checkUsernameExistInRealm(realmResource, customerCreateRequest.username())){
              throw  new DuplicatedException(Constants.ErrorKey.USERNAME_ALREADY_EXISTS);
         }
-        if(this.checkEmailExistInRealm(realmResource,customerPostVm.email())){
+        if(this.checkEmailExistInRealm(realmResource, customerCreateRequest.email())){
             throw  new DuplicatedException(Constants.ErrorKey.EMAIL_ALREADY_EXISTS);
         }
 
         UserRepresentation user = new UserRepresentation();
-        user.setUsername(customerPostVm.username());
-        user.setEmail(customerPostVm.email());
-        user.setFirstName(customerPostVm.firstName());
-        user.setLastName(customerPostVm.lastName());
+        user.setUsername(customerCreateRequest.username());
+        user.setEmail(customerCreateRequest.email());
+        user.setFirstName(customerCreateRequest.firstName());
+        user.setLastName(customerCreateRequest.lastName());
 
         // thông tin bảo mật
-        CredentialRepresentation credential = this.createPasswordCredentials(customerPostVm.password());
+        CredentialRepresentation credential = this.createPasswordCredentials(customerCreateRequest.password());
         List<CredentialRepresentation> credentials = Collections.singletonList(credential);
         user.setCredentials(credentials);
         user.setEnabled(true);
@@ -75,13 +74,13 @@ public class CustomerService {
 
         UserResource userResource = realmResource.users().get(userId);
 
-        RoleRepresentation role = realmResource.roles().get(customerPostVm.role()).toRepresentation();
+        RoleRepresentation role = realmResource.roles().get(customerCreateRequest.role()).toRepresentation();
 
         List<RoleRepresentation> roles = Collections.singletonList(role);
 
         userResource.roles().realmLevel().add(roles);
 
-        return  CustomerVm.fromKeycloakUserRes(user);
+        return  CustomerGetResponse.fromKeycloakUserRes(user);
     }
     private boolean checkUsernameExistInRealm(RealmResource realmResource,String username){
         // phân biệt hoa thường khong
@@ -103,16 +102,16 @@ public class CustomerService {
 
     }
 
-    public void updateCustomerProfile(CustomerProfilePutVm customerProfilePutVm){
+    public void updateCustomerProfile(CustomerProfileUpdateRequest customerProfileUpdateRequest){
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         try{
             RealmResource realmResource = keycloak.realm(keycloakPropsConfig.getRealm());
             UserResource userResource = realmResource.users().get(customerId);
             UserRepresentation userRepresentation = userResource.toRepresentation();
             if(userRepresentation!=null){
-                userRepresentation.setFirstName(customerProfilePutVm.firstName());
-                userRepresentation.setLastName(customerProfilePutVm.lastName());
-                userRepresentation.setEmail(customerProfilePutVm.email());
+                userRepresentation.setFirstName(customerProfileUpdateRequest.firstName());
+                userRepresentation.setLastName(customerProfileUpdateRequest.lastName());
+                userRepresentation.setEmail(customerProfileUpdateRequest.email());
                 userResource.update(userRepresentation);
             }
 
@@ -122,13 +121,13 @@ public class CustomerService {
 
     }
 
-    public List<CustomerVm> getCustomers(){
+    public List<CustomerGetResponse> getCustomers(){
         try {
             return this.keycloak.realm(keycloakPropsConfig.getRealm()).users()
                     .search(null,0,100)
                     .stream()
                     .filter(UserRepresentation::isEmailVerified)
-                    .map(CustomerVm::fromKeycloakUserRes)
+                    .map(CustomerGetResponse::fromKeycloakUserRes)
                     .toList();
         }catch (ForbiddenException forbiddenException){
             throw  new AccessDeniedException(Constants.ErrorKey.ACCESS_DENIED_KEYCLOAK);

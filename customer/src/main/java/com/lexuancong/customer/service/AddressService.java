@@ -1,8 +1,8 @@
 package com.lexuancong.customer.service;
 
-import com.lexuancong.customer.viewmodel.address.AddressDetailVm;
-import com.lexuancong.customer.viewmodel.address.AddressPostVm;
-import com.lexuancong.customer.viewmodel.address.AddressVm;
+import com.lexuancong.customer.viewmodel.address.AddressDetailGetResponse;
+import com.lexuancong.customer.viewmodel.address.AddressCreateRequest;
+import com.lexuancong.customer.viewmodel.address.AddressGetResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.List;
 @Service
 public class AddressService {
 
-    public AddressVm createAddress(AddressPostVm addressPostVm){
+    public AddressGetResponse createAddress(AddressCreateRequest addressCreateRequest){
         return null;
     }
 
@@ -18,9 +18,9 @@ public class AddressService {
 
     }
 
-    public AddressDetailVm getAddressById(Long id){
+    public AddressDetailGetResponse getAddressById(Long id){
         return null;
     }
-    public List<AddressVm> getAddressesByIds(List<Long> ids){return  null;}
+    public List<AddressGetResponse> getAddressesByIds(List<Long> ids){return  null;}
 
 }

@@ -1,7 +1,7 @@
 package com.lexuancong.customer.viewmodel.address;
 
-public record AddressVm(
-        Long id ,
+public record AddressDetailGetResponse(
+        Long id,
         String contactName,
         String phoneNumber,
         String specificAddress,
@@ -10,6 +10,7 @@ public record AddressVm(
         Long provinceId,
         String provinceName,
         Long countryId,
-        String countryName
+        String countryName,
+        boolean isActive
 ) {
 }
