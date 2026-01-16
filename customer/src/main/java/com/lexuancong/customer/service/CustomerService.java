@@ -2,9 +2,9 @@ package com.lexuancong.customer.service;
 
 import com.lexuancong.customer.config.KeycloakPropsConfig;
 import com.lexuancong.customer.constants.Constants;
-import com.lexuancong.customer.viewmodel.customer.CustomerCreateRequest;
-import com.lexuancong.customer.viewmodel.customer.CustomerProfileUpdateRequest;
-import com.lexuancong.customer.viewmodel.customer.CustomerGetResponse;
+import com.lexuancong.customer.dto.customer.CustomerCreateRequest;
+import com.lexuancong.customer.dto.customer.CustomerProfileUpdateRequest;
+import com.lexuancong.customer.dto.customer.CustomerGetResponse;
 import com.lexuancong.share.exception.AccessDeniedException;
 import com.lexuancong.share.exception.DuplicatedException;
 import com.lexuancong.share.utils.AuthenticationUtils;

@@ -1,7 +1,7 @@
 package com.lexuancong.feedback.service.internal;
 
 import com.lexuancong.feedback.config.ServiceUrlConfig;
-import com.lexuancong.feedback.viewmodel.order.CheckUserHasBoughtProductCompletedVm;
+import com.lexuancong.feedback.dto.order.CheckUserHasBoughtProductCompletedVm;
 import com.lexuancong.share.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,9 +1,9 @@
-package com.lexuancong.feedback.viewmodel.feedback;
+package com.lexuancong.feedback.dto.feedback;
 
 import java.util.List;
 
-public record FeedbackPagingVm(
-        List<FeedbackVm> ratingPayload,
+public record FeedbackPagingGetResponse(
+        List<FeedbackGetResponse> ratingPayload,
         int pageIndex,
         int pageSize,
         int totalElements,

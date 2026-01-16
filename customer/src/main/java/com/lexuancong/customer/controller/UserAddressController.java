@@ -1,9 +1,9 @@
 package com.lexuancong.customer.controller;
 
 import com.lexuancong.customer.service.UserAddressService;
-import com.lexuancong.customer.viewmodel.address.AddressDetailGetResponse;
-import com.lexuancong.customer.viewmodel.address.AddressCreateRequest;
-import com.lexuancong.customer.viewmodel.useraddress.UserAddressGetResponse;
+import com.lexuancong.customer.dto.address.AddressDetailGetResponse;
+import com.lexuancong.customer.dto.address.AddressCreateRequest;
+import com.lexuancong.customer.dto.useraddress.UserAddressGetResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

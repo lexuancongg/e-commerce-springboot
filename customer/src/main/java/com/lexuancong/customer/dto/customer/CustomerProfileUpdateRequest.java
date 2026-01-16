@@ -1,4 +1,4 @@
-package com.lexuancong.customer.viewmodel.customer;
+package com.lexuancong.customer.dto.customer;
 
 public record CustomerProfileUpdateRequest(
         String firstName,

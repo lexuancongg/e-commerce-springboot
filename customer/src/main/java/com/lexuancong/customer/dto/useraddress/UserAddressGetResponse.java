@@ -1,7 +1,7 @@
-package com.lexuancong.customer.viewmodel.useraddress;
+package com.lexuancong.customer.dto.useraddress;
 
 import com.lexuancong.customer.model.UserAddress;
-import com.lexuancong.customer.viewmodel.address.AddressGetResponse;
+import com.lexuancong.customer.dto.address.AddressGetResponse;
 import lombok.Builder;
 
 @Builder

@@ -1,7 +1,7 @@
-package com.lexuancong.customer.viewmodel.address;
+package com.lexuancong.customer.dto.address;
 
-public record AddressGetResponse(
-        Long id ,
+public record AddressDetailGetResponse(
+        Long id,
         String contactName,
         String phoneNumber,
         String specificAddress,
@@ -10,6 +10,7 @@ public record AddressGetResponse(
         Long provinceId,
         String provinceName,
         Long countryId,
-        String countryName
+        String countryName,
+        boolean isActive
 ) {
 }

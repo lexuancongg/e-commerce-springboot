@@ -20,9 +20,6 @@ public class Feedback extends AuditEntity{
     private Long productId;
 
 
-
-
-
     private String lastName;
 
     private String firstName;

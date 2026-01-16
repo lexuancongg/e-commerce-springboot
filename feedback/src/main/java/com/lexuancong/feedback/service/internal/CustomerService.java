@@ -1,7 +1,7 @@
 package com.lexuancong.feedback.service.internal;
 
 import com.lexuancong.feedback.config.ServiceUrlConfig;
-import com.lexuancong.feedback.viewmodel.customer.CustomerVm;
+import com.lexuancong.feedback.dto.customer.CustomerGetResponse;
 import com.lexuancong.share.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import java.net.URI;
 public class CustomerService {
     private final RestClient restClient;
     private final ServiceUrlConfig serviceUrlConfig;
-    public CustomerVm getCustomerInfo(){
+    public CustomerGetResponse getCustomerInfo(){
         String jwt = AuthenticationUtils.extractJwt();
         URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlConfig.customer())
                 .path("/internal/customer/profile")
@@ -26,6 +26,6 @@ public class CustomerService {
                 .uri(url)
                 .headers(httpHeaders -> httpHeaders.setBearerAuth(jwt))
                 .retrieve()
-                .body(CustomerVm.class);
+                .body(CustomerGetResponse.class);
     }
 }

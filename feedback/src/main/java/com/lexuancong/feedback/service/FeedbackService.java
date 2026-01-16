@@ -5,10 +5,10 @@ import com.lexuancong.feedback.model.Feedback;
 import com.lexuancong.feedback.repostitory.FeedbackRepository;
 import com.lexuancong.feedback.service.internal.CustomerService;
 import com.lexuancong.feedback.service.internal.OrderService;
-import com.lexuancong.feedback.viewmodel.customer.CustomerVm;
-import com.lexuancong.feedback.viewmodel.feedback.FeedbackPagingVm;
-import com.lexuancong.feedback.viewmodel.feedback.FeedbackPostVm;
-import com.lexuancong.feedback.viewmodel.feedback.FeedbackVm;
+import com.lexuancong.feedback.dto.customer.CustomerGetResponse;
+import com.lexuancong.feedback.dto.feedback.FeedbackPagingGetResponse;
+import com.lexuancong.feedback.dto.feedback.FeedbackCreateRequest;
+import com.lexuancong.feedback.dto.feedback.FeedbackGetResponse;
 import com.lexuancong.share.exception.AccessDeniedException;
 import com.lexuancong.share.exception.IllegalStateException;
 import com.lexuancong.share.exception.NotFoundException;
@@ -30,29 +30,29 @@ public class FeedbackService {
     private final FeedbackRepository feedbackRepository;
     private final CustomerService customerService;
     private final OrderService orderService;
-    public FeedbackVm createFeedback(FeedbackPostVm feedbackPostVm){
+    public FeedbackGetResponse createFeedback(FeedbackCreateRequest feedBackCreateRequest){
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
-        boolean exitedRating = this.feedbackRepository.existsByCreatedByAndProductId(customerId, feedbackPostVm.productId());
+        boolean exitedRating = this.feedbackRepository.existsByCreatedByAndProductId(customerId, feedBackCreateRequest.productId());
         if(exitedRating){
             throw new IllegalStateException(Constants.ErrorKey.FEEDBACK_EXITED);
         }
         // check xem người dùng đã mua sản  phẩm này chưa
-        if(!this.checkUserHasBoughtProductCompleted(feedbackPostVm.productId())){
+        if(!this.checkUserHasBoughtProductCompleted(feedBackCreateRequest.productId())){
             throw new AccessDeniedException(Constants.ErrorKey.ACCESS_DENIED);
         }
 
-        CustomerVm customerVm = this.customerService.getCustomerInfo();
-        if(customerVm == null){
+        CustomerGetResponse customerGetResponse = this.customerService.getCustomerInfo();
+        if(customerGetResponse == null){
             throw new NotFoundException(Constants.ErrorKey.CUSTOMER_NOT_FOUND,customerId);
         }
         Feedback feedback = new Feedback();
-        feedback.setProductId(feedbackPostVm.productId());
-        feedback.setContent(feedbackPostVm.content());
-        feedback.setStar(feedbackPostVm.star());
-        feedback.setLastName(customerVm.lastName());
-        feedback.setFirstName(customerVm.firstName());
+        feedback.setProductId(feedBackCreateRequest.productId());
+        feedback.setContent(feedBackCreateRequest.content());
+        feedback.setStar(feedBackCreateRequest.star());
+        feedback.setLastName(customerGetResponse.lastName());
+        feedback.setFirstName(customerGetResponse.firstName());
         Feedback savedFeedback = this.feedbackRepository.save(feedback);
-        return FeedbackVm.fromModel(savedFeedback);
+        return FeedbackGetResponse.fromFeedback(savedFeedback);
     }
 
     public void deleteFeedback(Long feedbackId){
@@ -68,15 +68,15 @@ public class FeedbackService {
 
     }
 
-        public FeedbackPagingVm getRatingByProductId(Long productId , int pageIndex, int pageSize){
+        public FeedbackPagingGetResponse getRatingByProductId(Long productId , int pageIndex, int pageSize){
             Pageable pageable = PageRequest.of(pageIndex, pageSize , Sort.by("createdAt").descending());
             Page<Feedback> ratingPage = this.feedbackRepository.findAllByProductId(productId, pageable);
             List<Feedback> feedbacks = ratingPage.getContent();
-            List<FeedbackVm> feedbackVms = feedbacks.stream()
-                    .map(FeedbackVm::fromModel)
+            List<FeedbackGetResponse> feedbackGetResponses = feedbacks.stream()
+                    .map(FeedbackGetResponse::fromFeedback)
                     .toList();
-            return new FeedbackPagingVm(
-                    feedbackVms, pageIndex,pageSize,
+            return new FeedbackPagingGetResponse(
+                    feedbackGetResponses, pageIndex,pageSize,
                     (int) ratingPage.getTotalElements(),
                     ratingPage.getTotalPages(),
                     ratingPage.isLast());

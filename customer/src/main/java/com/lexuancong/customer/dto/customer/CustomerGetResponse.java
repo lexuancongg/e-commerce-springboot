@@ -1,4 +1,4 @@
-package com.lexuancong.customer.viewmodel.customer;
+package com.lexuancong.customer.dto.customer;
 
 import org.keycloak.representations.idm.UserRepresentation;
 

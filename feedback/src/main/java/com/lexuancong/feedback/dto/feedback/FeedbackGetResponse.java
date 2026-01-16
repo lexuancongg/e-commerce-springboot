@@ -1,15 +1,14 @@
-package com.lexuancong.feedback.viewmodel.feedback;
+package com.lexuancong.feedback.dto.feedback;
 
 import com.lexuancong.feedback.model.Feedback;
-import com.lexuancong.feedback.viewmodel.customer.CustomerVm;
 
 import java.time.ZonedDateTime;
 
-public record FeedbackVm(
+public record FeedbackGetResponse(
         Long id, String content , int star, String firstName, String lastName, Long productId, ZonedDateTime createAt
         ) {
-    public static FeedbackVm fromModel(Feedback feedback){
-        return new FeedbackVm(
+    public static FeedbackGetResponse fromFeedback(Feedback feedback){
+        return new FeedbackGetResponse(
                 feedback.getId(),
                 feedback.getContent(),
                 feedback.getStar(),
