@@ -1,7 +1,7 @@
 package com.lexuancong.paypalpayment.service;
 
-import com.lexuancong.paypalpayment.viewmodel.PaypalCreatePaymentRequest;
-import com.lexuancong.paypalpayment.viewmodel.PaypalCreatePaymentResponse;
+import com.lexuancong.paypalpayment.dto.PaypalCreatePaymentRequest;
+import com.lexuancong.paypalpayment.dto.PaypalCreatePaymentResponse;
 import com.lexuancong.share.exception.NotFoundException;
 import com.paypal.core.PayPalHttpClient;
 import com.paypal.http.HttpResponse;
@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.stylesheets.LinkStyle;
 
 import java.io.IOException;
 import java.math.BigDecimal;

@@ -3,7 +3,7 @@ package com.lexuancong.oder.controller;
 import com.lexuancong.oder.constants.Constants;
 import com.lexuancong.oder.model.enum_status.OrderStatus;
 import com.lexuancong.oder.service.OderService;
-import com.lexuancong.oder.viewmodel.order.*;
+import com.lexuancong.oder.dto.order.*;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +21,8 @@ public class OrderController {
     }
 
     @PostMapping("/customer/orders")
-    public ResponseEntity<OrderVm> createOrder(@RequestBody @Valid OrderPostVm orderPostVm) {
-        return  ResponseEntity.ok(orderService.createOrder(orderPostVm));
+    public ResponseEntity<OrderVm> createOrder(@RequestBody @Valid OrderCreateRequest orderCreateRequest) {
+        return  ResponseEntity.ok(orderService.createOrder(orderCreateRequest));
 
     }
 
@@ -38,14 +38,14 @@ public class OrderController {
 
     // api đc gọi bởi feedback check xem đã mua sp này chưa => đã check
     @GetMapping({"/internal/orders/completed"})
-    public ResponseEntity<CheckUserHasBoughtProductCompletedVm> checkUserHasBoughtProductCompleted(
+    public ResponseEntity<CheckUserHasBoughtProductCompleted> checkUserHasBoughtProductCompleted(
             @RequestParam Long productId
     ){
         return ResponseEntity.ok(this.orderService.checkUserHasBoughtProductCompleted(productId));
     }
 
     @GetMapping("management/orders")
-    ResponseEntity<OrderPreviewPaging> getOrders(
+    ResponseEntity<OrderPagingGetResponse> getOrders(
             @RequestParam(value = "pageIndex" ,required = false, defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER) int pageIndex,
             @RequestParam(value = "pageSize", required = false, defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE) int pageSize
     ){

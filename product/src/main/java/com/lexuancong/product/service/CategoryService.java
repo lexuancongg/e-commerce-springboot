@@ -4,9 +4,9 @@ import com.lexuancong.product.constant.Constants;
 import com.lexuancong.product.model.Category;
 import com.lexuancong.product.repository.CategoryRepository;
 import com.lexuancong.product.service.internal.ImageService;
-import com.lexuancong.product.viewmodel.category.CategoryPostVm;
-import com.lexuancong.product.viewmodel.category.CategoryVm;
-import com.lexuancong.product.viewmodel.image.ImageVm;
+import com.lexuancong.product.dto.category.CategoryCreateRequest;
+import com.lexuancong.product.dto.category.CategoryGetResponse;
+import com.lexuancong.product.dto.image.ImagePreviewGetResponse;
 import com.lexuancong.share.exception.BadRequestException;
 import com.lexuancong.share.exception.DuplicatedException;
 import com.lexuancong.share.exception.NotFoundException;
@@ -25,35 +25,35 @@ public class CategoryService {
         this.imageService = imageService;
     }
 
-    public List<CategoryVm> getCategories(String categoryName) {
-        List<CategoryVm> categoryVms = new ArrayList<>();
+    public List<CategoryGetResponse> getCategories(String categoryName) {
+        List<CategoryGetResponse> categoryGetResponses = new ArrayList<>();
         List<Category> categories = categoryRepository.findByNameContainingIgnoreCase(categoryName);
         categories.forEach(category -> {
-            ImageVm image = null;
+            ImagePreviewGetResponse image = null;
             if (category.getImageId() != null) {
-                image = new ImageVm(category.getImageId(), imageService.getImageById(category.getImageId()).url());
+                image = new ImagePreviewGetResponse(category.getImageId(), imageService.getImageById(category.getImageId()).url());
             }
-            CategoryVm categoryVm = CategoryVm.builder()
+            CategoryGetResponse categoryGetResponse = CategoryGetResponse.builder()
                     .id(category.getId())
                     .name(category.getName())
                     .slug(category.getSlug())
                     .avatarUrl(image != null ? image.url() : "")
                     .build();
-            categoryVms.add(categoryVm);
+            categoryGetResponses.add(categoryGetResponse);
         });
-        return categoryVms;
+        return categoryGetResponses;
 
     }
 
-    public CategoryVm createCategory(CategoryPostVm categoryPostVm) {
-        this.validateDuplicateName(categoryPostVm.name(), null);
-        Category category = categoryPostVm.toModel();
-        if (categoryPostVm.parentId() != null) {
-            Category parent = categoryRepository.findById(categoryPostVm.parentId())
-                    .orElseThrow(() -> new BadRequestException(Constants.ErrorKey.PARENT_CATEGORY_NOT_FOUND, categoryPostVm.parentId()));
+    public CategoryGetResponse createCategory(CategoryCreateRequest categoryCreateRequest) {
+        this.validateDuplicateName(categoryCreateRequest.name(), null);
+        Category category = categoryCreateRequest.toCategory();
+        if (categoryCreateRequest.parentId() != null) {
+            Category parent = categoryRepository.findById(categoryCreateRequest.parentId())
+                    .orElseThrow(() -> new BadRequestException(Constants.ErrorKey.PARENT_CATEGORY_NOT_FOUND, categoryCreateRequest.parentId()));
             category.setParent(parent);
         }
-        return CategoryVm.fromModel(categoryRepository.saveAndFlush(category));
+        return CategoryGetResponse.fromCategory(categoryRepository.saveAndFlush(category));
 
     }
 
@@ -67,26 +67,26 @@ public class CategoryService {
         return categoryRepository.findByNameAndIdNot(name, id) != null;
     }
 
-    public void updateCategory(Long id, CategoryPostVm categoryPostVm) {
+    public void updateCategory(Long id, CategoryCreateRequest categoryCreateRequest) {
 
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(Constants.ErrorKey.CATEGORY_NOT_FOUND, id));
-        this.validateDuplicateName(categoryPostVm.name(), id);
-        this.updateCategoryAttribute(category, categoryPostVm);
+        this.validateDuplicateName(categoryCreateRequest.name(), id);
+        this.updateCategoryAttribute(category, categoryCreateRequest);
 
         categoryRepository.save(category);
     }
 
-    private void updateCategoryAttribute(Category category, CategoryPostVm categoryPostVm) {
-        category.setName(categoryPostVm.name());
-        category.setSlug(categoryPostVm.slug());
-        category.setDescription(categoryPostVm.description());
+    private void updateCategoryAttribute(Category category, CategoryCreateRequest categoryCreateRequest) {
+        category.setName(categoryCreateRequest.name());
+        category.setSlug(categoryCreateRequest.slug());
+        category.setDescription(categoryCreateRequest.description());
 
-        category.setPublic(categoryPostVm.isPublic());
-        category.setImageId(categoryPostVm.imageId());
-        if (categoryPostVm.parentId() != null) {
-            Category parent = categoryRepository.findById(categoryPostVm.parentId())
-                    .orElseThrow(() -> new NotFoundException(Constants.ErrorKey.PARENT_CATEGORY_NOT_FOUND, categoryPostVm.parentId()));
+        category.setPublic(categoryCreateRequest.isPublic());
+        category.setImageId(categoryCreateRequest.imageId());
+        if (categoryCreateRequest.parentId() != null) {
+            Category parent = categoryRepository.findById(categoryCreateRequest.parentId())
+                    .orElseThrow(() -> new NotFoundException(Constants.ErrorKey.PARENT_CATEGORY_NOT_FOUND, categoryCreateRequest.parentId()));
            this.validateCircularParent(category.getId(), parent);
            category.setParent(parent);
         }

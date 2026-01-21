@@ -1,8 +1,8 @@
 package com.lexuancong.product.controller;
 
 import com.lexuancong.product.service.ProductOptionService;
-import com.lexuancong.product.viewmodel.productoptions.ProductOptionGetVm;
-import com.lexuancong.product.viewmodel.productoptions.ProductOptionPostVm;
+import com.lexuancong.product.dto.productoptions.ProductOptionGetResponse;
+import com.lexuancong.product.dto.productoptions.ProductOptionCreateRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,18 +18,18 @@ public class ProductOptionController {
 
     // đã check
     @GetMapping("/management/product-options")
-    public ResponseEntity<List<ProductOptionGetVm>> getProductOptions() {
+    public ResponseEntity<List<ProductOptionGetResponse>> getProductOptions() {
         return ResponseEntity.ok(this.productOptionService.getProductOptions());
 
     }
 
     // đã check
     @PostMapping("/management/product-options")
-    public ResponseEntity<ProductOptionGetVm> createProductOption(
-            @Valid @RequestBody ProductOptionPostVm ProductOptionPostVm,
+    public ResponseEntity<ProductOptionGetResponse> createProductOption(
+            @Valid @RequestBody ProductOptionCreateRequest ProductOptionCreateRequest,
             UriComponentsBuilder uriComponentsBuilder
     ){
-        ProductOptionGetVm productOptionSaved = this.productOptionService.createProductOption(ProductOptionPostVm);
+        ProductOptionGetResponse productOptionSaved = this.productOptionService.createProductOption(ProductOptionCreateRequest);
         return ResponseEntity.created(uriComponentsBuilder.replacePath("/product-options/{id}")
                         .buildAndExpand(productOptionSaved.id()).toUri())
                 .body(productOptionSaved);
@@ -40,9 +40,9 @@ public class ProductOptionController {
     @PutMapping("/management/product-options/{id}")
     public ResponseEntity<Void> updateProductOption(
             @PathVariable(name = "id") Long id ,
-            @Valid @RequestBody ProductOptionPostVm productOptionPostVm
+            @Valid @RequestBody ProductOptionCreateRequest productOptionCreateRequest
     ){
-        this.productOptionService.updateProductOption(id,productOptionPostVm);
+        this.productOptionService.updateProductOption(id, productOptionCreateRequest);
         return ResponseEntity.ok().build();
     }
 

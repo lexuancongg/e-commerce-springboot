@@ -1,17 +1,14 @@
 package com.lexuancong.product.service.internal;
 
 import com.lexuancong.product.config.ServiceUrlConfig;
-import com.lexuancong.product.viewmodel.image.ImageVm;
+import com.lexuancong.product.dto.image.ImagePreviewGetResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -20,9 +17,9 @@ import java.util.List;
 public class ImageService {
     private final RestClient restClient;
     private final ServiceUrlConfig serviceUrlConfig;
-    public ImageVm getImageById (Long id){
+    public ImagePreviewGetResponse getImageById (Long id){
         if(id== null){
-            return  new ImageVm(null,"");
+            return  new ImagePreviewGetResponse(null,"");
         }
         URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlConfig.image())
                 .path("/images/{id}").buildAndExpand(id)
@@ -30,13 +27,13 @@ public class ImageService {
         return this.restClient.get()
                 .uri(url)
                 .retrieve()
-                .body(ImageVm.class);
+                .body(ImagePreviewGetResponse.class);
 
 
 
     }
 
-    public List<ImageVm> getImageByIds (List<Long> ids){
+    public List<ImagePreviewGetResponse> getImageByIds (List<Long> ids){
         if(ids.isEmpty()){
             return Collections.emptyList();
         }
@@ -47,7 +44,7 @@ public class ImageService {
         return  this.restClient.get()
                 .uri(uri)
                 .retrieve()
-                .body(new ParameterizedTypeReference<List<ImageVm>>(){});
+                .body(new ParameterizedTypeReference<List<ImagePreviewGetResponse>>(){});
 
     }
 }

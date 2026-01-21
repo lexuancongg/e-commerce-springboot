@@ -1,8 +1,8 @@
 package com.lexuancong.payment.controller;
 
 import com.lexuancong.payment.service.PaymentService;
-import com.lexuancong.payment.viewmodel.InitPaymentRequest;
-import com.lexuancong.payment.viewmodel.InitPaymentResponse;
+import com.lexuancong.payment.dto.InitPaymentRequest;
+import com.lexuancong.payment.dto.InitPaymentResponse;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

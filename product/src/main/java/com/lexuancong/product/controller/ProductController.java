@@ -2,9 +2,9 @@ package com.lexuancong.product.controller;
 
 import com.lexuancong.product.service.ProductService;
 import com.lexuancong.product.constant.Constants;
-import com.lexuancong.product.viewmodel.product.*;
-import com.lexuancong.product.viewmodel.product.producforwarehouse.ProductInfoVm;
-import com.lexuancong.product.viewmodel.product.variants.ProductVariantVm;
+import com.lexuancong.product.dto.product.*;
+import com.lexuancong.product.dto.product.producforwarehouse.ProductInfoGetResponse;
+import com.lexuancong.product.dto.product.variants.ProductVariantGetResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,24 +21,24 @@ public class ProductController {
 
     // create => đã check
     @PostMapping({"/management/products"})
-    public ResponseEntity<ProductSummaryVm> createProduct(@Valid @RequestBody ProductPostVm productPostVm) {
-        ProductSummaryVm productSummaryVm = this.productService.createProduct(productPostVm);
-        return new ResponseEntity<>(productSummaryVm, HttpStatus.CREATED);
+    public ResponseEntity<ProductSummaryGetResponse> createProduct(@Valid @RequestBody ProductCreateRequest productCreateRequest) {
+        ProductSummaryGetResponse productSummaryGetResponse = this.productService.createProduct(productCreateRequest);
+        return new ResponseEntity<>(productSummaryGetResponse, HttpStatus.CREATED);
 
     }
 
     // update // đã check
     @PutMapping(path = "/management/products/{id}")
     public ResponseEntity<Void> updateProduct(@PathVariable("id") Long id,
-                                              @Valid @RequestBody ProductPostVm productPostVm) {
-        this.productService.updateProduct(id,productPostVm);
+                                              @Valid @RequestBody ProductCreateRequest productCreateRequest) {
+        this.productService.updateProduct(id, productCreateRequest);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 
     }
 
     // ds nổi bật => CHECKED
     @GetMapping("/customer/products/featured")
-    public ResponseEntity<ProductPreviewPagingVm> getFeaturedProductsPaging(
+    public ResponseEntity<ProductPreviewPagingGetResponse> getFeaturedProductsPaging(
             @RequestParam(value = "pageIndex", defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER) int pageIndex,
             @RequestParam(value = "pageSize",defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE) int pageSize
     ) {
@@ -48,7 +48,7 @@ public class ProductController {
 
     // xem chi tiết sp => đã check
     @GetMapping("/customer/products/{slug}")
-    public ResponseEntity<ProductDetailVm> getProductDetail(@PathVariable("slug") String slug) {
+    public ResponseEntity<ProductDetailGetResponse> getProductDetail(@PathVariable("slug") String slug) {
         return ResponseEntity.ok(this.productService.getProductDetailBySlug(slug));
 
     }
@@ -78,7 +78,7 @@ public class ProductController {
 
     // lấy ra ds sp trong category dựa vào slug => đã check
     @GetMapping({"/customer/category/{categorySlug}/products"})
-    public ResponseEntity<ProductPagingVm> getProductsFromCategoryPaging(
+    public ResponseEntity<ProductPagingGetResponse> getProductsFromCategoryPaging(
             @RequestParam(value = "pageIndex",defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER,required = false) int pageIndex,
             @RequestParam(value = "pageSize",defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE,required = false) int pageSize,
             @PathVariable String categorySlug
@@ -89,15 +89,15 @@ public class ProductController {
 
     //  lấy ngaaux nhiên sp làm slide => đã check
     @GetMapping({"/customer/products/featured/slide"})
-    public ResponseEntity<List<ProductPreviewVm>> getProductFeaturedMakeSlide(){
-        List<ProductPreviewVm> productPreviewVms =  productService.getProductFeaturedMakeSlide();
-        return new ResponseEntity<>(productPreviewVms, HttpStatus.OK);
+    public ResponseEntity<List<ProductPreviewGetResponse>> getProductFeaturedMakeSlide(){
+        List<ProductPreviewGetResponse> productPreviewGetResponses =  productService.getProductFeaturedMakeSlide();
+        return new ResponseEntity<>(productPreviewGetResponses, HttpStatus.OK);
     }
 
 
     // đã check
     @GetMapping({"/customer/products","/internal-order/products"})
-    public ResponseEntity<List<ProductPreviewVm>> getProductsByIds (
+    public ResponseEntity<List<ProductPreviewGetResponse>> getProductsByIds (
             @RequestParam("productIds") List<Long> productIds
     ){
         return ResponseEntity.ok(this.productService.getProductsByIds(productIds));
@@ -107,7 +107,7 @@ public class ProductController {
 
 
     @GetMapping("/customer/products")
-    public ResponseEntity<ProductPagingVm> getProductByMultiParams(
+    public ResponseEntity<ProductPagingGetResponse> getProductByMultiParams(
             @RequestParam(value = "pageIndex" ,required = false , defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE) int pageIndex,
             @RequestParam(value = "pageSize", defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
             @RequestParam(value = "productName", defaultValue = "", required = false) String productName,
@@ -126,7 +126,7 @@ public class ProductController {
 
     // lay ds bien the => đã check
     @GetMapping("/customer/product-variations/{parentId}")
-    public ResponseEntity<List<ProductVariantVm>> getProductVariationsByParentId(@PathVariable Long parentId) {
+    public ResponseEntity<List<ProductVariantGetResponse>> getProductVariationsByParentId(@PathVariable Long parentId) {
         return new ResponseEntity<>(this.productService.getProductVariationsByParentId(parentId),HttpStatus.OK);
     }
 
@@ -134,7 +134,7 @@ public class ProductController {
 
     // checked
     @GetMapping("/internal/products/warehouse")
-    public ResponseEntity<List<ProductInfoVm>> filterProductInProductIdsByNameOrSku(
+    public ResponseEntity<List<ProductInfoGetResponse>> filterProductInProductIdsByNameOrSku(
             @RequestParam(name = "name" , required = false) String name,
             @RequestParam(required = false) List<Long> productIds,
             @RequestParam(name = "sku", required = false) String sku

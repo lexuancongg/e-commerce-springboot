@@ -1,8 +1,8 @@
 package com.lexuancong.product.controller;
 
 import com.lexuancong.product.service.ProductAttributeGroupService;
-import com.lexuancong.product.viewmodel.attributegroup.ProductAttributeGroupPostVm;
-import com.lexuancong.product.viewmodel.attributegroup.ProductAttributeGroupVm;
+import com.lexuancong.product.dto.attributegroup.ProductAttributeGroupCreateRequest;
+import com.lexuancong.product.dto.attributegroup.ProductAttributeGroupGetResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,22 +21,22 @@ public class ProductAttributeGroupController {
 
     // đã check
     @GetMapping({"/management/product-attribute-groups"})
-    public ResponseEntity<List<ProductAttributeGroupVm>> getProductAttributeGroups() {
-        List<ProductAttributeGroupVm> productAttributeGroupVms = this.productAttributeGroupService.getProductAttributeGroups();
-        return new ResponseEntity<>(productAttributeGroupVms, HttpStatus.OK);
+    public ResponseEntity<List<ProductAttributeGroupGetResponse>> getProductAttributeGroups() {
+        List<ProductAttributeGroupGetResponse> productAttributeGroupGetResponses = this.productAttributeGroupService.getProductAttributeGroups();
+        return new ResponseEntity<>(productAttributeGroupGetResponses, HttpStatus.OK);
     }
 
     //đã check
     @PostMapping({"/management/product-attribute-groups"})
-    public ResponseEntity<ProductAttributeGroupVm> createProductAttributeGroup(
-            @Valid @RequestBody ProductAttributeGroupPostVm productAttributeGroupPostVm,
+    public ResponseEntity<ProductAttributeGroupGetResponse> createProductAttributeGroup(
+            @Valid @RequestBody ProductAttributeGroupCreateRequest productAttributeGroupCreateRequest,
             UriComponentsBuilder uriComponentsBuilder
     ) {
-        ProductAttributeGroupVm productAttributeGroupVm = this.productAttributeGroupService
-                .createProductAttributeGroup(productAttributeGroupPostVm);
+        ProductAttributeGroupGetResponse productAttributeGroupGetResponse = this.productAttributeGroupService
+                .createProductAttributeGroup(productAttributeGroupCreateRequest);
         return ResponseEntity.created(uriComponentsBuilder.replacePath("management/product-attribute-groups/{id}")
-                .buildAndExpand(productAttributeGroupVm.id()).toUri()
-        ).body(productAttributeGroupVm);
+                .buildAndExpand(productAttributeGroupGetResponse.id()).toUri()
+        ).body(productAttributeGroupGetResponse);
 
     }
 
@@ -44,8 +44,8 @@ public class ProductAttributeGroupController {
     // đã check
     @PutMapping({"/management/product-attribute-groups/{id}"})
     public ResponseEntity<Void> updateProductAttributeGroup(@PathVariable Long id,
-                                                            @Valid @RequestBody ProductAttributeGroupPostVm productAttributeGroupPostVm) {
-        this.productAttributeGroupService.updateProductAttributeGroup(id, productAttributeGroupPostVm);
+                                                            @Valid @RequestBody ProductAttributeGroupCreateRequest productAttributeGroupCreateRequest) {
+        this.productAttributeGroupService.updateProductAttributeGroup(id, productAttributeGroupCreateRequest);
         return ResponseEntity.noContent().build();
     }
 

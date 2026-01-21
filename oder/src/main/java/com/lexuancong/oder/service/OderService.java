@@ -10,9 +10,9 @@ import com.lexuancong.oder.service.internal.InventoryService;
 import com.lexuancong.oder.service.internal.ProductService;
 import com.lexuancong.oder.specification.OrderSpecification;
 import com.lexuancong.oder.constants.Constants;
-import com.lexuancong.oder.viewmodel.inventory.InventorySubtract;
-import com.lexuancong.oder.viewmodel.order.*;
-import com.lexuancong.oder.viewmodel.product.ProductVariantPreviewVm;
+import com.lexuancong.oder.dto.inventory.InventorySubtract;
+import com.lexuancong.oder.dto.order.*;
+import com.lexuancong.oder.dto.product.ProductVariantPreviewGetResponse;
 import com.lexuancong.share.exception.NotFoundException;
 import com.lexuancong.share.utils.AuthenticationUtils;
 import org.springframework.data.domain.Page;
@@ -20,13 +20,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class OderService {
@@ -43,17 +40,17 @@ public class OderService {
         this.inventoryService = inventoryService;
     }
 
-    public OrderVm createOrder(OrderPostVm orderPostVm){
+    public OrderVm createOrder(OrderCreateRequest orderCreateRequest){
         List<InventorySubtract> inventorySubtracts = new ArrayList<>();
-        Order order = orderPostVm.toModel();
+        Order order = orderCreateRequest.toModel();
         String userId = AuthenticationUtils.extractCustomerIdFromJwt();
         order.setCustomerId(userId);
 
         this.orderRepository.save(order);
-        List<OrderItem> orderItemSet = orderPostVm.orderItemPostVms().stream()
+        List<OrderItem> orderItemSet = orderCreateRequest.orderItemCreateRequests().stream()
                 .map(orderItemPostVm -> {
                     inventorySubtracts.add(orderItemPostVm.toInventorySubtract());
-                    return  orderItemPostVm.toModel(order);
+                    return  orderItemPostVm.toOrder(order);
                 })
                 .toList();
         // save orderItems
@@ -95,11 +92,11 @@ public class OderService {
 
 
     // product này là product cha
-    public CheckUserHasBoughtProductCompletedVm checkUserHasBoughtProductCompleted(Long productId){
+    public CheckUserHasBoughtProductCompleted checkUserHasBoughtProductCompleted(Long productId){
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
-        List<ProductVariantPreviewVm> productVariantPreviewVms =  this.productService.getProductVariantByProductParentId(productId);
-        List<Long> productVariantIds = productVariantPreviewVms.stream()
-                .map(ProductVariantPreviewVm::id)
+        List<ProductVariantPreviewGetResponse> productVariantPreviewGetResponses =  this.productService.getProductVariantByProductParentId(productId);
+        List<Long> productVariantIds = productVariantPreviewGetResponses.stream()
+                .map(ProductVariantPreviewGetResponse::id)
                 .toList();
 
 
@@ -107,7 +104,7 @@ public class OderService {
                 OrderSpecification.checkUserHasBoughtProductCompleted(productVariantIds,customerId);
         boolean hasPurchased = this.orderRepository.findOne(checkUserHasBoughtSpecification)
                 .isPresent();
-        return new CheckUserHasBoughtProductCompletedVm(hasPurchased);
+        return new CheckUserHasBoughtProductCompleted(hasPurchased);
 
 
 
@@ -118,17 +115,17 @@ public class OderService {
 
     }
 
-    public OrderPreviewPaging getOrders(int pageIndex, int pageSize){
+    public OrderPagingGetResponse getOrders(int pageIndex, int pageSize){
         Sort sort = Sort.by(Sort.Direction.DESC, Constants.Column.CREATE_AT_COLUMN);
         Pageable   pageable = PageRequest.of(pageIndex,pageSize,sort);
         Page<Order> pageOrders = this.orderRepository.findAll(pageable);
         List<Order> orders = pageOrders.getContent();
-        List<OrderPreviewVm> orderPreviewVms = orders.stream()
-                .map(OrderPreviewVm::fromModel)
+        List<OrderPreviewGetResponse> orderPreviewGetResponses = orders.stream()
+                .map(OrderPreviewGetResponse::fromOrder)
                 .toList();
 
-        return new OrderPreviewPaging(
-                orderPreviewVms,
+        return new OrderPagingGetResponse(
+                orderPreviewGetResponses,
                 pageIndex,
                 pageSize,
                 (int) pageOrders.getTotalElements(),

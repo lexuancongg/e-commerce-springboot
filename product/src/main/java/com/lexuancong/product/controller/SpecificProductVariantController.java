@@ -1,8 +1,8 @@
 package com.lexuancong.product.controller;
 
 import com.lexuancong.product.service.SpecificProductVariantService;
-import com.lexuancong.product.viewmodel.productoptionvalue.ProductOptionValueGetVm;
-import com.lexuancong.product.viewmodel.specificproductvariant.SpecificProductVariantGetVm;
+import com.lexuancong.product.dto.productoptionvalue.ProductOptionValueGetResponse;
+import com.lexuancong.product.dto.specificproductvariant.SpecificProductVariantGetResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +19,7 @@ public class SpecificProductVariantController {
 
     // lấy thông tin biến thể cụ thể dựa vào sản phẩm cha
     @GetMapping("/customer/specific-product-variants/{productId}")
-    public ResponseEntity<List<SpecificProductVariantGetVm>> getSpecificProductVariantsByProductId(@PathVariable Long productId) {
+    public ResponseEntity<List<SpecificProductVariantGetResponse>> getSpecificProductVariantsByProductId(@PathVariable Long productId) {
         return ResponseEntity.ok(this.specificProductVariantService.getSpecificProductVariantsByProductId(productId));
     }
 
@@ -28,7 +28,7 @@ public class SpecificProductVariantController {
     // lấy option cụ thể tương ứng vs mỗi biến tể
 
     @GetMapping("/customer/specific-product-variants/option-values")
-    ResponseEntity< List<ProductOptionValueGetVm>> getProductOptionValuesOfSpecificProductVariants(
+    ResponseEntity< List<ProductOptionValueGetResponse>> getProductOptionValuesOfSpecificProductVariants(
             @RequestParam(value = "productIds") List<Long> productIds
 
     ) {

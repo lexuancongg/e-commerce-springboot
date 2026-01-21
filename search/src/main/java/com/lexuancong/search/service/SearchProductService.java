@@ -4,10 +4,9 @@ import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.lexuancong.search.constant.ProductField;
 import com.lexuancong.search.model.Product;
-import com.lexuancong.search.viewmodel.ProductPagingVm;
-import com.lexuancong.search.viewmodel.ProductPreviewVm;
-import com.lexuancong.search.viewmodel.ProductQueryParams;
-import org.apache.lucene.queryparser.xml.builders.BooleanQueryBuilder;
+import com.lexuancong.search.dto.ProductPagingGetResponse;
+import com.lexuancong.search.dto.ProductPreviewGetResponse;
+import com.lexuancong.search.dto.ProductQueryParams;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -26,7 +25,7 @@ public class SearchProductService {
         this.elasticsearchOperations = elasticsearchOperations;
     }
 
-    public ProductPagingVm findProductsByCriteria(ProductQueryParams productQueryParams) {
+    public ProductPagingGetResponse findProductsByCriteria(ProductQueryParams productQueryParams) {
         NativeQueryBuilder nativeQueryBuilder = NativeQuery.builder()
                 // theem cacs điều kiện vào truy vaans
                 .withQuery(queryBuilder -> queryBuilder
@@ -71,14 +70,14 @@ public class SearchProductService {
         SearchHits<Product> searchHitsProduct = this.elasticsearchOperations.search(query, Product.class);
         // chuyển đổi ds kết quả thành  phân trang page
         SearchPage<Product> searchPageProduct = SearchHitSupport.searchPageFor(searchHitsProduct, nativeQueryBuilder.getPageable());
-        List<ProductPreviewVm> productPreviewVms = searchHitsProduct.stream()
+        List<ProductPreviewGetResponse> productPreviewGetResponses = searchHitsProduct.stream()
                 .map(productSearchHit -> {
                     Product product = productSearchHit.getContent();
-                    return ProductPreviewVm.fromModel(product);
+                    return ProductPreviewGetResponse.fromModel(product);
                 })
                 .toList();
-        return new ProductPagingVm(
-                productPreviewVms,
+        return new ProductPagingGetResponse(
+                productPreviewGetResponses,
                 searchPageProduct.getNumber(),
                 searchPageProduct.getSize(),
                 (int) searchPageProduct.getTotalElements(),

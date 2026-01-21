@@ -1,8 +1,8 @@
 package com.lexuancong.product.controller;
 
 import com.lexuancong.product.service.BrandService;
-import com.lexuancong.product.viewmodel.brand.BrandPostVm;
-import com.lexuancong.product.viewmodel.brand.BrandVm;
+import com.lexuancong.product.dto.brand.BrandCreateRequest;
+import com.lexuancong.product.dto.brand.BrandGetResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,22 +22,22 @@ public class BrandController {
 
     // đã check
     @GetMapping({"/management/brands","/customer/brands"})
-    public ResponseEntity<List<BrandVm>> getBrands(
+    public ResponseEntity<List<BrandGetResponse>> getBrands(
             @RequestParam(name = "brandName" , required = false,defaultValue = "") String brandName
             ) {
-        List<BrandVm> brandVms = brandService.getBrands(brandName);
-        return new ResponseEntity<>(brandVms, HttpStatus.OK);
+        List<BrandGetResponse> brandGetResponses = brandService.getBrands(brandName);
+        return new ResponseEntity<>(brandGetResponses, HttpStatus.OK);
     }
 
 
     // đã check
 
     @PostMapping("/management/brands")
-    public ResponseEntity<BrandVm> createBrand(
-            @RequestBody @Valid BrandPostVm brandPostVm,
+    public ResponseEntity<BrandGetResponse> createBrand(
+            @RequestBody @Valid BrandCreateRequest brandCreateRequest,
             UriComponentsBuilder uriComponentsBuilder
             ){
-        BrandVm brandSaved  = brandService.createBrand(brandPostVm);
+        BrandGetResponse brandSaved  = brandService.createBrand(brandCreateRequest);
         return ResponseEntity.created(uriComponentsBuilder.replacePath("/brands/{id}")
                         .buildAndExpand(brandSaved.id()).toUri())
                 .body(brandSaved);
@@ -46,8 +46,8 @@ public class BrandController {
 
     // đã check
     @PutMapping("/management/brands/{id}")
-    public ResponseEntity<Void> updateBrand(@PathVariable Long id, @RequestBody @Valid BrandPostVm brandPostVm) {
-        brandService.updateBrand(id,brandPostVm);
+    public ResponseEntity<Void> updateBrand(@PathVariable Long id, @RequestBody @Valid BrandCreateRequest brandCreateRequest) {
+        brandService.updateBrand(id, brandCreateRequest);
         return ResponseEntity.noContent().build();
     }
 

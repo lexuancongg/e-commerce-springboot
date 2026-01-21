@@ -3,11 +3,10 @@ package com.lexuancong.payment.service.handler.providers;
 import com.lexuancong.payment.model.InitiatedPaymentVm;
 import com.lexuancong.payment.model.enumeration.PaymentMethod;
 import com.lexuancong.payment.repository.PaymentProviderRepository;
-import com.lexuancong.payment.viewmodel.InitPaymentRequest;
+import com.lexuancong.payment.dto.InitPaymentRequest;
 import com.lexuancong.paypalpayment.service.PaypalService;
-import com.lexuancong.paypalpayment.viewmodel.PaypalCreatePaymentRequest;
-import com.lexuancong.paypalpayment.viewmodel.PaypalCreatePaymentResponse;
-import lombok.RequiredArgsConstructor;
+import com.lexuancong.paypalpayment.dto.PaypalCreatePaymentRequest;
+import com.lexuancong.paypalpayment.dto.PaypalCreatePaymentResponse;
 import org.springframework.stereotype.Service;
 
 @Service

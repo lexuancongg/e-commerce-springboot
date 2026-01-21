@@ -2,8 +2,7 @@ package com.lexuancong.oder.service.internal;
 
 import com.lexuancong.oder.config.ServiceUrlConfig;
 import com.lexuancong.oder.model.OrderItem;
-import com.lexuancong.oder.viewmodel.cartItem.CartItemDeleteVm;
-import com.lexuancong.oder.viewmodel.order.OrderVm;
+import com.lexuancong.oder.dto.cartItem.CartItemDelete;
 import com.lexuancong.share.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,8 +20,8 @@ public class CartService {
     private final ServiceUrlConfig serviceUrlConfig;
     public void deleteCartItems(Collection<OrderItem> orderItems){
         String jwt = AuthenticationUtils.extractJwt();
-        List<CartItemDeleteVm> cartItemDeleteVms =  orderItems.stream()
-                .map(CartItemDeleteVm::fromOderItem)
+        List<CartItemDelete> cartItemDeletes =  orderItems.stream()
+                .map(CartItemDelete::fromOderItem)
                 .toList();
         URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlConfig.cart())
                 .path("/internal-order/cart-items/remove")
@@ -32,7 +31,7 @@ public class CartService {
         restClient.post()
                 .uri(url)
                 .headers(httpHeaders -> httpHeaders.setBearerAuth(jwt))
-                .body(cartItemDeleteVms)
+                .body(cartItemDeletes)
                 .retrieve();
     }
 }

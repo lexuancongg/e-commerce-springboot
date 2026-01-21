@@ -1,8 +1,8 @@
 package com.lexuancong.oder.controller;
 
 import com.lexuancong.oder.service.CheckoutService;
-import com.lexuancong.oder.viewmodel.checkout.CheckoutPostVm;
-import com.lexuancong.oder.viewmodel.checkout.CheckoutVm;
+import com.lexuancong.oder.dto.checkout.CheckoutCreateRequest;
+import com.lexuancong.oder.dto.checkout.CheckoutGetResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,12 +14,12 @@ public class CheckoutController {
         this.checkoutService = checkoutService;
     }
     @PostMapping("customer/checkouts")
-    public ResponseEntity<CheckoutVm> createCheckout(@Valid @RequestBody CheckoutPostVm checkoutPostVm) {
-        return ResponseEntity.ok(this.checkoutService.createCheckout(checkoutPostVm));
+    public ResponseEntity<CheckoutGetResponse> createCheckout(@Valid @RequestBody CheckoutCreateRequest checkoutCreateRequest) {
+        return ResponseEntity.ok(this.checkoutService.createCheckout(checkoutCreateRequest));
     }
 
     @GetMapping("/customer/checkouts/{id}")
-    public ResponseEntity<CheckoutVm> getCheckoutById(@PathVariable Long id) {
+    public ResponseEntity<CheckoutGetResponse> getCheckoutById(@PathVariable Long id) {
         return ResponseEntity.ok(this.checkoutService.getCheckoutById(id));
 
     }

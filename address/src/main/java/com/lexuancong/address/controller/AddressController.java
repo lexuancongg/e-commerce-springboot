@@ -42,7 +42,7 @@ public class AddressController{
         return ResponseEntity.ok(addressService.getAddresses(ids));
     }
 
-    @DeleteMapping({"/customer/addresses/{id}","/internal-customer/addresses/{id}"})
+    @DeleteMapping({"/internal-customer/addresses/{id}"})
     public ResponseEntity<Void> deleteAddress(@PathVariable Long id){
         addressService.deleteAddress(id);
         return ResponseEntity.ok().build();

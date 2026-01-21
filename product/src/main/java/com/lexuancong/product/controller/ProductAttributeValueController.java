@@ -1,15 +1,14 @@
 package com.lexuancong.product.controller;
 
 import com.lexuancong.product.service.ProductAttributeValueService;
-import com.lexuancong.product.viewmodel.productattribute.ProductAttributeValuePostVm;
-import com.lexuancong.product.viewmodel.productattribute.ProductAttributeValueVm;
+import com.lexuancong.product.dto.productattribute.ProductAttributeValueCreateRequest;
+import com.lexuancong.product.dto.productattribute.ProductAttributeValueGetResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -22,26 +21,26 @@ public class ProductAttributeValueController {
 
     // đã check
     @GetMapping("/management/product-attribute-values/{productId}")
-    public ResponseEntity<List<ProductAttributeValueVm>> getProductAttributeValueByProductId (
+    public ResponseEntity<List<ProductAttributeValueGetResponse>> getProductAttributeValueByProductId (
             @PathVariable("productId") Long productId) {
-        List<ProductAttributeValueVm> productAttributeValueVms = this.productAttributeValueService
+        List<ProductAttributeValueGetResponse> productAttributeValueGetResponses = this.productAttributeValueService
                 .getProductAttributeValueByProductId(productId);
-        return new ResponseEntity<>(productAttributeValueVms, HttpStatus.OK);
+        return new ResponseEntity<>(productAttributeValueGetResponses, HttpStatus.OK);
 
     }
 
 
     // đã check
     @PostMapping("/management/product-attribute-values")
-    public ResponseEntity<ProductAttributeValueVm> createProductAttributeValue(
-            @Valid @RequestBody ProductAttributeValuePostVm productAttributeValuePostVm,
+    public ResponseEntity<ProductAttributeValueGetResponse> createProductAttributeValue(
+            @Valid @RequestBody ProductAttributeValueCreateRequest productAttributeValueCreateRequest,
             UriComponentsBuilder uriComponentsBuilder
             ) {
-        ProductAttributeValueVm productAttributeValueVm = this.productAttributeValueService
-                .createProductAttributeValue(productAttributeValuePostVm);
+        ProductAttributeValueGetResponse productAttributeValueGetResponse = this.productAttributeValueService
+                .createProductAttributeValue(productAttributeValueCreateRequest);
         return ResponseEntity.created(uriComponentsBuilder.replacePath("/backoffice/product-attribute-value/{id}")
-                .buildAndExpand(productAttributeValueVm.id()).toUri())
-                .body(productAttributeValueVm);
+                .buildAndExpand(productAttributeValueGetResponse.id()).toUri())
+                .body(productAttributeValueGetResponse);
     }
 
 
@@ -57,8 +56,8 @@ public class ProductAttributeValueController {
     // đã check
     @PutMapping({"/management/product-attribute-values/{id}"})
     public ResponseEntity<Void> updateProductAttributeValue(@PathVariable(value = "id") Long id,
-                                                            @Valid @RequestBody ProductAttributeValuePostVm productAttributeValuePostVm){
-        this.productAttributeValueService.updateProductAttributeValue(id,productAttributeValuePostVm);
+                                                            @Valid @RequestBody ProductAttributeValueCreateRequest productAttributeValueCreateRequest){
+        this.productAttributeValueService.updateProductAttributeValue(id, productAttributeValueCreateRequest);
         return ResponseEntity.noContent().build();
 
     }

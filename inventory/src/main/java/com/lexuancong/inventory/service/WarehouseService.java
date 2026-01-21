@@ -4,17 +4,16 @@ import com.lexuancong.inventory.constants.Constants;
 import com.lexuancong.inventory.model.Warehouse;
 import com.lexuancong.inventory.repository.WarehouseRepository;
 import com.lexuancong.inventory.service.Internal.AddressService;
-import com.lexuancong.inventory.viewmodel.address.AddressPostVm;
-import com.lexuancong.inventory.viewmodel.address.AddressVm;
-import com.lexuancong.inventory.viewmodel.warehouse.WarehousePostVm;
-import com.lexuancong.inventory.viewmodel.warehouse.WarehouseVm;
+import com.lexuancong.inventory.dto.address.AddressCreateRequest;
+import com.lexuancong.inventory.dto.address.AddressGetResponse;
+import com.lexuancong.inventory.dto.warehouse.WarehouseCreateRequest;
+import com.lexuancong.inventory.dto.warehouse.WarehouseGetResponse;
 import com.lexuancong.share.exception.DuplicatedException;
 import com.lexuancong.share.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,27 +26,27 @@ public class WarehouseService {
 
     }
 
-    public WarehouseVm createWarehouse(WarehousePostVm warehousePostVm) {
-        this.validateExitedName(warehousePostVm.name(),null);
-        AddressPostVm addressPostVm = this.buidAddressPostVm(warehousePostVm);
-        AddressVm addressSaved = this.addressService.createAddress(addressPostVm);
+    public WarehouseGetResponse createWarehouse(WarehouseCreateRequest warehouseCreateRequest) {
+        this.validateExitedName(warehouseCreateRequest.name(),null);
+        AddressCreateRequest addressCreateRequest = this.buidAddressPostVm(warehouseCreateRequest);
+        AddressGetResponse addressSaved = this.addressService.createAddress(addressCreateRequest);
 
         Warehouse warehouse = new Warehouse();
-        warehouse.setName(warehousePostVm.name());
+        warehouse.setName(warehouseCreateRequest.name());
         warehouse.setAddressId(addressSaved.id());
-        return WarehouseVm.fromModel(this.warehouseRepository.save(warehouse));
+        return WarehouseGetResponse.fromWarehouse(this.warehouseRepository.save(warehouse));
 
 
     }
 
-    private AddressPostVm buidAddressPostVm(WarehousePostVm warehousePostVm){
-        return  new AddressPostVm(
-                warehousePostVm.contactName(),
-                warehousePostVm.phoneNumber(),
-                warehousePostVm.specificAddress(),
-                warehousePostVm.districtId(),
-                warehousePostVm.provinceId(),
-                warehousePostVm.countryId()
+    private AddressCreateRequest buidAddressPostVm(WarehouseCreateRequest warehouseCreateRequest){
+        return  new AddressCreateRequest(
+                warehouseCreateRequest.contactName(),
+                warehouseCreateRequest.phoneNumber(),
+                warehouseCreateRequest.specificAddress(),
+                warehouseCreateRequest.districtId(),
+                warehouseCreateRequest.provinceId(),
+                warehouseCreateRequest.countryId()
         );
     }
 
@@ -65,13 +64,13 @@ public class WarehouseService {
     }
 
 
-    public void  updateWarehouse(Long id , WarehousePostVm warehousePostVm){
+    public void  updateWarehouse(Long id , WarehouseCreateRequest warehouseCreateRequest){
         Warehouse warehouse = this.warehouseRepository.findById(id)
                 .orElseThrow(()-> new NotFoundException(Constants.ErrorKey.WAREHOUSE_NOT_FOUND,id));
-        this.validateExitedName(warehousePostVm.name(),id);
-        warehouse.setName(warehousePostVm.name());
-        AddressPostVm addressPostVm = this.buidAddressPostVm(warehousePostVm);
-        this.addressService.updateAddress(warehouse.getAddressId(),addressPostVm);
+        this.validateExitedName(warehouseCreateRequest.name(),id);
+        warehouse.setName(warehouseCreateRequest.name());
+        AddressCreateRequest addressCreateRequest = this.buidAddressPostVm(warehouseCreateRequest);
+        this.addressService.updateAddress(warehouse.getAddressId(), addressCreateRequest);
         this.warehouseRepository.save(warehouse);
 
     }
@@ -83,9 +82,9 @@ public class WarehouseService {
         this.addressService.deleteAddress(warehouse.getAddressId());
     }
 
-    public List<WarehouseVm> getWarehouses() {
+    public List<WarehouseGetResponse> getWarehouses() {
         List<Warehouse> warehouses = this.warehouseRepository.findAll();
-        return warehouses.stream().map(WarehouseVm::fromModel).toList();
+        return warehouses.stream().map(WarehouseGetResponse::fromWarehouse).toList();
 
     }
 }

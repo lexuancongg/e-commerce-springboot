@@ -1,6 +1,6 @@
 package com.lexuancong.vnpaypayment.service;
 
-import com.lexuancong.vnpaypayment.viewmodel.VnpayCreatePaymentUrlRequest;
+import com.lexuancong.vnpaypayment.dto.VnpayCreatePaymentUrlRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;

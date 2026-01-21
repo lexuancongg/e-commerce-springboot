@@ -7,8 +7,8 @@ import com.lexuancong.product.model.attribute.ProductAttribute;
 import com.lexuancong.product.repository.ProductAttributeRepository;
 import com.lexuancong.product.repository.ProductAttributeValueRepository;
 import com.lexuancong.product.repository.ProductRepository;
-import com.lexuancong.product.viewmodel.productattribute.ProductAttributeValuePostVm;
-import com.lexuancong.product.viewmodel.productattribute.ProductAttributeValueVm;
+import com.lexuancong.product.dto.productattribute.ProductAttributeValueCreateRequest;
+import com.lexuancong.product.dto.productattribute.ProductAttributeValueGetResponse;
 import com.lexuancong.share.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -27,32 +27,32 @@ public class ProductAttributeValueService {
         this.productAttributeRepository = productAttributeRepository;
     }
 
-    public List<ProductAttributeValueVm> getProductAttributeValueByProductId(Long productId) {
+    public List<ProductAttributeValueGetResponse> getProductAttributeValueByProductId(Long productId) {
         Product product = this.productRepository.findById(productId)
                 .orElseThrow(() -> new NotFoundException(Constants.ErrorKey.PRODUCT_NOT_FOUND, productId));
 
-        List<ProductAttributeValueVm> productAttributeValueVms = this.productAttributeValueRepository
+        List<ProductAttributeValueGetResponse> productAttributeValueGetResponses = this.productAttributeValueRepository
                 .findAllByProduct(product)
                 .stream()
-                .map(ProductAttributeValueVm::fromModel)
+                .map(ProductAttributeValueGetResponse::fromProductAttributeValue)
                 .toList();
 
-        return productAttributeValueVms;
+        return productAttributeValueGetResponses;
 
     }
 
-    public ProductAttributeValueVm createProductAttributeValue(ProductAttributeValuePostVm productAttributeValuePostVm) {
+    public ProductAttributeValueGetResponse createProductAttributeValue(ProductAttributeValueCreateRequest productAttributeValueCreateRequest) {
         ProductAttributeValue productAttributeValue = new ProductAttributeValue();
-        Product product = this.productRepository.findById(productAttributeValuePostVm.productId())
-                .orElseThrow(() -> new NotFoundException(Constants.ErrorKey.PRODUCT_NOT_FOUND, productAttributeValuePostVm.productId()));
+        Product product = this.productRepository.findById(productAttributeValueCreateRequest.productId())
+                .orElseThrow(() -> new NotFoundException(Constants.ErrorKey.PRODUCT_NOT_FOUND, productAttributeValueCreateRequest.productId()));
         productAttributeValue.setProduct(product);
         ProductAttribute productAttribute = this.productAttributeRepository.
-                findById(productAttributeValuePostVm.productAttributeId())
-                .orElseThrow(() -> new NotFoundException(Constants.ErrorKey.PRODUCT_ATTRIBUTE_NOT_FOUND, productAttributeValuePostVm.productAttributeId()));
+                findById(productAttributeValueCreateRequest.productAttributeId())
+                .orElseThrow(() -> new NotFoundException(Constants.ErrorKey.PRODUCT_ATTRIBUTE_NOT_FOUND, productAttributeValueCreateRequest.productAttributeId()));
         productAttributeValue.setProductAttribute(productAttribute);
-        productAttributeValue.setValue(productAttributeValuePostVm.value());
+        productAttributeValue.setValue(productAttributeValueCreateRequest.value());
         this.productAttributeValueRepository.save(productAttributeValue);
-        return ProductAttributeValueVm.fromModel(productAttributeValue);
+        return ProductAttributeValueGetResponse.fromProductAttributeValue(productAttributeValue);
 
     }
 
@@ -64,13 +64,13 @@ public class ProductAttributeValueService {
         productAttributeRepository.deleteById(id);
     }
 
-    public void updateProductAttributeValue(Long id, ProductAttributeValuePostVm productAttributeValuePostVm) {
+    public void updateProductAttributeValue(Long id, ProductAttributeValueCreateRequest productAttributeValueCreateRequest) {
         Optional<ProductAttributeValue> optionalProductAttributeValue = this.productAttributeValueRepository.findById(id);
         if (optionalProductAttributeValue.isEmpty()) {
             throw new NotFoundException(Constants.ErrorKey.PRODUCT_ATTRIBUTE_VALUE_NOT_FOUND, id);
         }
         ProductAttributeValue productAttributeValue = optionalProductAttributeValue.get();
-        productAttributeValue.setValue(productAttributeValuePostVm.value());
+        productAttributeValue.setValue(productAttributeValueCreateRequest.value());
         this.productAttributeValueRepository.save(productAttributeValue);
 
 

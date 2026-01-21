@@ -6,10 +6,10 @@ import com.lexuancong.inventory.model.Warehouse;
 import com.lexuancong.inventory.repository.StockRepository;
 import com.lexuancong.inventory.repository.WarehouseRepository;
 import com.lexuancong.inventory.service.Internal.ProductService;
-import com.lexuancong.inventory.viewmodel.product.ProductInfoVm;
-import com.lexuancong.inventory.viewmodel.stock.StockGetVm;
-import com.lexuancong.inventory.viewmodel.stock.StockPostVm;
-import com.lexuancong.inventory.viewmodel.stock.StockPutQuantityVm;
+import com.lexuancong.inventory.dto.product.ProductInfoGetResponse;
+import com.lexuancong.inventory.dto.stock.StockGetResponse;
+import com.lexuancong.inventory.dto.stock.StockCreateRequest;
+import com.lexuancong.inventory.dto.stock.StockPutQuantityRequest;
 import com.lexuancong.share.exception.DuplicatedException;
 import com.lexuancong.share.exception.NotFoundException;
 import org.springframework.stereotype.Service;
@@ -34,21 +34,21 @@ public class StockService {
     }
 
 
-    public void addProductIntoWarehouse(List<StockPostVm> stockPostVmList){
+    public void addProductIntoWarehouse(List<StockCreateRequest> stockCreateRequestList){
         List<Stock> stocks = new ArrayList<>();
-        for (StockPostVm stockPostVm : stockPostVmList) {
+        for (StockCreateRequest stockCreateRequest : stockCreateRequestList) {
 
             // cần update sau vì for lớn gây ra performan kém
-            ProductInfoVm productInfoVm = this.productService.getProductById(stockPostVm.productId());
-            if(productInfoVm == null){
-                throw new NotFoundException(Constants.ErrorKey.PRODUCT_NOT_FOUND, stockPostVm.productId());
+            ProductInfoGetResponse productInfoGetResponse = this.productService.getProductById(stockCreateRequest.productId());
+            if(productInfoGetResponse == null){
+                throw new NotFoundException(Constants.ErrorKey.PRODUCT_NOT_FOUND, stockCreateRequest.productId());
             }
-            Warehouse warehouse = this.warehouseRepository.findById(stockPostVm.warehouseId())
-                    .orElseThrow(() -> new NotFoundException(Constants.ErrorKey.WAREHOUSE_NOT_FOUND, stockPostVm.warehouseId()));
-            this.validateExitedProductInStock(stockPostVm.productId(),stockPostVm.warehouseId());
+            Warehouse warehouse = this.warehouseRepository.findById(stockCreateRequest.warehouseId())
+                    .orElseThrow(() -> new NotFoundException(Constants.ErrorKey.WAREHOUSE_NOT_FOUND, stockCreateRequest.warehouseId()));
+            this.validateExitedProductInStock(stockCreateRequest.productId(), stockCreateRequest.warehouseId());
 
             Stock stock = Stock.builder()
-                    .productId(stockPostVm.productId())
+                    .productId(stockCreateRequest.productId())
                     .quantity(0)
                     .warehouse(warehouse)
                     .lockedQuantity(0)
@@ -69,10 +69,10 @@ public class StockService {
     }
 
 
-    public void updateQuantityProductInStock(List<StockPutQuantityVm> stockPutQuantityVms){
+    public void updateQuantityProductInStock(List<StockPutQuantityRequest> stockPutQuantityRequests){
 
-        List<Long> stockIds = stockPutQuantityVms.parallelStream()
-                .map(StockPutQuantityVm::stockId)
+        List<Long> stockIds = stockPutQuantityRequests.parallelStream()
+                .map(StockPutQuantityRequest::stockId)
                 .toList();
 
         List<Stock> stocks = this.stockRepository.findAllById(stockIds);
@@ -80,30 +80,30 @@ public class StockService {
         Map<Long,Stock> stockMap = stocks.stream()
                 .collect(Collectors.toMap(Stock::getId, stock -> stock));
 
-        for (StockPutQuantityVm stockPutQuantityVm : stockPutQuantityVms) {
-            Stock stock = stockMap.get(stockPutQuantityVm.stockId());
+        for (StockPutQuantityRequest stockPutQuantityRequest : stockPutQuantityRequests) {
+            Stock stock = stockMap.get(stockPutQuantityRequest.stockId());
             if(stock == null)
                 continue;
-            stock.setQuantity(stockPutQuantityVm.quantity());
+            stock.setQuantity(stockPutQuantityRequest.quantity());
         }
         this.stockRepository.saveAll(stocks);
     }
 
 
-    public List<StockGetVm> getStockByWarehouseIdAndProductSkuAndProductName(Long warehouseId, String productSku,String productName){
+    public List<StockGetResponse> getStockByWarehouseIdAndProductSkuAndProductName(Long warehouseId, String productSku, String productName){
         List<Long> productIdsInWarehouse = this.warehouseService.getProductIdsInWarehouse(warehouseId);
         // tìm kiếm trong productId này có product nào có sku vaf name mach nếu k null
-        List<ProductInfoVm> productInfoVms = this.productService.filterProductInProductIdsByNameOrSku(productIdsInWarehouse,productSku,productName);
-        Map<Long,ProductInfoVm> productInfoVmMap = productInfoVms.parallelStream()
-                .collect(Collectors.toMap(ProductInfoVm::id, productInfoVm -> productInfoVm));
+        List<ProductInfoGetResponse> productInfoGetResponses = this.productService.filterProductInProductIdsByNameOrSku(productIdsInWarehouse,productSku,productName);
+        Map<Long, ProductInfoGetResponse> productInfoVmMap = productInfoGetResponses.parallelStream()
+                .collect(Collectors.toMap(ProductInfoGetResponse::id, productInfoGetResponse -> productInfoGetResponse));
 
         List<Stock> stocks =
                 this.stockRepository.findByWarehouseIdAndProductIds(warehouseId,productInfoVmMap.keySet());
 
         return stocks.stream()
                 .map(stock ->  {
-                    ProductInfoVm productInfoVm = productInfoVmMap.get(stock.getProductId());
-                    return StockGetVm.fromModel(stock, productInfoVm);
+                    ProductInfoGetResponse productInfoGetResponse = productInfoVmMap.get(stock.getProductId());
+                    return StockGetResponse.fromStock(stock, productInfoGetResponse);
                 }).toList();
 
 

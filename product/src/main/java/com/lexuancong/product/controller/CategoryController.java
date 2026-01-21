@@ -1,8 +1,8 @@
 package com.lexuancong.product.controller;
 
 import com.lexuancong.product.service.CategoryService;
-import com.lexuancong.product.viewmodel.category.CategoryPostVm;
-import com.lexuancong.product.viewmodel.category.CategoryVm;
+import com.lexuancong.product.dto.category.CategoryCreateRequest;
+import com.lexuancong.product.dto.category.CategoryGetResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,20 +20,20 @@ public class CategoryController {
 
     // CHECKED
     @GetMapping({"/management/categories","/customer/categories"})
-    public ResponseEntity<List<CategoryVm>> getCategories(
+    public ResponseEntity<List<CategoryGetResponse>> getCategories(
             @RequestParam(required = false , defaultValue = "") String categoryName
     ) {
-        List<CategoryVm> categoryVms = categoryService.getCategories(categoryName);
-        return new ResponseEntity<>(categoryVms, HttpStatus.OK);
+        List<CategoryGetResponse> categoryGetResponses = categoryService.getCategories(categoryName);
+        return new ResponseEntity<>(categoryGetResponses, HttpStatus.OK);
     }
 
     // đã check
     @PostMapping("/management/categories")
-    public ResponseEntity<CategoryVm> createCategory(
-            @RequestBody @Valid CategoryPostVm categoryPostVm,
+    public ResponseEntity<CategoryGetResponse> createCategory(
+            @RequestBody @Valid CategoryCreateRequest categoryCreateRequest,
             UriComponentsBuilder uriComponentsBuilder
             ){
-        CategoryVm categorySaved = categoryService.createCategory(categoryPostVm);
+        CategoryGetResponse categorySaved = categoryService.createCategory(categoryCreateRequest);
         return ResponseEntity.created(uriComponentsBuilder.replacePath("/categories/{id}")
                 .buildAndExpand(categorySaved.id())
                 .toUri()
@@ -43,9 +43,9 @@ public class CategoryController {
     // đã check
     @PutMapping("/management/categories/{id}")
     public ResponseEntity<Void> updateCategory(@PathVariable Long id,
-                                               @RequestBody @Valid CategoryPostVm categoryPostVm
+                                               @RequestBody @Valid CategoryCreateRequest categoryCreateRequest
     ){
-        categoryService.updateCategory(id,categoryPostVm);
+        categoryService.updateCategory(id, categoryCreateRequest);
         return ResponseEntity.noContent().build();
     }
 

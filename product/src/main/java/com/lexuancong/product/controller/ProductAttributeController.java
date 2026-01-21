@@ -3,9 +3,9 @@ package com.lexuancong.product.controller;
 import com.lexuancong.product.model.attribute.ProductAttribute;
 import com.lexuancong.product.service.ProductAttributeService;
 import com.lexuancong.product.constant.Constants;
-import com.lexuancong.product.viewmodel.attribute.ProductAttributePagingVm;
-import com.lexuancong.product.viewmodel.attribute.ProductAttributePostVm;
-import com.lexuancong.product.viewmodel.attribute.ProductAttributeVm;
+import com.lexuancong.product.dto.attribute.ProductAttributePagingGetResponse;
+import com.lexuancong.product.dto.attribute.ProductAttributeCreateRequest;
+import com.lexuancong.product.dto.attribute.ProductAttributeGetResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,13 +22,13 @@ public class ProductAttributeController {
 
     // đã check
     @GetMapping({"/management/product-attributes","customer/product-attributes"})
-    public ResponseEntity<List<ProductAttributeVm>> getProductAttributes() {
+    public ResponseEntity<List<ProductAttributeGetResponse>> getProductAttributes() {
         return ResponseEntity.ok(this.productAttributeService.getProductAttributes());
     }
 
     // phân trang theo thuộc tính
     @GetMapping({"/management/product-attribute/paging"})
-    public ResponseEntity<ProductAttributePagingVm> getProductAttributePaging(
+    public ResponseEntity<ProductAttributePagingGetResponse> getProductAttributePaging(
             @RequestParam(name ="pageIndex" ,defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER,required = false)
             final int pageIndex,
             @RequestParam(name = "pageSize" ,defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE,required = false)
@@ -40,21 +40,21 @@ public class ProductAttributeController {
     // đã check
 
     @PostMapping("/management/product-attributes")
-    public ResponseEntity<ProductAttributeVm> createProductAttribute(@RequestBody @Valid ProductAttributePostVm productAttributePostVm,
-                                                                     UriComponentsBuilder uriComponentsBuilder ) {
-        ProductAttribute productAttribute = this.productAttributeService.createProductAttribute(productAttributePostVm);
-        ProductAttributeVm productAttributeVm = ProductAttributeVm.fromModel(productAttribute);
+    public ResponseEntity<ProductAttributeGetResponse> createProductAttribute(@RequestBody @Valid ProductAttributeCreateRequest productAttributeCreateRequest,
+                                                                              UriComponentsBuilder uriComponentsBuilder ) {
+        ProductAttribute productAttribute = this.productAttributeService.createProductAttribute(productAttributeCreateRequest);
+        ProductAttributeGetResponse productAttributeGetResponse = ProductAttributeGetResponse.fromProductAttribute(productAttribute);
         return ResponseEntity.created(uriComponentsBuilder.replacePath("/product-attributes/{id}")
                         .buildAndExpand(productAttribute.getId()).toUri())
-                .body(productAttributeVm);
+                .body(productAttributeGetResponse);
     }
 
 
     // đã check
     @PutMapping({"/management/product-attributes/{id}"})
     public ResponseEntity<Void> updateProductAttribute(@PathVariable Long id,
-                                                       @Valid @RequestBody ProductAttributePostVm productAttributePostVm) {
-        this.productAttributeService.updateProductAttribute(id,productAttributePostVm);
+                                                       @Valid @RequestBody ProductAttributeCreateRequest productAttributeCreateRequest) {
+        this.productAttributeService.updateProductAttribute(id, productAttributeCreateRequest);
         return ResponseEntity.noContent().build();
     }
 

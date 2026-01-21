@@ -4,8 +4,8 @@ import com.lexuancong.product.constant.Constants;
 import com.lexuancong.product.model.ProductOption;
 import com.lexuancong.product.repository.ProductOptionRepository;
 import com.lexuancong.product.repository.ProductOptionValueRepository;
-import com.lexuancong.product.viewmodel.productoptions.ProductOptionGetVm;
-import com.lexuancong.product.viewmodel.productoptions.ProductOptionPostVm;
+import com.lexuancong.product.dto.productoptions.ProductOptionGetResponse;
+import com.lexuancong.product.dto.productoptions.ProductOptionCreateRequest;
 import com.lexuancong.share.exception.BadRequestException;
 import com.lexuancong.share.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -20,18 +20,18 @@ public class ProductOptionService {
     private final ProductOptionRepository productOptionRepository;
     private final ProductOptionValueRepository productOptionValueRepository;
 
-    public List<ProductOptionGetVm> getProductOptions() {
+    public List<ProductOptionGetResponse> getProductOptions() {
         List<ProductOption> productOptions = productOptionRepository.findAll();
         return productOptions.stream()
-                .map(ProductOptionGetVm::fromModel)
+                .map(ProductOptionGetResponse::fromProductOption)
                 .collect(Collectors.toList());
     }
 
-    public ProductOptionGetVm createProductOption(ProductOptionPostVm productOptionPostVm){
-        this.validateDuplicatedName(productOptionPostVm.name(), null);
-        ProductOption productOption = productOptionPostVm.toModel();
+    public ProductOptionGetResponse createProductOption(ProductOptionCreateRequest productOptionCreateRequest){
+        this.validateDuplicatedName(productOptionCreateRequest.name(), null);
+        ProductOption productOption = productOptionCreateRequest.toProductOption();
         productOptionRepository.save(productOption);
-        return ProductOptionGetVm.fromModel(productOption);
+        return ProductOptionGetResponse.fromProductOption(productOption);
 
     }
 
@@ -45,11 +45,11 @@ public class ProductOptionService {
     }
 
 
-    public void updateProductOption(Long id, ProductOptionPostVm productOptionPostVm){
+    public void updateProductOption(Long id, ProductOptionCreateRequest productOptionCreateRequest){
         ProductOption productOption = this.productOptionRepository.findById(id)
                 .orElseThrow(()->new NotFoundException(Constants.ErrorKey.PRODUCT_OPTION_NOT_FOUND,id));
-        this.validateDuplicatedName(productOptionPostVm.name(), id);
-        productOption.setName(productOptionPostVm.name());
+        this.validateDuplicatedName(productOptionCreateRequest.name(), id);
+        productOption.setName(productOptionCreateRequest.name());
         this.productOptionRepository.save(productOption);
 
     }

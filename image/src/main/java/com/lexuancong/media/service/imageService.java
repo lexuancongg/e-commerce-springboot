@@ -3,8 +3,8 @@ package com.lexuancong.media.service;
 import com.lexuancong.media.config.FilesystemConfig;
 import com.lexuancong.media.model.Image;
 import com.lexuancong.media.repository.ImageRepository;
-import com.lexuancong.media.viewmodel.ImageDetailVm;
-import com.lexuancong.media.viewmodel.ImagePostVm;
+import com.lexuancong.media.dto.ImageDetailGetResponse;
+import com.lexuancong.media.dto.ImageCreateRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -23,11 +23,11 @@ public class imageService {
         this.filesystemConfig = filesystemConfig;
     }
 
-    public Image create(ImagePostVm imagePostVm)  {
-        Image image = imagePostVm.toModel();
+    public Image create(ImageCreateRequest imageCreateRequest)  {
+        Image image = imageCreateRequest.toImage();
         try {
             // dữ liệu của file được  the hien duoi dang file
-            String filePath = this.saveFileInFilesystem(image.getFileName() , imagePostVm.file().getBytes());
+            String filePath = this.saveFileInFilesystem(image.getFileName() , imageCreateRequest.file().getBytes());
             image.setFilePath(filePath);
             imageRepository.save(image);
 
@@ -88,7 +88,7 @@ public class imageService {
     }
 
 
-    public ImageDetailVm getImageById(Long id){
+    public ImageDetailGetResponse getImageById(Long id){
         // dựa vào file path ddeer lays trong file sytemt
         Image image = imageRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Image not found"));
@@ -97,7 +97,7 @@ public class imageService {
         InputStream fileContent = null;
         try {
             fileContent = Files.newInputStream(path);
-            return new ImageDetailVm(image.getId() ,image.getDescription() ,
+            return new ImageDetailGetResponse(image.getId() ,image.getDescription() ,
                     image.getFileName(),image.getImageType(),fileContent);
         } catch (IOException e) {
             throw new RuntimeException(e);

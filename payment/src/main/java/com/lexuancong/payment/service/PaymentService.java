@@ -3,8 +3,8 @@ package com.lexuancong.payment.service;
 import com.lexuancong.payment.model.InitiatedPaymentVm;
 import com.lexuancong.payment.repository.PaymentRepository;
 import com.lexuancong.payment.service.handler.providers.ProviderPaymentHandler;
-import com.lexuancong.payment.viewmodel.InitPaymentRequest;
-import com.lexuancong.payment.viewmodel.InitPaymentResponse;
+import com.lexuancong.payment.dto.InitPaymentRequest;
+import com.lexuancong.payment.dto.InitPaymentResponse;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 

@@ -2,9 +2,9 @@ package com.lexuancong.oder.service.internal;
 
 import com.lexuancong.oder.config.ServiceUrlConfig;
 import com.lexuancong.oder.model.OrderItem;
-import com.lexuancong.oder.viewmodel.product.ProductCheckoutPreviewVm;
-import com.lexuancong.oder.viewmodel.product.ProductSubtractQuantityVm;
-import com.lexuancong.oder.viewmodel.product.ProductVariantPreviewVm;
+import com.lexuancong.oder.dto.product.ProductCheckoutPreviewGetResponse;
+import com.lexuancong.oder.dto.product.ProductSubtractQuantity;
+import com.lexuancong.oder.dto.product.ProductVariantPreviewGetResponse;
 import com.lexuancong.share.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
@@ -22,11 +22,11 @@ public class ProductService {
     private final ServiceUrlConfig serviceUrlConfig;
     private final RestClient restClient;
 
-    public List<ProductVariantPreviewVm> getProductVariantByProductParentId(Long productId) {
+    public List<ProductVariantPreviewGetResponse> getProductVariantByProductParentId(Long productId) {
         return null;
     }
 
-    public List<ProductCheckoutPreviewVm>  getProductInfoPreviewByIds(Collection<Long> productIds) {
+    public List<ProductCheckoutPreviewGetResponse>  getProductInfoPreviewByIds(Collection<Long> productIds) {
         String jwt = AuthenticationUtils.extractJwt();
         URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlConfig.product())
                 .path("/internal-order/products")
@@ -38,7 +38,7 @@ public class ProductService {
                 .uri(url)
                 .headers(httpHeaders -> httpHeaders.setBearerAuth(jwt))
                 .retrieve()
-                .toEntity(new ParameterizedTypeReference<List<ProductCheckoutPreviewVm>>() {
+                .toEntity(new ParameterizedTypeReference<List<ProductCheckoutPreviewGetResponse>>() {
                 })
                 .getBody();
 
@@ -46,8 +46,8 @@ public class ProductService {
 
     public void updateQuantityProductAfterOrder(Collection<OrderItem> orderItems){
         String jwt = AuthenticationUtils.extractJwt();
-        List<ProductSubtractQuantityVm> productSubtractQuantityVms = orderItems.stream()
-                .map(ProductSubtractQuantityVm::fromOrderItem)
+        List<ProductSubtractQuantity> productSubtractQuantities = orderItems.stream()
+                .map(ProductSubtractQuantity::fromOrderItem)
                 .toList();
         URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlConfig.product())
                 .path("/internal-order/products/subtract-quantity")
@@ -57,7 +57,7 @@ public class ProductService {
         this.restClient.put()
                 .uri(url)
                 .headers(httpHeaders -> httpHeaders.setBearerAuth(jwt))
-                .body(productSubtractQuantityVms)
+                .body(productSubtractQuantities)
                 .retrieve();
     }
 

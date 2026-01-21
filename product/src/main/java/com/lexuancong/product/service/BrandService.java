@@ -3,8 +3,8 @@ package com.lexuancong.product.service;
 import com.lexuancong.product.constant.Constants;
 import com.lexuancong.product.model.Brand;
 import com.lexuancong.product.repository.BrandRepository;
-import com.lexuancong.product.viewmodel.brand.BrandPostVm;
-import com.lexuancong.product.viewmodel.brand.BrandVm;
+import com.lexuancong.product.dto.brand.BrandCreateRequest;
+import com.lexuancong.product.dto.brand.BrandGetResponse;
 import com.lexuancong.share.exception.BadRequestException;
 import com.lexuancong.share.exception.DuplicatedException;
 import com.lexuancong.share.exception.NotFoundException;
@@ -19,16 +19,16 @@ public class BrandService {
         this.brandRepository = brandRepository;
     }
 
-    public List<BrandVm> getBrands(String brandName){
+    public List<BrandGetResponse> getBrands(String brandName){
         return brandRepository.findByNameContainingIgnoreCase(brandName)
                 .stream()
-                .map(BrandVm::fromModel)
+                .map(BrandGetResponse::fromBrand)
                 .toList();
     }
 
-    public BrandVm createBrand(BrandPostVm brandPostVm) {
-        this.validateDuplicateName(brandPostVm.name(),null);
-        return BrandVm.fromModel(brandRepository.save(brandPostVm.toModel()));
+    public BrandGetResponse createBrand(BrandCreateRequest brandCreateRequest) {
+        this.validateDuplicateName(brandCreateRequest.name(),null);
+        return BrandGetResponse.fromBrand(brandRepository.save(brandCreateRequest.toBrand()));
     }
     private void validateDuplicateName(String brandName,Long id) {
         if(this.checkIsExitsName(brandName,id)){
@@ -40,14 +40,14 @@ public class BrandService {
         return brandRepository.findExistedName(brandName, id)!=null;
     }
 
-    public void updateBrand(Long id,BrandPostVm brandPostVm){
-        this.validateDuplicateName(brandPostVm.name(),id);
+    public void updateBrand(Long id, BrandCreateRequest brandCreateRequest){
+        this.validateDuplicateName(brandCreateRequest.name(),id);
         Brand brand = brandRepository.findById(id)
                 // throw exception
                 .orElseThrow(()->new NotFoundException(Constants.ErrorKey.BRAND_NOT_FOUND,id));
-        brand.setName(brandPostVm.name());
-        brand.setSlug(brandPostVm.slug());
-        brand.setPublic(brandPostVm.isPublic());
+        brand.setName(brandCreateRequest.name());
+        brand.setSlug(brandCreateRequest.slug());
+        brand.setPublic(brandCreateRequest.isPublic());
         brandRepository.save(brand);
 
     }

@@ -1,7 +1,7 @@
 package com.lexuancong.inventory.service.Internal;
 
 import com.lexuancong.inventory.config.ServiceUrlConfig;
-import com.lexuancong.inventory.viewmodel.product.ProductInfoVm;
+import com.lexuancong.inventory.dto.product.ProductInfoGetResponse;
 import com.lexuancong.share.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
@@ -12,7 +12,6 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,7 +22,7 @@ public class ProductService {
     private final RestClient restClient;
     private final ServiceUrlConfig serviceUrlConfig;
 
-    public ProductInfoVm getProductById(Long productId){
+    public ProductInfoGetResponse getProductById(Long productId){
         String jwt  = AuthenticationUtils.extractJwt();
         URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlConfig.product())
                 .path("/internal/products/"+ productId)
@@ -33,10 +32,10 @@ public class ProductService {
                 .uri(url)
                 .headers(httpHeaders -> httpHeaders.setBearerAuth(jwt))
                 .retrieve()
-                .body(ProductInfoVm.class);
+                .body(ProductInfoGetResponse.class);
     }
 
-    public List<ProductInfoVm> filterProductInProductIdsByNameOrSku(List<Long> productIds,String name,String sku){
+    public List<ProductInfoGetResponse> filterProductInProductIdsByNameOrSku(List<Long> productIds, String name, String sku){
         String jwt  = AuthenticationUtils.extractJwt();
         if(productIds.isEmpty()){
             return Collections.emptyList();
@@ -54,7 +53,7 @@ public class ProductService {
                 .uri(url)
                 .headers(httpHeaders -> httpHeaders.setBearerAuth(jwt))
                 .retrieve()
-                .toEntity(new ParameterizedTypeReference<List<ProductInfoVm>>() {
+                .toEntity(new ParameterizedTypeReference<List<ProductInfoGetResponse>>() {
                 })
                 .getBody();
     }

@@ -1,8 +1,8 @@
 package com.lexuancong.inventory.service.Internal;
 
 import com.lexuancong.inventory.config.ServiceUrlConfig;
-import com.lexuancong.inventory.viewmodel.address.AddressPostVm;
-import com.lexuancong.inventory.viewmodel.address.AddressVm;
+import com.lexuancong.inventory.dto.address.AddressCreateRequest;
+import com.lexuancong.inventory.dto.address.AddressGetResponse;
 import com.lexuancong.share.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ public class AddressService {
     private final ServiceUrlConfig serviceUrlConfig;
 
 
-    public AddressVm createAddress(AddressPostVm addressPostVm){
+    public AddressGetResponse createAddress(AddressCreateRequest addressCreateRequest){
         String jwt = AuthenticationUtils.extractJwt();
         URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlConfig.address())
                 .path("/internal/addresses")
@@ -28,14 +28,14 @@ public class AddressService {
         return this.restClient.post()
                 .uri(url)
                 .headers(httpHeaders -> httpHeaders.setBearerAuth(jwt))
-                .body(addressPostVm)
+                .body(addressCreateRequest)
                 .retrieve()
-                .body(AddressVm.class);
+                .body(AddressGetResponse.class);
 
 
     }
 
-    public void updateAddress(Long id, AddressPostVm addressPostVm){
+    public void updateAddress(Long id, AddressCreateRequest addressCreateRequest){
         String jwt = AuthenticationUtils.extractJwt();
         URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlConfig.address())
                 .path("/internal/addresses/{id}")
@@ -44,7 +44,7 @@ public class AddressService {
         this.restClient.put()
                 .uri(url)
                 .headers(httpHeaders -> httpHeaders.setBearerAuth(jwt))
-                .body(addressPostVm)
+                .body(addressCreateRequest)
                 .retrieve()
                 .body(Void.class);
     }

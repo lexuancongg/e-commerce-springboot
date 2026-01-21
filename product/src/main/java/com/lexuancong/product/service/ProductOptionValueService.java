@@ -4,7 +4,7 @@ import com.lexuancong.product.constant.Constants;
 import com.lexuancong.product.model.Product;
 import com.lexuancong.product.repository.ProductOptionValueRepository;
 import com.lexuancong.product.repository.ProductRepository;
-import com.lexuancong.product.viewmodel.productoptionvalue.ProductOptionValueGetVm;
+import com.lexuancong.product.dto.productoptionvalue.ProductOptionValueGetResponse;
 import com.lexuancong.share.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,19 +17,19 @@ public class ProductOptionValueService {
     private final ProductOptionValueRepository productOptionValueRepository;
     private final ProductRepository productRepository;
 
-    public List<ProductOptionValueGetVm> getProductOptionValues(){
+    public List<ProductOptionValueGetResponse> getProductOptionValues(){
         return this.productOptionValueRepository.findAll()
                 .stream()
-                .map(ProductOptionValueGetVm::fromModel)
+                .map(ProductOptionValueGetResponse::fromProductOptionValue)
                 .toList();
     }
 
-    public List<ProductOptionValueGetVm> getProductOptionValuesByProductId(Long productId){
+    public List<ProductOptionValueGetResponse> getProductOptionValuesByProductId(Long productId){
         Product product = this.productRepository.findById(productId)
                 .orElseThrow(() -> new NotFoundException(Constants.ErrorKey.PRODUCT_NOT_FOUND,productId));
         return this.productOptionValueRepository.findAllByProduct(product)
                 .stream()
-                .map(ProductOptionValueGetVm::fromModel)
+                .map(ProductOptionValueGetResponse::fromProductOptionValue)
                 .toList();
 
     }

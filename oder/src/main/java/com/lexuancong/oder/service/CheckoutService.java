@@ -3,13 +3,12 @@ package com.lexuancong.oder.service;
 import com.lexuancong.oder.constants.Constants;
 import com.lexuancong.oder.model.Checkout;
 import com.lexuancong.oder.model.CheckoutItem;
-import com.lexuancong.oder.model.enum_status.CheckoutStatus;
 import com.lexuancong.oder.repository.CheckoutRepository;
 import com.lexuancong.oder.service.internal.ProductService;
-import com.lexuancong.oder.viewmodel.checkout.CheckoutPostVm;
-import com.lexuancong.oder.viewmodel.checkout.CheckoutVm;
-import com.lexuancong.oder.viewmodel.checkoutitem.CheckoutItemPostVm;
-import com.lexuancong.oder.viewmodel.product.ProductCheckoutPreviewVm;
+import com.lexuancong.oder.dto.checkout.CheckoutCreateRequest;
+import com.lexuancong.oder.dto.checkout.CheckoutGetResponse;
+import com.lexuancong.oder.dto.checkoutitem.CheckoutItemCreateRequest;
+import com.lexuancong.oder.dto.product.ProductCheckoutPreviewGetResponse;
 import com.lexuancong.share.exception.AccessDeniedException;
 import com.lexuancong.share.exception.NotFoundException;
 import com.lexuancong.share.utils.AuthenticationUtils;
@@ -29,11 +28,11 @@ public class CheckoutService {
     private final CheckoutRepository checkoutRepository;
     private final ProductService productService;
 
-    public CheckoutVm createCheckout(CheckoutPostVm checkoutPostVm){
-        Checkout checkout = checkoutPostVm.toModel();
+    public CheckoutGetResponse createCheckout(CheckoutCreateRequest checkoutCreateRequest){
+        Checkout checkout = checkoutCreateRequest.toModel();
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         checkout.setCustomerId(customerId);
-        List<CheckoutItem> checkoutItems = this.buildCheckoutItems(checkoutPostVm,checkout);
+        List<CheckoutItem> checkoutItems = this.buildCheckoutItems(checkoutCreateRequest,checkout);
         checkout.setCheckoutItems(checkoutItems);
         BigDecimal total = checkoutItems.parallelStream()
                 .reduce(BigDecimal.ZERO,
@@ -42,33 +41,33 @@ public class CheckoutService {
         checkout.setTotalPrice(total);
 
         checkout = this.checkoutRepository.save(checkout);
-        CheckoutVm checkoutVm = CheckoutVm.fromModel(checkout);
-        return checkoutVm;
+        CheckoutGetResponse checkoutGetResponse = CheckoutGetResponse.fromModel(checkout);
+        return checkoutGetResponse;
     }
 
 
-    public List<CheckoutItem> buildCheckoutItems(CheckoutPostVm checkoutPostVm , Checkout checkout){
-        List<CheckoutItemPostVm> checkoutItemPostVms = checkoutPostVm.checkoutItemPostVms();
-        Set<Long> productIdsCheckoutItems = checkoutItemPostVms.stream()
-                .map(CheckoutItemPostVm::productId)
+    public List<CheckoutItem> buildCheckoutItems(CheckoutCreateRequest checkoutCreateRequest, Checkout checkout){
+        List<CheckoutItemCreateRequest> checkoutItemCreateRequests = checkoutCreateRequest.checkoutItemCreateRequests();
+        Set<Long> productIdsCheckoutItems = checkoutItemCreateRequests.stream()
+                .map(CheckoutItemCreateRequest::productId)
                 .collect(Collectors.toSet());
 
-        List<ProductCheckoutPreviewVm> productCheckoutPreviewVms =
+        List<ProductCheckoutPreviewGetResponse> productCheckoutPreviewGetResponses =
                 this.productService.getProductInfoPreviewByIds(productIdsCheckoutItems);
-        if(productCheckoutPreviewVms.isEmpty()){
+        if(productCheckoutPreviewGetResponses.isEmpty()){
             throw  new NotFoundException(Constants.ErrorKey.PRODUCT_NOT_FOUND);
         }
-        Map<Long,ProductCheckoutPreviewVm> productCheckoutPreviewVmMap = productCheckoutPreviewVms.stream()
-                .collect(Collectors.toMap(ProductCheckoutPreviewVm::id,Function.identity()));
+        Map<Long, ProductCheckoutPreviewGetResponse> productCheckoutPreviewVmMap = productCheckoutPreviewGetResponses.stream()
+                .collect(Collectors.toMap(ProductCheckoutPreviewGetResponse::id,Function.identity()));
 
 
-        List<CheckoutItem> checkoutItems = checkoutItemPostVms.stream()
-                .map(checkoutItemPostVm -> {
-                    ProductCheckoutPreviewVm productInfo = productCheckoutPreviewVmMap.get(checkoutItemPostVm.productId());
+        List<CheckoutItem> checkoutItems = checkoutItemCreateRequests.stream()
+                .map(checkoutItemCreateRequest -> {
+                    ProductCheckoutPreviewGetResponse productInfo = productCheckoutPreviewVmMap.get(checkoutItemCreateRequest.productId());
                     if(productInfo == null){
                         throw  new NotFoundException(Constants.ErrorKey.PRODUCT_NOT_FOUND);
                     }
-                    return checkoutItemPostVm.toModel(checkout,productInfo);
+                    return checkoutItemCreateRequest.toCheckoutItem(checkout,productInfo);
                 } )
                 .toList();
         return checkoutItems;
@@ -76,11 +75,11 @@ public class CheckoutService {
 
 
 
-    public CheckoutVm getCheckoutById(Long id){
+    public CheckoutGetResponse getCheckoutById(Long id){
         Checkout checkout = this.checkoutRepository.findById(id)
                 .orElseThrow(()-> new NotFoundException(Constants.ErrorKey.CHECKOUT_NOT_FOUND));
         this.validateOwnCurrentUser(checkout);
-        return CheckoutVm.fromModel(checkout);
+        return CheckoutGetResponse.fromModel(checkout);
 
     }
 

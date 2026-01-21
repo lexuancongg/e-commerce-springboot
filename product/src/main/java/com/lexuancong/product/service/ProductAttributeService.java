@@ -5,9 +5,9 @@ import com.lexuancong.product.model.attribute.ProductAttribute;
 import com.lexuancong.product.model.attribute.ProductAttributeGroup;
 import com.lexuancong.product.repository.ProductAttributeGroupRepository;
 import com.lexuancong.product.repository.ProductAttributeRepository;
-import com.lexuancong.product.viewmodel.attribute.ProductAttributePagingVm;
-import com.lexuancong.product.viewmodel.attribute.ProductAttributePostVm;
-import com.lexuancong.product.viewmodel.attribute.ProductAttributeVm;
+import com.lexuancong.product.dto.attribute.ProductAttributePagingGetResponse;
+import com.lexuancong.product.dto.attribute.ProductAttributeCreateRequest;
+import com.lexuancong.product.dto.attribute.ProductAttributeGetResponse;
 import com.lexuancong.share.exception.BadRequestException;
 import com.lexuancong.share.exception.NotFoundException;
 import org.springframework.data.domain.Page;
@@ -16,7 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.concurrent.locks.Condition;
 
 @Service
 public class ProductAttributeService {
@@ -28,21 +27,21 @@ public class ProductAttributeService {
         this.productAttributeRepository = productAttributeRepository;
     }
 
-    public List<ProductAttributeVm> getProductAttributes() {
+    public List<ProductAttributeGetResponse> getProductAttributes() {
         return this.productAttributeRepository.findAll().stream()
-                .map(ProductAttributeVm::fromModel)
+                .map(ProductAttributeGetResponse::fromProductAttribute)
                 .toList();
     }
 
-    public ProductAttributePagingVm getProductAttributePaging(int pageIndex, int pageSize) {
+    public ProductAttributePagingGetResponse getProductAttributePaging(int pageIndex, int pageSize) {
         Pageable pageable = PageRequest.of(pageIndex, pageSize);
         Page<ProductAttribute> productAttributePage = this.productAttributeRepository.findAll(pageable);
         List<ProductAttribute> productAttributes = productAttributePage.getContent();
-        List<ProductAttributeVm> productAttributeVms = productAttributes.stream()
-                .map(ProductAttributeVm::fromModel)
+        List<ProductAttributeGetResponse> productAttributeGetResponses = productAttributes.stream()
+                .map(ProductAttributeGetResponse::fromProductAttribute)
                 .toList();
-        return new ProductAttributePagingVm(
-                productAttributeVms,
+        return new ProductAttributePagingGetResponse(
+                productAttributeGetResponses,
                 pageIndex,
                 pageSize,
                 (int) productAttributePage.getTotalElements(),
@@ -52,12 +51,12 @@ public class ProductAttributeService {
 
     }
 
-    public ProductAttribute createProductAttribute(ProductAttributePostVm productAttributePostVm) {
-        this.validateExistedName(productAttributePostVm.name(), null);
+    public ProductAttribute createProductAttribute(ProductAttributeCreateRequest productAttributeCreateRequest) {
+        this.validateExistedName(productAttributeCreateRequest.name(), null);
 
         ProductAttribute productAttribute = new ProductAttribute();
-        productAttribute.setName(productAttributePostVm.name());
-        this.setProductAttributeGroup(productAttribute, productAttributePostVm.productAttributeGroupId());
+        productAttribute.setName(productAttributeCreateRequest.name());
+        this.setProductAttributeGroup(productAttribute, productAttributeCreateRequest.productAttributeGroupId());
         return this.productAttributeRepository.save(productAttribute);
     }
 
@@ -81,13 +80,13 @@ public class ProductAttributeService {
         return this.productAttributeRepository.findByNameAndIdNot(name, id) != null;
     }
 
-    public void updateProductAttribute(Long id, ProductAttributePostVm productAttributePostVm) {
+    public void updateProductAttribute(Long id, ProductAttributeCreateRequest productAttributeCreateRequest) {
         ProductAttribute productAttribute = this.productAttributeRepository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException(Constants.ErrorKey.PRODUCT_ATTRIBUTE_NOT_FOUND,id));
-        this.validateExistedName(productAttributePostVm.name(), id);
-        productAttribute.setName(productAttributePostVm.name());
-        this.setProductAttributeGroup(productAttribute, productAttributePostVm.productAttributeGroupId());
+        this.validateExistedName(productAttributeCreateRequest.name(), id);
+        productAttribute.setName(productAttributeCreateRequest.name());
+        this.setProductAttributeGroup(productAttribute, productAttributeCreateRequest.productAttributeGroupId());
         this.productAttributeRepository.save(productAttribute);
     }
 

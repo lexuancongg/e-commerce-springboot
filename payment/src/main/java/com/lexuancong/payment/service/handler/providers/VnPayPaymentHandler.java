@@ -3,9 +3,9 @@ package com.lexuancong.payment.service.handler.providers;
 import com.lexuancong.payment.model.InitiatedPaymentVm;
 import com.lexuancong.payment.model.enumeration.PaymentMethod;
 import com.lexuancong.payment.repository.PaymentProviderRepository;
-import com.lexuancong.payment.viewmodel.InitPaymentRequest;
+import com.lexuancong.payment.dto.InitPaymentRequest;
 import com.lexuancong.vnpaypayment.service.VnpayService;
-import com.lexuancong.vnpaypayment.viewmodel.VnpayCreatePaymentUrlRequest;
+import com.lexuancong.vnpaypayment.dto.VnpayCreatePaymentUrlRequest;
 import org.springframework.stereotype.Component;
 
 @Component

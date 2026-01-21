@@ -1,7 +1,7 @@
 package com.lexuancong.product.controller;
 
 import com.lexuancong.product.service.ProductOptionValueService;
-import com.lexuancong.product.viewmodel.productoptionvalue.ProductOptionValueGetVm;
+import com.lexuancong.product.dto.productoptionvalue.ProductOptionValueGetResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +18,7 @@ public class ProductOptionValueController {
 
     // đã check
     @GetMapping("/management/product-option-values")
-    public ResponseEntity<List<ProductOptionValueGetVm>> getProductOptionValues() {
+    public ResponseEntity<List<ProductOptionValueGetResponse>> getProductOptionValues() {
         return ResponseEntity.ok(this.productOptionValueService.getProductOptionValues());
 
     }
@@ -26,7 +26,7 @@ public class ProductOptionValueController {
 
     // đã check
     @GetMapping("/management/product-option-values/{productId}")
-    public ResponseEntity<List<ProductOptionValueGetVm>> getProductOptionValuesByProductId(@PathVariable Long productId) {
+    public ResponseEntity<List<ProductOptionValueGetResponse>> getProductOptionValuesByProductId(@PathVariable Long productId) {
         return ResponseEntity.ok(this.productOptionValueService.getProductOptionValuesByProductId(productId));
     }
 

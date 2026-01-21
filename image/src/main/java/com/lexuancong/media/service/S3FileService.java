@@ -2,7 +2,7 @@ package com.lexuancong.media.service;
 
 import com.lexuancong.media.model.Image;
 import com.lexuancong.media.repository.ImageRepository;
-import com.lexuancong.media.viewmodel.ImageDetailVm;
+import com.lexuancong.media.dto.ImageDetailGetResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -40,7 +40,7 @@ public class S3FileService {
         return "https://" + bucketName + ".s3.amazonaws.com/" + fileName;
     }
 
-    public ImageDetailVm getImageById(Long id) {
+    public ImageDetailGetResponse getImageById(Long id) {
         // lấy thông tin ảnh từ DB
         Image image = imageRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Image not found"));
@@ -63,7 +63,7 @@ public class S3FileService {
 
             URL url = presigner.presignGetObject(presignRequest).url();
 
-            return new ImageDetailVm(
+            return new ImageDetailGetResponse(
                     image.getId(),
                     image.getDescription(),
                     image.getFileName(),

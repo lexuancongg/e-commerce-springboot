@@ -1,7 +1,7 @@
 package com.lexuancong.payment.controller;
 
 import com.lexuancong.payment.service.PaymentProviderService;
-import com.lexuancong.payment.viewmodel.PaymentProviderVm;
+import com.lexuancong.payment.dto.PaymentProviderGetResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +18,7 @@ public class PaymentProviderController {
 
     // get các method payment cho người dùng chọn
     @GetMapping("/customer/payment-providers")
-    public ResponseEntity<List<PaymentProviderVm>> getPaymentProviders(){
+    public ResponseEntity<List<PaymentProviderGetResponse>> getPaymentProviders(){
         return ResponseEntity.ok(this.paymentProviderService.getPaymentProviders());
     }
 

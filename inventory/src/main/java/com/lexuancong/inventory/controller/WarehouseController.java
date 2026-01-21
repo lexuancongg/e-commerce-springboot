@@ -1,8 +1,8 @@
 package com.lexuancong.inventory.controller;
 
 import com.lexuancong.inventory.service.WarehouseService;
-import com.lexuancong.inventory.viewmodel.warehouse.WarehousePostVm;
-import com.lexuancong.inventory.viewmodel.warehouse.WarehouseVm;
+import com.lexuancong.inventory.dto.warehouse.WarehouseCreateRequest;
+import com.lexuancong.inventory.dto.warehouse.WarehouseGetResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,16 +20,16 @@ public class WarehouseController {
 
     // checked
     @PostMapping("/management/warehouses")
-    public ResponseEntity<WarehouseVm> createWarehouse(
-            @RequestBody @Valid WarehousePostVm warehousePostVm,
+    public ResponseEntity<WarehouseGetResponse> createWarehouse(
+            @RequestBody @Valid WarehouseCreateRequest warehouseCreateRequest,
             UriComponentsBuilder uriComponentsBuilder
     ) {
-        WarehouseVm warehouseVm = this.warehouseService.createWarehouse(warehousePostVm);
+        WarehouseGetResponse warehouseGetResponse = this.warehouseService.createWarehouse(warehouseCreateRequest);
         return ResponseEntity.created(
                 uriComponentsBuilder.replacePath("/warehouses/{id}")
-                        .buildAndExpand(warehouseVm.id())
+                        .buildAndExpand(warehouseGetResponse.id())
                         .toUri()
-        ).body(warehouseVm);
+        ).body(warehouseGetResponse);
 
     }
 
@@ -38,9 +38,9 @@ public class WarehouseController {
     @PutMapping("/management/warehouses/{id}")
     public ResponseEntity<Void> updateWarehouse(
             @PathVariable Long id,
-            @Valid @RequestBody WarehousePostVm warehousePostVm
+            @Valid @RequestBody WarehouseCreateRequest warehouseCreateRequest
     ){
-        this.warehouseService.updateWarehouse(id,warehousePostVm);
+        this.warehouseService.updateWarehouse(id, warehouseCreateRequest);
         return ResponseEntity.noContent().build();
     }
 
@@ -59,7 +59,7 @@ public class WarehouseController {
 
     // checked
     @GetMapping("/management/warehouses")
-    public ResponseEntity<List<WarehouseVm>> getWarehouses() {
+    public ResponseEntity<List<WarehouseGetResponse>> getWarehouses() {
         return ResponseEntity.ok(this.warehouseService.getWarehouses());
 
     }
