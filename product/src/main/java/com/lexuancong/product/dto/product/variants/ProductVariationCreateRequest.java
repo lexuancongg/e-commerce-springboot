@@ -13,7 +13,6 @@ public record ProductVariationCreateRequest(
         String name,
         String slug,
         String sku,
-        String gtin,
         BigDecimal price,
         Long avatarImageId,
         List<Long> imageIds,
@@ -27,7 +26,6 @@ public record ProductVariationCreateRequest(
         product.setName(name);
         product.setSlug(slug);
         product.setSku(sku);
-        product.setGtin(gtin);
         product.setPrice(price);
         product.setAvatarImageId(avatarImageId);
         return product;

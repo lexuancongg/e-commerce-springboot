@@ -11,7 +11,6 @@ public record ProductVariantGetResponse(
         String name,
         String slug,
         String sku,
-        String gtin,
         BigDecimal price,
         String avatarUrl,
         List<ImagePreviewGetResponse>  productImages,

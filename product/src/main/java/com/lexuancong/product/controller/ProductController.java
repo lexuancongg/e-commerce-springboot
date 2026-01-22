@@ -64,17 +64,6 @@ public class ProductController {
 
 
 
-//    // lây ra ds sp
-//    @GetMapping({"/customer/products"})
-//    public ResponseEntity<ProductPagingVm> getProductsPaging(
-//            @RequestParam(value = "pageIndex", defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER,required = false) int pageIndex,
-//            @RequestParam(value = "pageSize",defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE ,required = false) int pageSize
-//    ){
-//        return ResponseEntity.ok(this.productService.getProductsPaging(pageIndex,pageSize));
-//
-//    }
-
-
 
     // lấy ra ds sp trong category dựa vào slug => đã check
     @GetMapping({"/customer/category/{categorySlug}/products"})

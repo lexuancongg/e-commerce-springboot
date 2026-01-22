@@ -26,7 +26,12 @@
 		<module>image</module>
 		<module>oder</module>
 		<module>search</module>
-
+		<module>payment</module>
+		<module>paypal-payment</module>
+		<module>feedback</module>
+		<module>vnpay-payment</module>
+		<module>inventory</module>
+		<module>api-gateway</module>
 	</modules>
 
 	<properties>

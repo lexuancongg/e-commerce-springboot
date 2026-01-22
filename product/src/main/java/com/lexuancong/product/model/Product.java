@@ -28,8 +28,7 @@ public class Product extends AuditEntity{
     private String sku;
     // slug để hiển thị trên url
     private String slug;
-    // mã vạch quốc tế
-    private String gtin;
+
     private BigDecimal price;
     // cs biến thể hay không
     private boolean hasOptions;
@@ -45,9 +44,7 @@ public class Product extends AuditEntity{
     // số luownjng tồn kho
     private Long inventoryQuantity;
 
-    // SEO
-    private String metaTitle;
-    private String metaDescription;
+
     // hình id hình ảnh đại diện
     private Long avatarImageId;
 

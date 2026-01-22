@@ -21,4 +21,7 @@ public class ShippingAddress {
     private Long districtId;
     private Long provinceId;
     private Long countyId;
+    private String countryName;
+    private String provinceName;
+    private String districtName;
 }

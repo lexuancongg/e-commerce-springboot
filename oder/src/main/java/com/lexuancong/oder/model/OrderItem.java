@@ -20,7 +20,6 @@ public class OrderItem extends AuditEntity{
     private int quantity ;
     @Column(name = "price")
     private BigDecimal productPrice ;
-    private BigDecimal totalPrice ;
     private String productName ;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -10,7 +10,6 @@ public interface BaseProductPropertiesRequire {
     String slug();
     String sku();
 
-    String gtin();
 
 //    Double price();
     BigDecimal price();

@@ -356,10 +356,7 @@ public class ProductService {
     private void validateUniqueProductProperties(BaseProductPropertiesRequire baseProductProperties, Product existingProduct) {
         this.ensurePropertyNotExists(baseProductProperties.slug().toLowerCase(), this.productRepository::findBySlug,
                 existingProduct, Constants.ErrorKey.SLUG_ALREADY_EXISTED);
-        if (StringUtils.isNotEmpty(baseProductProperties.gtin())) {
-            this.ensurePropertyNotExists(baseProductProperties.gtin(), this.productRepository::findByGtin,
-                    existingProduct, Constants.ErrorKey.GTIN_ALREADY_EXISTED);
-        }
+
         this.ensurePropertyNotExists(baseProductProperties.sku(), this.productRepository::findBySku,
                 existingProduct, Constants.ErrorKey.SKU_ALREADY_EXISTED);
 
@@ -389,11 +386,7 @@ public class ProductService {
                 // throw exception
                 throw new DuplicatedException(Constants.ErrorKey.SLUG_ALREADY_EXISTED);
             }
-            if (StringUtils.isNotEmpty(variation.gtin()) && !setGtins.add(variation.gtin())) {
-                // throw exception
-                throw new DuplicatedException(Constants.ErrorKey.GTIN_ALREADY_EXISTED);
 
-            }
         }
     }
 
@@ -504,7 +497,6 @@ public class ProductService {
         variationInit.setAvatarImageId(productVariationCreateRequest.avatarImageId());
         variationInit.setSlug(productVariationCreateRequest.slug());
         variationInit.setSku(productVariationCreateRequest.sku());
-        variationInit.setGtin(productVariationCreateRequest.gtin());
         variationInit.setPrice(productVariationCreateRequest.price());
         variationInit.setPublic(mainProduct.isPublic());
         // khi create
@@ -573,7 +565,6 @@ public class ProductService {
         product.setSpecifications(productCreateRequest.specification());
         product.setSku(productCreateRequest.sku());
         product.setDescription(productCreateRequest.description());
-        product.setGtin(productCreateRequest.gtin());
         product.setPrice(productCreateRequest.price());
         product.setFeature(productCreateRequest.isFeature());
         // lombok tự động đổi tên setter và getter
@@ -713,11 +704,6 @@ public class ProductService {
 
     }
 
-    // lấy sp
-//    public ProductPagingVm getProductsPaging(int pageIndex,int pageSize){
-//        Pageable pageable = PageRequest.of(pageIndex,pageSize);
-//
-//    }
 
 
     public ProductPagingGetResponse getProductsByCategorySlug(int pageIndex, int pageSize, String categorySlug) {
@@ -852,7 +838,6 @@ public class ProductService {
                                 variant.getName(),
                                 variant.getSlug(),
                                 variant.getSku(),
-                                variant.getGtin(),
                                 variant.getPrice(),
                                 avatarUrl,
                                 productImages,

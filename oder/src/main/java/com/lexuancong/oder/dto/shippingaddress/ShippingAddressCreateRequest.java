@@ -10,7 +10,10 @@ public record ShippingAddressCreateRequest(
         @NotBlank String specificAddress ,
         @NotNull Long districtId,
         @NotNull Long provinceId,
-        @NotNull Long countryId
+        @NotNull Long countryId,
+        @NotBlank String countryName,
+        @NotBlank String provinceName,
+        @NotBlank String districtName
 
 ) {
     public ShippingAddress toShippingAddress() {
@@ -21,6 +24,9 @@ public record ShippingAddressCreateRequest(
                 .districtId(districtId)
                 .provinceId(provinceId)
                 .countyId(countryId)
+                .countryName(countryName)
+                .provinceName(provinceName)
+                .districtName(districtName)
                 .build();
 
 
