@@ -28,7 +28,7 @@ public class WarehouseService {
 
     public WarehouseGetResponse createWarehouse(WarehouseCreateRequest warehouseCreateRequest) {
         this.validateExitedName(warehouseCreateRequest.name(),null);
-        AddressCreateRequest addressCreateRequest = this.buidAddressPostVm(warehouseCreateRequest);
+        AddressCreateRequest addressCreateRequest = this.buildAddressPostVm(warehouseCreateRequest);
         AddressGetResponse addressSaved = this.addressService.createAddress(addressCreateRequest);
 
         Warehouse warehouse = new Warehouse();
@@ -39,7 +39,7 @@ public class WarehouseService {
 
     }
 
-    private AddressCreateRequest buidAddressPostVm(WarehouseCreateRequest warehouseCreateRequest){
+    private AddressCreateRequest buildAddressPostVm(WarehouseCreateRequest warehouseCreateRequest){
         return  new AddressCreateRequest(
                 warehouseCreateRequest.contactName(),
                 warehouseCreateRequest.phoneNumber(),
@@ -69,7 +69,7 @@ public class WarehouseService {
                 .orElseThrow(()-> new NotFoundException(Constants.ErrorKey.WAREHOUSE_NOT_FOUND,id));
         this.validateExitedName(warehouseCreateRequest.name(),id);
         warehouse.setName(warehouseCreateRequest.name());
-        AddressCreateRequest addressCreateRequest = this.buidAddressPostVm(warehouseCreateRequest);
+        AddressCreateRequest addressCreateRequest = this.buildAddressPostVm(warehouseCreateRequest);
         this.addressService.updateAddress(warehouse.getAddressId(), addressCreateRequest);
         this.warehouseRepository.save(warehouse);
 

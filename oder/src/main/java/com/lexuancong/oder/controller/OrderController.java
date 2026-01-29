@@ -21,14 +21,14 @@ public class OrderController {
     }
 
     @PostMapping("/customer/orders")
-    public ResponseEntity<OrderVm> createOrder(@RequestBody @Valid OrderCreateRequest orderCreateRequest) {
+    public ResponseEntity<OrderGetResponse> createOrder(@RequestBody @Valid OrderCreateRequest orderCreateRequest) {
         return  ResponseEntity.ok(orderService.createOrder(orderCreateRequest));
 
     }
 
     // có thể tận dụng api này cho check ở feedback nhưng mà không tối ưu về performance vì load ht
     @GetMapping("/customer/orders/my-orders")
-    public ResponseEntity<List<OrderVm>> getMyOrders(
+    public ResponseEntity<List<OrderGetResponse>> getMyOrders(
             @RequestParam(required = false)OrderStatus orderStatus
             ) {
         return ResponseEntity.ok(this.orderService.getMyOrders(orderStatus));
@@ -37,7 +37,7 @@ public class OrderController {
 
 
     // api đc gọi bởi feedback check xem đã mua sp này chưa => đã check
-    @GetMapping({"/internal/orders/completed"})
+    @GetMapping({"/internal-feedback/orders/completed"})
     public ResponseEntity<CheckUserHasBoughtProductCompleted> checkUserHasBoughtProductCompleted(
             @RequestParam Long productId
     ){
@@ -56,7 +56,7 @@ public class OrderController {
 
 
     @GetMapping("/management/orders/{id}")
-    public ResponseEntity<OrderVm> getOrderById(@PathVariable Long id){
+    public ResponseEntity<OrderGetResponse> getOrderById(@PathVariable Long id){
         return ResponseEntity.ok(this.orderService.getOrderById(id));
     }
 

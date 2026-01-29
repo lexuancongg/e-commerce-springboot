@@ -18,7 +18,7 @@ public class CustomerService {
     public CustomerGetResponse getCustomerInfo(){
         String jwt = AuthenticationUtils.extractJwt();
         URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlConfig.customer())
-                .path("/internal/customer/profile")
+                .path("/internal-feedback/customer/profile")
                 .buildAndExpand()
                 .toUri();
 

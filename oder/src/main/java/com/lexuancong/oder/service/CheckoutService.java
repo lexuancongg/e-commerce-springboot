@@ -29,7 +29,7 @@ public class CheckoutService {
     private final ProductService productService;
 
     public CheckoutGetResponse createCheckout(CheckoutCreateRequest checkoutCreateRequest){
-        Checkout checkout = checkoutCreateRequest.toModel();
+        Checkout checkout = checkoutCreateRequest.toCheckout();
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         checkout.setCustomerId(customerId);
         List<CheckoutItem> checkoutItems = this.buildCheckoutItems(checkoutCreateRequest,checkout);
@@ -41,7 +41,7 @@ public class CheckoutService {
         checkout.setTotalPrice(total);
 
         checkout = this.checkoutRepository.save(checkout);
-        CheckoutGetResponse checkoutGetResponse = CheckoutGetResponse.fromModel(checkout);
+        CheckoutGetResponse checkoutGetResponse = CheckoutGetResponse.fromCheckout(checkout);
         return checkoutGetResponse;
     }
 
@@ -79,7 +79,7 @@ public class CheckoutService {
         Checkout checkout = this.checkoutRepository.findById(id)
                 .orElseThrow(()-> new NotFoundException(Constants.ErrorKey.CHECKOUT_NOT_FOUND));
         this.validateOwnCurrentUser(checkout);
-        return CheckoutGetResponse.fromModel(checkout);
+        return CheckoutGetResponse.fromCheckout(checkout);
 
     }
 
@@ -89,7 +89,7 @@ public class CheckoutService {
         }
     }
     private boolean checkOwnCurrentUser(Checkout checkout){
-        return !checkout.getId().equals(AuthenticationUtils.extractCustomerIdFromJwt());
+        return !checkout.getCustomerId().equals(AuthenticationUtils.extractCustomerIdFromJwt());
 
     }
 }

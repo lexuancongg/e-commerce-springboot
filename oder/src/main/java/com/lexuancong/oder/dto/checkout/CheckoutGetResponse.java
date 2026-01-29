@@ -12,7 +12,7 @@ public record CheckoutGetResponse(
         List<CheckoutItemGetResponse> checkoutItemGetResponses
 
 ){
-    public static CheckoutGetResponse fromModel(Checkout checkout){
+    public static CheckoutGetResponse fromCheckout(Checkout checkout){
         List<CheckoutItemGetResponse> checkoutItems = checkout.getCheckoutItems().stream()
                 .map(CheckoutItemGetResponse::fromCheckoutItem)
                 .toList();

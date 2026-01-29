@@ -9,15 +9,14 @@ public record OrderItemGetResponse(
         Long productId,
         int quantity,
         BigDecimal productPrice,
-        BigDecimal totalPrice,
         Long orderId,
         String productName
 
 ) {
-    public static OrderItemGetResponse fromModel(OrderItem orderItem) {
+    public static OrderItemGetResponse fromOrderItem(OrderItem orderItem) {
         return new OrderItemGetResponse(orderItem.getId(),
                 orderItem.getProductId(),orderItem.getQuantity(),orderItem.getProductPrice(),
-                orderItem.getTotalPrice(),orderItem.getProductId(),orderItem.getProductName()
+                orderItem.getProductId(),orderItem.getProductName()
         );
 
     }

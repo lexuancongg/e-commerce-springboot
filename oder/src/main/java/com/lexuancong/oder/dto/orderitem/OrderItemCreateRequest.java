@@ -13,12 +13,11 @@ public record OrderItemCreateRequest(
         BigDecimal productPrice,
         BigDecimal totalPrice
 ) {
-    public OrderItem toOrder(Order order){
+    public OrderItem toOrderItem(Order order){
         return OrderItem.builder()
                 .productId(productId)
                 .quantity(quantity)
                 .productPrice(productPrice)
-                .totalPrice(totalPrice)
                 .productName(productName)
                 .order(order)
                 .build();

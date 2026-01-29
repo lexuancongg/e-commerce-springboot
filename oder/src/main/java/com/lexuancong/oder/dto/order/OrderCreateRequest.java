@@ -24,7 +24,7 @@ public record OrderCreateRequest(
 
 
         ) {
-    public Order toModel(){
+    public Order toOrder(){
         ShippingAddress shippingAddress = this.shippingAddressCreateRequest.toShippingAddress();
         return Order.builder()
                 .email(email)
@@ -37,6 +37,7 @@ public record OrderCreateRequest(
                 .deliveryMethod(this.deliveryMethod)
                 .checkoutId(checkoutId)
                 .paymentStatus(PaymentStatus.PENDING)
+
                 .build();
 
     }

@@ -14,7 +14,7 @@ public record CheckoutCreateRequest(
         List<CheckoutItemCreateRequest> checkoutItemCreateRequests,
         BigDecimal totalPrice
 ){
-    public Checkout toModel(){
+    public Checkout toCheckout(){
         return Checkout.builder()
                 .totalPrice(totalPrice)
                 .email(email)

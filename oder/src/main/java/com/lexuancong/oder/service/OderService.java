@@ -40,29 +40,30 @@ public class OderService {
         this.inventoryService = inventoryService;
     }
 
-    public OrderVm createOrder(OrderCreateRequest orderCreateRequest){
+    public OrderGetResponse createOrder(OrderCreateRequest orderCreateRequest){
         List<InventorySubtract> inventorySubtracts = new ArrayList<>();
-        Order order = orderCreateRequest.toModel();
+        Order order = orderCreateRequest.toOrder();
         String userId = AuthenticationUtils.extractCustomerIdFromJwt();
         order.setCustomerId(userId);
 
         this.orderRepository.save(order);
+
         List<OrderItem> orderItemSet = orderCreateRequest.orderItemCreateRequests().stream()
-                .map(orderItemPostVm -> {
-                    inventorySubtracts.add(orderItemPostVm.toInventorySubtract());
-                    return  orderItemPostVm.toOrder(order);
+                .map(orderItemCreateRequest -> {
+                    inventorySubtracts.add(orderItemCreateRequest.toInventorySubtract());
+                    return  orderItemCreateRequest.toOrderItem(order);
                 })
                 .toList();
         // save orderItems
         this.orderItemRepository.saveAll(orderItemSet);
 
 
-        OrderVm orderVm = OrderVm.fromModel(order,orderItemSet);
+        OrderGetResponse orderGetResponse = OrderGetResponse.from(order,orderItemSet);
 
         this.cartService.deleteCartItems(orderItemSet);
         this.productService.updateQuantityProductAfterOrder(orderItemSet);
         this.inventoryService.subtractQuantityProduct(inventorySubtracts);
-        return orderVm;
+        return orderGetResponse;
 
 
     }
@@ -75,7 +76,7 @@ public class OderService {
         this.orderRepository.save(order);
     }
 
-    public List<OrderVm> getMyOrders(OrderStatus orderStatus){
+    public List<OrderGetResponse> getMyOrders(OrderStatus orderStatus){
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         Specification<Order> specification = OrderSpecification.findMyOrders(customerId,orderStatus);
         Sort sort = Sort.by(Sort.Direction.DESC, Constants.Column.CREATE_AT_COLUMN);
@@ -84,7 +85,7 @@ public class OderService {
                 .map(order -> {
                     Long orderId = order.getId();
                     List<OrderItem> orderItems = this.orderItemRepository.findAllByOderId(orderId);
-                    return OrderVm.fromModel(order,orderItems);
+                    return OrderGetResponse.from(order,orderItems);
                 })
                 .toList();
 
@@ -136,11 +137,11 @@ public class OderService {
     }
 
 
-    public OrderVm getOrderById(Long orderId){
+    public OrderGetResponse getOrderById(Long orderId){
         Order order = this.orderRepository.findById(orderId)
                 .orElseThrow(()-> new NotFoundException(Constants.ErrorKey.ORDER_NOT_FOUND,orderId));
         List<OrderItem> orderItems = this.orderItemRepository.findAllByOderId(orderId);
-        return OrderVm.fromModel(order,orderItems);
+        return OrderGetResponse.from(order,orderItems);
 
     }
 

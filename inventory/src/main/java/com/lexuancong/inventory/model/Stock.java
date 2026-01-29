@@ -15,7 +15,6 @@ public class Stock extends AuditEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // khóa ngoại sp
     @Column(nullable = false)
     private Long productId;
 

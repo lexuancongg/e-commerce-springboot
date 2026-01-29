@@ -21,7 +21,7 @@ public class AddressService {
     public AddressGetResponse createAddress(AddressCreateRequest addressCreateRequest){
         String jwt = AuthenticationUtils.extractJwt();
         URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlConfig.address())
-                .path("/internal/addresses")
+                .path("/internal-inventory/addresses")
                 .buildAndExpand()
                 .toUri();
 

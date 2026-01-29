@@ -13,7 +13,7 @@ public class CustomerController {
     }
 
     // đã check
-    @GetMapping({"/customer/customers/profile","/internal/customers/profile"})
+    @GetMapping({"/customer/customers/profile","/internal-feedback/customers/profile"})
     public ResponseEntity<CustomerGetResponse> getCustomerProfile() {
         return ResponseEntity.ok(customerService.getCustomerProfile());
     }
