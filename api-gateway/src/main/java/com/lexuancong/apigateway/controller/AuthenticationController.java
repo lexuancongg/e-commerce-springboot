@@ -1,7 +1,7 @@
 package com.lexuancong.apigateway.controller;
 
 import com.lexuancong.apigateway.dto.AuthenticatedUserResponse;
-import com.lexuancong.apigateway.dto.AuthenticationGetResponse;
+import com.lexuancong.apigateway.dto.AuthenticationResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -15,13 +15,13 @@ import java.security.Principal;
 @RestController
 public class AuthenticationController {
     @GetMapping("/authentication")
-    public ResponseEntity<AuthenticationGetResponse> getAuthenticationInfo(@AuthenticationPrincipal OAuth2User principal) {
+    public ResponseEntity<AuthenticationResponse> getAuthenticationInfo(@AuthenticationPrincipal OAuth2User principal) {
         if(principal == null) {
-            return ResponseEntity.ok(new AuthenticationGetResponse(false, null));
+            return ResponseEntity.ok(new AuthenticationResponse(false, null));
         }
         String username = principal.getAttribute("preferred_username");
         AuthenticatedUserResponse authenticatedUse = new AuthenticatedUserResponse(username);
-        return ResponseEntity.ok(new AuthenticationGetResponse(true, authenticatedUse));
+        return ResponseEntity.ok(new AuthenticationResponse(true, authenticatedUse));
     }
 
 

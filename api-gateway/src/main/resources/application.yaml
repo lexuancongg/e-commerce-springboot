@@ -27,13 +27,14 @@ spring:
             - DedupeResponseHeader=Origin Access-Control-Request-Method Access-Control-Request-Headers
 
 # lưu session trong redis thay vì mặc định trong memory
-#  data:
-#    redis:
-#      host: redis
-#      port: 6379
-#  session:
-#    redis:
-#      repository-type: default
+  data:
+    redis:
+      host: redis
+      port: 6379
+      password:
+  session:
+    redis:
+      repository-type: default
 
 
 

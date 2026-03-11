@@ -1,6 +1,6 @@
 package com.lexuancong.apigateway.dto;
 
-public record AuthenticationGetResponse(
+public record AuthenticationResponse(
         boolean isAuthenticated,
         AuthenticatedUserResponse authenticatedUser
 ) {
