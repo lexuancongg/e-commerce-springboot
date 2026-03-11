@@ -869,17 +869,17 @@ public class ProductService {
     }
 
 
-    public void subtractProductQuantityAfterOder(List<ProductSubtractQuantityVm> productSubtractQuantityVms){
-        List<Long> productIds = productSubtractQuantityVms.stream()
-                .map(ProductSubtractQuantityVm::productId)
+    public void subtractProductQuantityAfterOder(List<ProductSubtractQuantityRequest> productSubtractQuantityRequests){
+        List<Long> productIds = productSubtractQuantityRequests.stream()
+                .map(ProductSubtractQuantityRequest::productId)
                 .toList();
         List<Product> products = this.productRepository.findAllByIdInAndPublicIsTrue(productIds);
 
-        Map<Long,Long> mapQuantitySubtractByProductId = productSubtractQuantityVms.stream()
+        Map<Long,Long> mapQuantitySubtractByProductId = productSubtractQuantityRequests.stream()
                 .collect(
                         Collectors.toMap(
-                                ProductSubtractQuantityVm::productId ,
-                                ProductSubtractQuantityVm::quantity,
+                                ProductSubtractQuantityRequest::productId ,
+                                ProductSubtractQuantityRequest::quantity,
                                 Long::sum
                         )
                 );

@@ -22,7 +22,7 @@ public class ProductCdcKafkaListenerConfig {
 
     // KafkaProperties được inject vào từ bean do mapper từ file properties
     @Bean(name = "productCdcListenerContainerFactory")
-    public ConcurrentKafkaListenerContainerFactory<KafkaProductMessageKey, KafkaProductCdcMessageValue> kafkaListenerContainerFactory(KafkaProperties properties) {
+        public ConcurrentKafkaListenerContainerFactory<KafkaProductMessageKey, KafkaProductCdcMessageValue> kafkaListenerContainerFactory(KafkaProperties properties) {
         var factory = new ConcurrentKafkaListenerContainerFactory<KafkaProductMessageKey, KafkaProductCdcMessageValue>();
         factory.setConsumerFactory(this.consumerFactory(KafkaProductMessageKey.class, KafkaProductCdcMessageValue.class, properties));
         return factory;
@@ -40,9 +40,9 @@ public class ProductCdcKafkaListenerConfig {
         // => nos bọc lôĩ vào DeserializationException => cho phép :
 //        1.Gửi message lỗi sang Dead Letter Topic (DLT)
 //        2.Bỏ qua message lỗi mà vẫn tiếp tục xử lý các message khác hoặc log lỗi
-        var keyDeserialize = new ErrorHandlingDeserializer<>(this.gettJsonDeserializer(keyclass));
-        var valueDeserialize = new ErrorHandlingDeserializer<>(this.gettJsonDeserializer(valueclass));
-        return new DefaultKafkaConsumerFactory<>(props, keyDeserialize, valueDeserialize);
+            var keyDeserialize = new ErrorHandlingDeserializer<>(this.gettJsonDeserializer(keyclass));
+            var valueDeserialize = new ErrorHandlingDeserializer<>(this.gettJsonDeserializer(valueclass));
+            return new DefaultKafkaConsumerFactory<>(props, keyDeserialize, valueDeserialize);
     }
 
     private Map<String, Object> buildConsumerProperties(KafkaProperties kafkaProperties) {

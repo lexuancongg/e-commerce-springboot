@@ -34,7 +34,7 @@ public class imageService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return null;
+        return image;
     }
 
     public String saveFileInFilesystem(String fileName, byte[] contentFile){

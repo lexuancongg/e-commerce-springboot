@@ -122,7 +122,7 @@ public class ProductController {
 
 
     // checked
-    @GetMapping("/internal/products/warehouse")
+    @GetMapping("/internal-inventory/products/warehouse")
     public ResponseEntity<List<ProductInfoGetResponse>> filterProductInProductIdsByNameOrSku(
             @RequestParam(name = "name" , required = false) String name,
             @RequestParam(required = false) List<Long> productIds,
@@ -144,9 +144,9 @@ public class ProductController {
 
     @PutMapping("/internal-order/products/subtract-quantity")
     public ResponseEntity<Void> subtractProductQuantityAfterOder(
-            @Valid @RequestBody List<ProductSubtractQuantityVm> productSubtractQuantityVms
+            @Valid @RequestBody List<ProductSubtractQuantityRequest> productSubtractQuantityRequests
     ){
-        this.productService.subtractProductQuantityAfterOder(productSubtractQuantityVms);
+        this.productService.subtractProductQuantityAfterOder(productSubtractQuantityRequests);
         return ResponseEntity.noContent().build();
     }
 
