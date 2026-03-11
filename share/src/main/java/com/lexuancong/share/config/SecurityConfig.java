@@ -1,5 +1,6 @@
-package com.lexuancong.media.config;
+package com.lexuancong.share.config;
 
+import com.lexuancong.share.constants.Constants;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -16,14 +17,13 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
 @Configuration
-public class SecurityConfig {
-    // bean đĩnh nghĩa chuổi bộ lọc filter cho request đi qua
+public class   SecurityConfig {
+
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                // caaus hình quyền truy cập http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/customer/**").permitAll()
                         .requestMatchers("/management/**").hasRole("ADMIN")
@@ -34,11 +34,55 @@ public class SecurityConfig {
     }
 
 
+//    {
+//  "exp": 1755877460,
+//  "iat": 1755877160,
+//  "jti": "57bed55a-f6dd-4ece-9b84-e027f5613592",
+//  "iss": "http://localhost:8080/realms/ecommerce",
+//  "aud": "account",
+//  "sub": "d1d1bab8-ee71-40c5-95ef-9d32818523b0",
+//  "typ": "Bearer",
+//  "azp": "xuancong-ecommerce",
+//  "sid": "653cd956-00ca-47ec-aaa0-b49776596bb3",
+//  "acr": "1",
+//  "allowed-origins": [
+//    "http://host.docker.internal:8000/login/oauth2/code/ecommerce",
+//    "http://localhost:8000",
+//    "http://localhost:3000"
+//  ],
+//  "realm_access": {
+//    "roles": [
+//      "default-roles-ecommerce",
+//      "offline_access",
+//      "uma_authorization"
+//    ]
+//  },
+//  "resource_access": {
+//    "account": {
+//      "roles": [
+//        "manage-account",
+//        "manage-account-links",
+//        "view-profile"
+//      ]
+//    }
+//  },
+//  "scope": "openid profile email",
+//  "email_verified": false,
+//  "name": "le cong",
+//  "preferred_username": "buff",
+//  "given_name": "le",
+//  "family_name": "cong",
+//  "email": "congle.190904@gmail.com"
+//}
+
+
+
+
     @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverterForKeycloak() {
-        Converter<Jwt, Collection<GrantedAuthority>> jwtGrantedAuthoritiesConverter = jwt ->{
-            Map<String,Collection<String>> realmAccess = jwt.getClaim("realmAccess");
-            Collection<String> roles = realmAccess.get("roles");
+    public JwtAuthenticationConverter jwtAuthenticationConverterFromKeycloak(){
+        Converter<Jwt, Collection<GrantedAuthority>> jwtGrantedAuthoritiesConverter = jwt -> {
+            Map<String,Collection<String>> realmAccess = jwt.getClaim(Constants.KeycloakJwtClaimConstants.REALM_ACCESS);
+            Collection<String> roles = realmAccess.get(Constants.KeycloakJwtClaimConstants.ROLES);
             return roles.stream()
                     .map(role -> new SimpleGrantedAuthority("ROLE_".concat(role)))
                     .collect(Collectors.toList());
@@ -48,6 +92,4 @@ public class SecurityConfig {
         return jwtAuthenticationConverter;
 
     }
-
-
 }

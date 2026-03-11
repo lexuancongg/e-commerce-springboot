@@ -13,12 +13,12 @@ spring:
 #   => lưu lại => để tokenRelay có thể lấy token
         - SaveSession
       routes:
-        - id: api
+        - id: image
 #          url đươợc forward toiyy
-          uri: http://nginx
+          uri: http://image
 #          điều kiện path api phải khớp
           predicates:
-            - Path=/api/**
+            - Path=/api/image/**
 #          các bộ lọc áp duụng lên truocs khi forward
           filters:
 #          lấy token trong session để chuyến tiếp theo req khi được forward
