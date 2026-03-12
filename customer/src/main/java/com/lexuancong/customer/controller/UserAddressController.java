@@ -1,9 +1,9 @@
 package com.lexuancong.customer.controller;
 
 import com.lexuancong.customer.service.UserAddressService;
-import com.lexuancong.customer.dto.address.AddressDetailGetResponse;
+import com.lexuancong.customer.dto.address.AddressDetailResponse;
 import com.lexuancong.customer.dto.address.AddressCreateRequest;
-import com.lexuancong.customer.dto.useraddress.UserAddressGetResponse;
+import com.lexuancong.customer.dto.useraddress.UserAddressResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,13 +18,13 @@ public class UserAddressController {
     private final UserAddressService userAddressService;
     // CHECKED
     @PostMapping("/customer/user-address")
-    public ResponseEntity<UserAddressGetResponse> createUserAddress(@RequestBody @Valid AddressCreateRequest addressCreateRequest){
+    public ResponseEntity<UserAddressResponse> createUserAddress(@RequestBody @Valid AddressCreateRequest addressCreateRequest){
         return ResponseEntity.ok(userAddressService.createUserAddress(addressCreateRequest));
 
     }
    // CHECKED
     @GetMapping("/customer/user-address/default")
-    public ResponseEntity<AddressDetailGetResponse>  getDefaultAddress(){
+    public ResponseEntity<AddressDetailResponse>  getDefaultAddress(){
         return ResponseEntity.ok(userAddressService.getDefaultAddress());
     }
 
@@ -47,7 +47,7 @@ public class UserAddressController {
     // CHECKED
     // get danh sach address => cần tối ưu độ phức tạp thuật toán
     @GetMapping("/customer/user-address/addresses")
-    public ResponseEntity<List<AddressDetailGetResponse>> getUserAddressDetail(){
+    public ResponseEntity<List<AddressDetailResponse>> getUserAddressDetail(){
         return ResponseEntity.ok(this.userAddressService.getUserAddressDetail());
 
 

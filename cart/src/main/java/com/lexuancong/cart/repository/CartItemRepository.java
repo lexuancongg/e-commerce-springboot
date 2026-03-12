@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CartItemRepository extends JpaRepository<CartItem, CartItemId> {
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT c FROM CartItem c WHERE c.customerId = :customerId AND c.productId = :productId")
     Optional<CartItem> findByCustomerIdAndProductId(String customerId, Long productId);
 

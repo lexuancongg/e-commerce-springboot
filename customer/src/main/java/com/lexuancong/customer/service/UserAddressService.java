@@ -3,10 +3,10 @@ package com.lexuancong.customer.service;
 import com.lexuancong.customer.constants.Constants;
 import com.lexuancong.customer.model.UserAddress;
 import com.lexuancong.customer.repository.UserAddressRepository;
-import com.lexuancong.customer.dto.address.AddressDetailGetResponse;
+import com.lexuancong.customer.dto.address.AddressDetailResponse;
 import com.lexuancong.customer.dto.address.AddressCreateRequest;
-import com.lexuancong.customer.dto.address.AddressGetResponse;
-import com.lexuancong.customer.dto.useraddress.UserAddressGetResponse;
+import com.lexuancong.customer.dto.address.AddressResponse;
+import com.lexuancong.customer.dto.useraddress.UserAddressResponse;
 import com.lexuancong.share.exception.NotFoundException;
 import com.lexuancong.share.utils.AuthenticationUtils;
 import org.springframework.stereotype.Service;
@@ -21,34 +21,34 @@ import java.util.Optional;
 @Transactional
 public class UserAddressService {
     private final UserAddressRepository userAddressRepository;
-    private final AddressService addressService;
+    private final AddressClient addressClient;
 
-    public UserAddressService(UserAddressRepository userAddressRepository, AddressService locationService) {
+    public UserAddressService(UserAddressRepository userAddressRepository, AddressClient locationService) {
         this.userAddressRepository = userAddressRepository;
-        this.addressService = locationService;
+        this.addressClient = locationService;
     }
 
 
-    public UserAddressGetResponse createUserAddress(AddressCreateRequest addressCreateRequest) {
+    public UserAddressResponse createUserAddress(AddressCreateRequest addressCreateRequest) {
         String userId =AuthenticationUtils.extractCustomerIdFromJwt();
         List<UserAddress> userAddresses = userAddressRepository.findByUserId(userId);
         boolean isFirstAddress = userAddresses.isEmpty();
-        // goi api sang service location de them address
-        AddressGetResponse addressVmOfAddressSaved = addressService.createAddress(addressCreateRequest);
+
+        AddressResponse address = addressClient.createAddress(addressCreateRequest);
         UserAddress userAddress = UserAddress.builder()
                 .userId(userId)
-                .addressId(addressVmOfAddressSaved.id())
+                .addressId(address.id())
                 .isActive(isFirstAddress)
                 .build();
 
-        return UserAddressGetResponse.fromUserAddress(userAddressRepository.save(userAddress),addressVmOfAddressSaved);
+        return UserAddressResponse.fromUserAddress(userAddressRepository.save(userAddress),address);
     }
 
-    public AddressDetailGetResponse getDefaultAddress(){
+    public AddressDetailResponse getDefaultAddress(){
         String userId = AuthenticationUtils.extractCustomerIdFromJwt();
         UserAddress userAddress = userAddressRepository.findByUserIdAndIsActiveTrue(userId)
                 .orElseThrow(()->  new NotFoundException(Constants.ErrorKey.ADDRESS_DEFAULT_NOT_FOUND) );
-        return  addressService.getAddressById(userAddress.getAddressId());
+        return  addressClient.getAddressById(userAddress.getAddressId());
 
     }
 
@@ -58,7 +58,7 @@ public class UserAddressService {
         if(optionalUserAddress.isEmpty()){
             throw new NotFoundException(Constants.ErrorKey.ADDRESS_NOT_FOUND);
         }
-        this.addressService.deleteAddress(id);
+        this.addressClient.deleteAddress(id);
         userAddressRepository.delete(optionalUserAddress.get());
 
     }
@@ -73,29 +73,29 @@ public class UserAddressService {
     }
 
 
-    public List<AddressDetailGetResponse> getUserAddressDetail(){
+    public List<AddressDetailResponse> getUserAddressDetail(){
         String userId = AuthenticationUtils.extractCustomerIdFromJwt();
         List<UserAddress> userAddresses = this.userAddressRepository.findAllByUserId(userId);
         List<Long> addressIds = userAddresses.stream()
                 .map(UserAddress::getAddressId)
                 .toList();
-        List<AddressGetResponse> addressGetResponses = addressService.getAddressesByIds(addressIds);
-        List<AddressDetailGetResponse> addressDetailGetResponses = userAddresses.stream()
+        List<AddressResponse> addresses = addressClient.getAddressesByIds(addressIds);
+        List<AddressDetailResponse> addressDetails = userAddresses.stream()
                 .flatMap(userAddress ->
-                        addressGetResponses.stream()
-                                .filter(addressGetResponse -> addressGetResponse.id().equals(userAddress.getAddressId()) )
-                                .map(addressGetResponseFiltered ->
-                                        new AddressDetailGetResponse(
-                                                addressGetResponseFiltered.id(),
-                                                addressGetResponseFiltered.contactName(),
-                                                addressGetResponseFiltered.phoneNumber(),
-                                                addressGetResponseFiltered.specificAddress(),
-                                                addressGetResponseFiltered.districtId(),
-                                                addressGetResponseFiltered.districtName(),
-                                                addressGetResponseFiltered.provinceId(),
-                                                addressGetResponseFiltered.provinceName(),
-                                                addressGetResponseFiltered.countryId(),
-                                                addressGetResponseFiltered.countryName(),
+                        addresses.stream()
+                                .filter(address -> address.id().equals(userAddress.getAddressId()) )
+                                .map(addressFiltered ->
+                                        new AddressDetailResponse(
+                                                addressFiltered.id(),
+                                                addressFiltered.contactName(),
+                                                addressFiltered.phoneNumber(),
+                                                addressFiltered.specificAddress(),
+                                                addressFiltered.districtId(),
+                                                addressFiltered.districtName(),
+                                                addressFiltered.provinceId(),
+                                                addressFiltered.provinceName(),
+                                                addressFiltered.countryId(),
+                                                addressFiltered.countryName(),
                                                 userAddress.isActive()
                                         )
                                 )
@@ -104,8 +104,8 @@ public class UserAddressService {
         // sxep lai
         // Comparable : muốn so sánh thì class T phải implement nó , như collectTions.sort(list)
         // comparator : dùng để so sánh ngoài như collections.strem.sorted()
-        Comparator<AddressDetailGetResponse> comparator = Comparator.comparing(AddressDetailGetResponse::isActive).reversed();
-        return addressDetailGetResponses.stream().sorted(comparator).toList();
+        Comparator<AddressDetailResponse> comparator = Comparator.comparing(AddressDetailResponse::isActive).reversed();
+        return addressDetails.stream().sorted(comparator).toList();
     }
 
 

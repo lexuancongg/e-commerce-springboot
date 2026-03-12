@@ -1,7 +1,7 @@
 package com.lexuancong.customer.controller;
 
 import com.lexuancong.customer.service.CustomerService;
-import com.lexuancong.customer.dto.customer.CustomerGetResponse;
+import com.lexuancong.customer.dto.customer.CustomerResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,7 +14,7 @@ public class CustomerController {
 
     // đã check
     @GetMapping({"/customer/customers/profile","/internal-feedback/customers/profile"})
-    public ResponseEntity<CustomerGetResponse> getCustomerProfile() {
+    public ResponseEntity<CustomerResponse> getCustomerProfile() {
         return ResponseEntity.ok(customerService.getCustomerProfile());
     }
 

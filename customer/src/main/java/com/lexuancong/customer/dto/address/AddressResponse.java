@@ -1,6 +1,6 @@
 package com.lexuancong.customer.dto.address;
 
-public record AddressGetResponse(
+public record AddressResponse(
         Long id ,
         String contactName,
         String phoneNumber,

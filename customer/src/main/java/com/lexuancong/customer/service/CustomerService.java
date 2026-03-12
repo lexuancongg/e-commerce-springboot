@@ -4,7 +4,7 @@ import com.lexuancong.customer.config.KeycloakPropsConfig;
 import com.lexuancong.customer.constants.Constants;
 import com.lexuancong.customer.dto.customer.CustomerCreateRequest;
 import com.lexuancong.customer.dto.customer.CustomerProfileUpdateRequest;
-import com.lexuancong.customer.dto.customer.CustomerGetResponse;
+import com.lexuancong.customer.dto.customer.CustomerResponse;
 import com.lexuancong.share.exception.AccessDeniedException;
 import com.lexuancong.share.exception.DuplicatedException;
 import com.lexuancong.share.utils.AuthenticationUtils;
@@ -33,14 +33,14 @@ public class CustomerService {
         this.keycloakPropsConfig = keycloakPropsConfig;
     }
 
-    public CustomerGetResponse getCustomerProfile(){
+    public CustomerResponse getCustomerProfile(){
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         try {
             UserRepresentation userFromKeycloak = keycloak.realm(keycloakPropsConfig.getRealm())
                     .users()
                     .get(customerId)
                     .toRepresentation();
-            return CustomerGetResponse.fromKeycloakUserRes(userFromKeycloak);
+            return CustomerResponse.fromKeycloakUserRes(userFromKeycloak);
         }catch (ForbiddenException forbiddenException){
             throw new AccessDeniedException(Constants.ErrorKey.ACCESS_DENIED_KEYCLOAK);
         }
@@ -49,7 +49,7 @@ public class CustomerService {
 
 
 
-    public CustomerGetResponse createCustomer(CustomerCreateRequest customerCreateRequest){
+    public CustomerResponse createCustomer(CustomerCreateRequest customerCreateRequest){
         RealmResource realmResource = keycloak.realm(keycloakPropsConfig.getRealm());
         if(this.checkUsernameExistInRealm(realmResource, customerCreateRequest.username())){
              throw  new DuplicatedException(Constants.ErrorKey.USERNAME_ALREADY_EXISTS);
@@ -80,7 +80,7 @@ public class CustomerService {
 
         userResource.roles().realmLevel().add(roles);
 
-        return  CustomerGetResponse.fromKeycloakUserRes(user);
+        return  CustomerResponse.fromKeycloakUserRes(user);
     }
     private boolean checkUsernameExistInRealm(RealmResource realmResource,String username){
         // phân biệt hoa thường khong
@@ -121,13 +121,13 @@ public class CustomerService {
 
     }
 
-    public List<CustomerGetResponse> getCustomers(){
+    public List<CustomerResponse> getCustomers(){
         try {
             return this.keycloak.realm(keycloakPropsConfig.getRealm()).users()
                     .search(null,0,100)
                     .stream()
                     .filter(UserRepresentation::isEmailVerified)
-                    .map(CustomerGetResponse::fromKeycloakUserRes)
+                    .map(CustomerResponse::fromKeycloakUserRes)
                     .toList();
         }catch (ForbiddenException forbiddenException){
             throw  new AccessDeniedException(Constants.ErrorKey.ACCESS_DENIED_KEYCLOAK);
