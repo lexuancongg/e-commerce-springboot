@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface DistrictRepository extends JpaRepository<District,Long> {
     List<District> findAllByProvinceIdOrderByNameAsc(Long provinceId);
+
+    boolean existsByProvince_Id(Long provinceId);
 }

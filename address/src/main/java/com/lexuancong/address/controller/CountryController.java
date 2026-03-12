@@ -1,10 +1,10 @@
 package com.lexuancong.address.controller;
 
 import com.lexuancong.address.service.CountryService;
-import com.lexuancong.address.dto.country.CountryPagingGetResponse;
 import com.lexuancong.address.dto.country.CountryCreateRequest;
-import com.lexuancong.address.dto.country.CountryGetResponse;
+import com.lexuancong.address.dto.country.CountryResponse;
 import com.lexuancong.share.constants.Constants;
+import com.lexuancong.share.dto.paging.PagingResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +24,7 @@ public class CountryController {
     // checked
 
     @GetMapping("/management/countries/paging")
-    public ResponseEntity<CountryPagingGetResponse> getCountriesPaging(
+    public ResponseEntity<PagingResponse<CountryResponse>> getCountriesPaging(
             @RequestParam(name ="pageIndex" ,defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER,required = false)
             final int pageIndex,
             @RequestParam(name = "pageSize" ,defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE,required = false)
@@ -36,17 +36,17 @@ public class CountryController {
 
     // checked
     @GetMapping({"/management/countries","/customer/countries"})
-    public ResponseEntity<List<CountryGetResponse>> getCountries(){
+    public ResponseEntity<List<CountryResponse>> getCountries(){
         return ResponseEntity.ok(countryService.getCountries());
     }
 
     // checked
     @PostMapping("/management/countries")
-    public ResponseEntity<CountryGetResponse> createCountry(
+    public ResponseEntity<CountryResponse> createCountry(
             @RequestBody @Valid final CountryCreateRequest countryCreateRequest,
             final UriComponentsBuilder uriComponentsBuilder
             ){
-        CountryGetResponse countrySaved = countryService.createCountry(countryCreateRequest);
+        CountryResponse countrySaved = countryService.createCountry(countryCreateRequest);
         return ResponseEntity.created(
                         uriComponentsBuilder
                                 .replacePath("/management/countries/{id}")

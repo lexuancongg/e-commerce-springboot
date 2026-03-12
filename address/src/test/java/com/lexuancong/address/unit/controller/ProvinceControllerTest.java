@@ -4,8 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.lexuancong.address.controller.ProvinceController;
 import com.lexuancong.address.service.ProvinceService;
-import com.lexuancong.address.dto.province.ProvinceGetResponse;
-import com.lexuancong.address.dto.province.ProvincePagingGetResponse;
+import com.lexuancong.address.dto.province.ProvinceResponse;
 import com.lexuancong.address.dto.province.ProvinceCreateRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,8 +53,8 @@ public class ProvinceControllerTest {
 
     @Test
     public void TestGetProvincesByCountryId_whenValidRequest_thenReturnOk() throws Exception {
-        List<ProvinceGetResponse> provinceGetResponses = List.of(new ProvinceGetResponse(5L,"VietNam",5L,"country"));
-        given(this.provinceService.getProvincesByCountryId(5L)).willReturn(provinceGetResponses);
+        List<ProvinceResponse> provinceRespons = List.of(new ProvinceResponse(5L,"VietNam",5L,"country"));
+        given(this.provinceService.getProvincesByCountryId(5L)).willReturn(provinceRespons);
         mockMvc.perform(get("/address/management/provinces/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -69,10 +68,10 @@ public class ProvinceControllerTest {
                 .name("Quang Tri")
                 .build();
         String requestBody = this.objectWriter.writeValueAsString(provinceCreateRequest);
-        ProvinceGetResponse provinceGetResponse = ProvinceGetResponse.builder()
+        ProvinceResponse provinceResponse = ProvinceResponse.builder()
                 .countryId(1L)
                 .build();
-        given(this.provinceService.createProvince(provinceCreateRequest)).willReturn(provinceGetResponse);
+        given(this.provinceService.createProvince(provinceCreateRequest)).willReturn(provinceResponse);
         this.mockMvc.perform(post("/address/management/provinces")
         .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))

@@ -1,11 +1,12 @@
 package com.lexuancong.address.controller;
 
 import com.lexuancong.address.service.ProvinceService;
-import com.lexuancong.address.dto.province.ProvincePagingGetResponse;
 import com.lexuancong.address.dto.province.ProvinceCreateRequest;
-import com.lexuancong.address.dto.province.ProvinceGetResponse;
+import com.lexuancong.address.dto.province.ProvinceResponse;
 import com.lexuancong.share.constants.Constants;
+import com.lexuancong.share.dto.paging.PagingResponse;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -21,15 +22,15 @@ public class ProvinceController {
 
     // checked
     @GetMapping("/management/provinces/paging")
-    public ResponseEntity<ProvincePagingGetResponse> getProvincesPaging(
+    public ResponseEntity<PagingResponse<ProvinceResponse>> getProvincesPaging(
             @RequestParam(value = "pageIndex",defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER,required = false)
             final int pageIndex,
             @RequestParam(value = "pageSize",defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE,required = false)
             final  int pageSize,
             @RequestParam(value = "countryId",required = false) final Long countryId
     ) {
-        ProvincePagingGetResponse provincePagingGetResponse = provinceService.getProvincesPaging(pageIndex,pageSize,countryId);
-        return ResponseEntity.ok(provincePagingGetResponse);
+        PagingResponse<ProvinceResponse> provincePaging = provinceService.getProvincesPaging(pageIndex,pageSize,countryId);
+        return ResponseEntity.ok(provincePaging);
 
     }
 
@@ -37,25 +38,23 @@ public class ProvinceController {
 
     // checked
     @GetMapping({"/management/provinces/{countryId}","/customer/provinces/{countryId}"})
-    public ResponseEntity<List<ProvinceGetResponse>> getProvincesByCountryId(
+    public ResponseEntity<List<ProvinceResponse>> getProvincesByCountryId(
             @PathVariable(value = "countryId") final Long countryId
     ) {
-        List<ProvinceGetResponse> provinceGetResponses = provinceService.getProvincesByCountryId(countryId);
-        return ResponseEntity.ok(provinceGetResponses);
+        List<ProvinceResponse> provinces = provinceService.getProvincesByCountryId(countryId);
+        return ResponseEntity.ok(provinces);
     }
 
-    // checked
+
 
     @PostMapping("/management/provinces")
-    public ResponseEntity<ProvinceGetResponse> createProvince(
+    public ResponseEntity<ProvinceResponse> createProvince(
             @RequestBody @Valid final ProvinceCreateRequest provinceCreateRequest,
             UriComponentsBuilder uriComponentsBuilder
             ){
-        ProvinceGetResponse provinceSaved = provinceService.createProvince(provinceCreateRequest);
-        return ResponseEntity.created(
-                uriComponentsBuilder.replacePath("/management/provinces/{id}")
-                        .buildAndExpand(provinceSaved.id()).toUri()
-        ).body(provinceSaved);
+        ProvinceResponse provinceSaved = provinceService.createProvince(provinceCreateRequest);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(provinceSaved);
     }
 
 

@@ -6,9 +6,9 @@ import com.lexuancong.address.repository.AddressRepository;
 import com.lexuancong.address.repository.CountryRepository;
 import com.lexuancong.address.repository.DistrictRepository;
 import com.lexuancong.address.repository.ProvinceRepository;
-import com.lexuancong.address.dto.address.AddressDetailGetResponse;
+import com.lexuancong.address.dto.address.AddressDetailResponse;
 import com.lexuancong.address.dto.address.AddressCreateRequest;
-import com.lexuancong.address.dto.address.AddressGetResponse;
+import com.lexuancong.address.dto.address.AddressResponse;
 import com.lexuancong.share.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,10 +29,10 @@ public class AddressService {
     private final ProvinceRepository provinceRepository;
     private final DistrictRepository districtRepository;
 
-    public AddressGetResponse createAddress(AddressCreateRequest addressCreateRequest){
+    public AddressResponse createAddress(AddressCreateRequest addressCreateRequest){
         Address address = addressCreateRequest.toAddressBase();
         this.performSetEntityIfExistsOrThrow(address, addressCreateRequest);
-        return AddressGetResponse.fromAddress(addressRepository.save(address));
+        return AddressResponse.fromAddress(addressRepository.save(address));
     }
 
     
@@ -49,10 +49,18 @@ public class AddressService {
     }
 
     private void performSetEntityIfExistsOrThrow(Address address, AddressCreateRequest addressCreateRequest){
-        this.setEntityIfExistsOrThrow(addressCreateRequest.countryId(),countryRepository::findById ,
-                Constants.ErrorKey.COUNTRY_NOT_FOUND, address::setCountry);
-        this.setEntityIfExistsOrThrow(addressCreateRequest.provinceId(),provinceRepository::findById,
-                Constants.ErrorKey.PROVINCE_NOT_FOUND , address::setProvince);
+        this.setEntityIfExistsOrThrow(
+                addressCreateRequest.countryId(),
+                countryRepository::findById ,
+                Constants.ErrorKey.COUNTRY_NOT_FOUND,
+                address::setCountry
+        );
+        this.setEntityIfExistsOrThrow(
+                addressCreateRequest.provinceId(),
+                provinceRepository::findById,
+                Constants.ErrorKey.PROVINCE_NOT_FOUND ,
+                address::setProvince
+        );
         this.setEntityIfExistsOrThrow(addressCreateRequest.districtId(),districtRepository::findById,
                 Constants.ErrorKey.DISTRICT_NOT_FOUND, address::setDistrict);
     }
@@ -70,16 +78,16 @@ public class AddressService {
 
 
 
-    public AddressDetailGetResponse getAddressById(Long id){
+    public AddressDetailResponse getAddressById(Long id){
         Address address = addressRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(Constants.ErrorKey.ADDRESS_NOT_FOUND,id));
-        return AddressDetailGetResponse.fromAddress(address);
+        return AddressDetailResponse.fromAddress(address);
 
     }
 
-    public List<AddressDetailGetResponse> getAddresses(List<Long> ids){
+    public List<AddressDetailResponse> getAddresses(List<Long> ids){
         List<Address> addresses = addressRepository.findAllByIdIn(ids);
-        return addresses.stream().map(AddressDetailGetResponse::fromAddress)
+        return addresses.stream().map(AddressDetailResponse::fromAddress)
                 .collect(Collectors.toList());
     }
 

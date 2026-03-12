@@ -8,6 +8,8 @@ public record CountryCreateRequest(
         @NotBlank @Size(min = 1, max = 100) String name
 ) {
     public Country toCountry(){
-        return Country.builder().name(this.name).build();
+        return Country.builder()
+                .name(this.name)
+                .build();
     }
 }

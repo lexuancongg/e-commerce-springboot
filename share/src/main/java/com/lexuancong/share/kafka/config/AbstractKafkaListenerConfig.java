@@ -22,8 +22,8 @@ public abstract class  AbstractKafkaListenerConfig <K,V>{
         this.keyType = keyType;
         this.valueType = valueType;
         this.kafkaProperties = kafkaProperties;
-
     }
+
 
     public abstract ConcurrentKafkaListenerContainerFactory<K,V> listenerContainerFactory();
     public  ConcurrentKafkaListenerContainerFactory<K,V> kafkaListenerContainerFactory(){

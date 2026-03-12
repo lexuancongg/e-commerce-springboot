@@ -4,8 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.lexuancong.address.controller.CountryController;
 import com.lexuancong.address.service.CountryService;
-import com.lexuancong.address.dto.country.CountryGetResponse;
-import com.lexuancong.address.dto.country.CountryPagingGetResponse;
+import com.lexuancong.address.dto.country.CountryResponse;
 import com.lexuancong.address.dto.country.CountryCreateRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,7 +63,7 @@ public class CountryControllerTest {
     // pass
     @Test
     void testGetCountries_whenValidRequest_thenReturnOk() throws Exception {
-        List<CountryGetResponse> mockResult = List.of(new CountryGetResponse(1L, "VietNam"));
+        List<CountryResponse> mockResult = List.of(new CountryResponse(1L, "VietNam"));
         given(countryService.getCountries()).willReturn(mockResult);
         this.mockMvc.perform(MockMvcRequestBuilders.get("/address/management/countries")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -78,7 +77,7 @@ public class CountryControllerTest {
     // pass
     @Test
     void testCreateCountry_whenValidRequest_thenReturnOk() throws Exception {
-        CountryGetResponse mockResult = new CountryGetResponse(1L, "VietNam");
+        CountryResponse mockResult = new CountryResponse(1L, "VietNam");
         CountryCreateRequest countryCreateRequest = new CountryCreateRequest("VietNam");
         String bodyRequest = this.objectWriter.writeValueAsString(countryCreateRequest);
         given(countryService.createCountry(countryCreateRequest)).willReturn(mockResult);
@@ -95,7 +94,7 @@ public class CountryControllerTest {
     // pass
     @Test
     void testCreateCountry_WhenNameIsBlank_thenReturnBadRequest() throws Exception {
-        CountryGetResponse mockResult = new CountryGetResponse(1L, "VietNam");
+        CountryResponse mockResult = new CountryResponse(1L, "VietNam");
         CountryCreateRequest countryCreateRequest = new CountryCreateRequest("");
         String bodyRequest = this.objectWriter.writeValueAsString(countryCreateRequest);
         this.mockMvc.perform(post("/address/management/countries")

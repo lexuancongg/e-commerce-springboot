@@ -9,4 +9,8 @@ public interface AddressRepository extends JpaRepository<Address,Long> {
     List<Address> findAllByIdIn(List<Long> ids);
 
     List<Long> id(Long id);
+
+    boolean existsByCountry_Id(Long countryId);
+
+    boolean existsByProvince_Id(Long provinceId);
 }
