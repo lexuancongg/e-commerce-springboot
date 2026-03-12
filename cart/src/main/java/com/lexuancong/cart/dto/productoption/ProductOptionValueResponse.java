@@ -1,6 +1,6 @@
 package com.lexuancong.cart.dto.productoption;
 
-public record ProductOptionValueGetResponse(
+public record ProductOptionValueResponse(
         Long id,
         String optionName,
         String value

@@ -11,7 +11,6 @@ public class AuthenticationUtils {
     public static String extractCustomerIdFromJwt() {
         Authentication authentication = getAuthentication();
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
-            // bắn ra ngoại leej
         }
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
         return jwtAuthenticationToken.getToken().getSubject();

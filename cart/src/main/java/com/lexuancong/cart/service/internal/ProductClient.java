@@ -1,8 +1,8 @@
 package com.lexuancong.cart.service.internal;
 
-import com.lexuancong.cart.config.ServiceUrlConfig;
-import com.lexuancong.cart.dto.product.ProductPreviewGetResponse;
-import com.lexuancong.cart.dto.productoption.ProductOptionValueDetailGetResponse;
+import com.lexuancong.cart.config.ServiceUrlsProperties;
+import com.lexuancong.cart.dto.product.ProductPreviewResponse;
+import com.lexuancong.cart.dto.productoption.ProductOptionValueDetailResponse;
 import com.lexuancong.share.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
@@ -16,25 +16,25 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ProductService {
+public class ProductClient {
     private final RestClient restClient;
-    private final ServiceUrlConfig serviceUrlConfig;
+    private final ServiceUrlsProperties serviceUrlsProperties;
 
     public boolean checkExistById(Long productId){
         return this.getProductById(productId) != null;
     }
 
-    private ProductPreviewGetResponse getProductById(Long id){
-        List<ProductPreviewGetResponse> productPreviewGetResponse = this.getProductListByIds(List.of(id));
-        if(CollectionUtils.isEmpty(productPreviewGetResponse)){
+    private ProductPreviewResponse getProductById(Long id){
+        List<ProductPreviewResponse> productPreviewResponse = this.getProductListByIds(List.of(id));
+        if(CollectionUtils.isEmpty(productPreviewResponse)){
             return null;
         }
-        return productPreviewGetResponse.getFirst();
+        return productPreviewResponse.getFirst();
     }
 
 
-    public List<ProductPreviewGetResponse> getProductListByIds(List<Long> ids){
-        final URI requestUrl = UriComponentsBuilder.fromHttpUrl(this.serviceUrlConfig.product())
+    public List<ProductPreviewResponse> getProductListByIds(List<Long> ids){
+        final URI requestUrl = UriComponentsBuilder.fromHttpUrl(this.serviceUrlsProperties.product())
                 .path("/customer/")
                 .queryParam("productIds", ids)
                 .build()
@@ -43,13 +43,13 @@ public class ProductService {
         return this.restClient.get()
                 .uri(requestUrl)
                 .retrieve()
-                .toEntity(new ParameterizedTypeReference<List<ProductPreviewGetResponse>>() {})
+                .toEntity(new ParameterizedTypeReference<List<ProductPreviewResponse>>() {})
                 .getBody();
     }
 
-    public List<ProductOptionValueDetailGetResponse> getProductOptionValueBySpecificProductIds(List<Long> productIds){
+    public List<ProductOptionValueDetailResponse> getProductOptionValueBySpecificProductIds(List<Long> productIds){
         String jwt  = AuthenticationUtils.extractJwt();
-        URI url =UriComponentsBuilder.fromHttpUrl(this.serviceUrlConfig.product())
+        URI url =UriComponentsBuilder.fromHttpUrl(this.serviceUrlsProperties.product())
                 .path("/customer...")
                 .queryParam("productIds",productIds)
                 .build()
@@ -58,7 +58,7 @@ public class ProductService {
                 .uri(url)
                 .headers(httpHeaders -> httpHeaders.setBearerAuth(jwt))
                 .retrieve()
-                .toEntity(new ParameterizedTypeReference<List<ProductOptionValueDetailGetResponse>>() {})
+                .toEntity(new ParameterizedTypeReference<List<ProductOptionValueDetailResponse>>() {})
                 .getBody();
 
     }

@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: cart
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/cart
+    username: xuancong
+    password: xuancong
+
+server:
+  port: 8003
+  # server:
+  #   address: 127.0.0.1
+
+xuancong:
+  service:
+    product: ""

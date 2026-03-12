@@ -1,13 +1,13 @@
 package com.lexuancong.cart.service;
 
 import com.lexuancong.cart.constants.Constants;
-import com.lexuancong.cart.dto.productoption.ProductOptionValueDetailGetResponse;
+import com.lexuancong.cart.dto.productoption.ProductOptionValueDetailResponse;
 import com.lexuancong.cart.model.CartItem;
 import com.lexuancong.cart.repository.CartItemRepository;
-import com.lexuancong.cart.service.internal.ProductService;
+import com.lexuancong.cart.service.internal.ProductClient;
 import com.lexuancong.cart.dto.cartitem.*;
-import com.lexuancong.cart.dto.product.ProductPreviewGetResponse;
-import com.lexuancong.cart.dto.productoption.ProductOptionValueGetResponse;
+import com.lexuancong.cart.dto.product.ProductPreviewResponse;
+import com.lexuancong.cart.dto.productoption.ProductOptionValueResponse;
 import com.lexuancong.share.exception.BadRequestException;
 import com.lexuancong.share.exception.NotFoundException;
 import com.lexuancong.share.utils.AuthenticationUtils;
@@ -27,15 +27,15 @@ import java.util.stream.Collectors;
 @Transactional
 public class CartItemService {
     private final CartItemRepository cartItemRepository;
-    private final ProductService productService;
-    public CartItemGetResponse addCartItem(CartItemCreateRequest cartItemCreateRequest){
-        this.validateProduct(cartItemCreateRequest.productId());
+    private final ProductClient productClient;
+    public CartItemResponse addCartItem(CartItemCreateRequest cartItemCreateRequest){
+        this.validateProductExist(cartItemCreateRequest.productId());
         CartItem cartItem = this.performAddCartItem(cartItemCreateRequest);
-        return CartItemGetResponse.fromCartItem(cartItem);
+        return CartItemResponse.fromCartItem(cartItem);
 
     }
-    private void validateProduct(Long productId){
-        if(!productService.checkExistById(productId)){
+    private void validateProductExist(Long productId){
+        if(!productClient.checkExistById(productId)){
             throw new NotFoundException(Constants.ErrorKey.PRODUCT_NOT_FOUND, productId);
         }
     }
@@ -66,64 +66,72 @@ public class CartItemService {
 
 
 
-    // api put cartItem about quantity
-    public CartItemGetResponse updateCartItem(Long productId, CartItemUpdateRequest cartItemUpdateRequest){
-        this.validateProduct(productId);
+    public CartItemResponse updateCartItem(Long productId, CartItemUpdateRequest cartItemUpdateRequest){
+        this.validateProductExist(productId);
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         CartItem cartItem =  cartItemUpdateRequest.toCartItem(customerId,productId);
         CartItem cartItemSaved = cartItemRepository.save(cartItem);
-        return CartItemGetResponse.fromCartItem(cartItemSaved);
+        return CartItemResponse.fromCartItem(cartItemSaved);
 
     }
 
 
-    public List<CartItemDetailGetResponse> getCartItems(){
+    public List<CartItemDetailResponse> getCartItems(){
+
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
+
         List<CartItem> cartItems = cartItemRepository.findByCustomerIdOrderByCreatedAtDesc(customerId);
         Map<Long , CartItem> mapCartItemByProductId = cartItems.stream()
-                .collect(Collectors.toMap(CartItem::getProductId, Function.identity()));
+                .collect(
+                        Collectors.toMap(CartItem::getProductId, Function.identity())
+                );
         List<Long> productIds = cartItems.stream()
                 .map(CartItem::getProductId)
                 .toList();
-        List<ProductPreviewGetResponse> productInCartItems = this.productService.getProductListByIds(productIds);
-        Map<Long, ProductPreviewGetResponse>  mapProductPreviewByProductId =  productInCartItems.stream()
-                .collect(Collectors.toMap(ProductPreviewGetResponse::id, Function.identity()));
+        List<ProductPreviewResponse> productInCartItems = this.productClient.getProductListByIds(productIds);
+
+        Map<Long, ProductPreviewResponse>  mapProductPreviewByProductId =  productInCartItems.stream()
+                .collect(Collectors.toMap(ProductPreviewResponse::id, Function.identity()));
 
         // fetch tới lấy options-value
-        List<ProductOptionValueDetailGetResponse> productOptionValueDetailResponses =
-                this.productService.getProductOptionValueBySpecificProductIds(productIds);
+        List<ProductOptionValueDetailResponse> productOptionValueDetailResponses =
+                this.productClient.getProductOptionValueBySpecificProductIds(productIds);
 
-        Map<Long , CartItemDetailGetResponse> mapCartItemDetailByProductId = new HashMap<>();
-        for (ProductOptionValueDetailGetResponse productOptionValueDetailGetResponse : productOptionValueDetailResponses) {
-            if(!mapCartItemDetailByProductId.containsKey(productOptionValueDetailGetResponse.productId())){
+        Map<Long , CartItemDetailResponse> mapCartItemDetailByProductId = new HashMap<>();
+
+        for (ProductOptionValueDetailResponse productOptionValueDetailResponse : productOptionValueDetailResponses) {
+            ProductOptionValueResponse optionValue = new ProductOptionValueResponse(
+                    productOptionValueDetailResponse.id(),
+                    productOptionValueDetailResponse.optionName(),
+                    productOptionValueDetailResponse.value()
+
+            );
+
+
+            if(!mapCartItemDetailByProductId.containsKey(productOptionValueDetailResponse.productId())){
+                ProductPreviewResponse productPreview  =
+                        mapProductPreviewByProductId.get(productOptionValueDetailResponse.productId());
+
+
                 mapCartItemDetailByProductId.put(
-                        productOptionValueDetailGetResponse.productOptionId(),
-                        new CartItemDetailGetResponse(
-                                productOptionValueDetailGetResponse.productId(),
-                                mapCartItemByProductId.get(productOptionValueDetailGetResponse.productId())
-                                        .getQuantity(),
-                                productOptionValueDetailGetResponse.productName(),
-                                mapProductPreviewByProductId.get(productOptionValueDetailGetResponse.productId())
-                                        .slug(),
-                                mapProductPreviewByProductId.get(productOptionValueDetailGetResponse.productId())
-                                        .avatarUrl(),
-                                mapProductPreviewByProductId.get(productOptionValueDetailGetResponse.productId())
-                                        .price(),
-                                new ArrayList<>()
-
-                        )
-
+                        productOptionValueDetailResponse.productId(),
+                        CartItemDetailResponse.builder()
+                                .productId(productPreview.id())
+                                .avatarUrl(productPreview.avatarUrl())
+                                .price(productPreview.price())
+                                .slug(productPreview.slug())
+                                .productName(productPreview.name())
+                                .quantity(mapCartItemByProductId.get(productOptionValueDetailResponse.productId()).getQuantity())
+                                .productOptionValues(new ArrayList<>(
+                                        List.of(optionValue)
+                                ))
+                                .build()
                         );
                 continue;
             }
-            CartItemDetailGetResponse cartItemDetailGetResponse = mapCartItemDetailByProductId.get(productOptionValueDetailGetResponse.productId());
-            cartItemDetailGetResponse.productOptionValue().add(
-                    new ProductOptionValueGetResponse(
-                            productOptionValueDetailGetResponse.id(),
-                            productOptionValueDetailGetResponse.productOptionName(),
-                            productOptionValueDetailGetResponse.value()
-                    )
-            );
+            CartItemDetailResponse cartItemDetail =
+                    mapCartItemDetailByProductId.get(productOptionValueDetailResponse.productId());
+            cartItemDetail.productOptionValues().add(optionValue);
         }
 
         return new ArrayList<>(mapCartItemDetailByProductId.values());
@@ -131,35 +139,38 @@ public class CartItemService {
     }
 
 
-    // api delete
     public void deleteCartItem(Long productId){
-        this.validateProduct(productId);
+        this.validateProductExist(productId);
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
         cartItemRepository.deleteByCustomerIdAndProductId(customerId,productId);
     }
 
 
-    public List<CartItemGetResponse> updateCartItemAfterOrder(List<CartItemDeletRequest> cartItemDeletRequests){
-        this.validateDuplicatedProductIdInCartItemDelete(cartItemDeletRequests);
 
-        List<Long> productIds = cartItemDeletRequests.stream()
-                .map(CartItemDeletRequest::productId)
+    public List<CartItemResponse> updateCartItemAfterOrder(List<CartItemDeleteRequest> cartItemDeleteRequests){
+        this.validateDuplicatedProductIdInCartItemDelete(cartItemDeleteRequests);
+
+        List<Long> productIds = cartItemDeleteRequests.stream()
+                .map(CartItemDeleteRequest::productId)
                 .toList();
+
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
+
         List<CartItem> cartItems = this.cartItemRepository.findByCustomerIdAndProductIdIn(customerId,productIds);
+
         Map<Long,CartItem> mapCartItemByProductId = cartItems.stream()
                 .collect(Collectors.toMap(CartItem::getProductId, Function.identity()));
         List<CartItem> cartItemsToDelete = new ArrayList<>();
         List<CartItem> cartItemsToUpdateQuantity = new ArrayList<>();
-        for (CartItemDeletRequest cartItemDeletRequest : cartItemDeletRequests){
+        for (CartItemDeleteRequest cartItemDeleteRequest : cartItemDeleteRequests){
             Optional<CartItem> optionalCartItem=
-                    Optional.ofNullable(mapCartItemByProductId.get(cartItemDeletRequest.productId()));
+                    Optional.ofNullable(mapCartItemByProductId.get(cartItemDeleteRequest.productId()));
 
             optionalCartItem.ifPresent(cartItem -> {
-                if(cartItem.getQuantity() <= cartItemDeletRequest.quantity()){
+                if(cartItem.getQuantity() <= cartItemDeleteRequest.quantity()){
                     cartItemsToDelete.add(cartItem);
                 }else{
-                    cartItem.setQuantity(cartItem.getQuantity() - cartItemDeletRequest.quantity());
+                    cartItem.setQuantity(cartItem.getQuantity() - cartItemDeleteRequest.quantity());
                     cartItemsToUpdateQuantity.add(cartItem);
                 }
             });
@@ -168,20 +179,21 @@ public class CartItemService {
         this.cartItemRepository.deleteAll(cartItemsToDelete);
         this.cartItemRepository.saveAll(cartItemsToUpdateQuantity);
         return cartItemsToUpdateQuantity.stream()
-                .map(CartItemGetResponse::fromCartItem)
+                .map(CartItemResponse::fromCartItem)
                 .toList();
 
     }
 
 
-    private void  validateDuplicatedProductIdInCartItemDelete(List<CartItemDeletRequest> cartItemDeletRequests){
-        Map<Long,Integer> mapProductIdToQuantity = new HashMap<>();
-        for (CartItemDeletRequest cartItemDeletRequest : cartItemDeletRequests){
-            Integer quantityProduct =  mapProductIdToQuantity.get(cartItemDeletRequest.productId());
-            if(!Objects.isNull(quantityProduct) && !quantityProduct.equals(cartItemDeletRequest.quantity())){
+
+    private void  validateDuplicatedProductIdInCartItemDelete(List<CartItemDeleteRequest> requests){
+        Map<Long,Integer> map = new HashMap<>();
+        for (CartItemDeleteRequest req : requests){
+            Integer quantityProduct =  map.putIfAbsent(req.productId(),req.quantity());
+
+            if(!Objects.isNull(quantityProduct) && !quantityProduct.equals(req.quantity())){
                 throw  new BadRequestException(Constants.ErrorKey.DUPLICATED_CART_ITEMS_TO_DELETE);
             }
-            mapProductIdToQuantity.put(cartItemDeletRequest.productId(), cartItemDeletRequest.quantity());
         }
     }
 }

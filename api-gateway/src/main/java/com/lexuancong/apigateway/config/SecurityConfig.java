@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 @Configuration
 @EnableWebFluxSecurity
-// config theo Reactive application (webFlux)
+// config  Reactive application (webFlux)
 public class SecurityConfig {
     private final ReactiveClientRegistrationRepository clientRegistrationRepository;
     private  final String REALM_ACCESS_CLAIM = "realm_access";
@@ -64,11 +64,12 @@ public class SecurityConfig {
                 new OidcClientInitiatedServerLogoutSuccessHandler(this.clientRegistrationRepository);
         oidcClientInitiatedServerLogoutSuccessHandler.setPostLogoutRedirectUri("http://frontend:3000");
         return oidcClientInitiatedServerLogoutSuccessHandler;
+
     }
 
     // mapper sang quyền từ oauth2loggin() , còn đối tượng authentication được tạo theo mặc định sub=>name
     @Bean
-  // bean này mapper quyền ở tầng cuối cùng , nhận lại các quyền trong authentication rồi map lại
+  //  bean chinhr sửa lại / map lại danh sách quyền  trc khi spring tạo authentication
     public GrantedAuthoritiesMapper grantedAuthoritiesMapper( ){
         // tham số ds quyền mặc định chk phải là quyền thực , mà là chua một trong hai đối tượng check instant dưới chứa thông tin cả idtoken hoặc access token
         return  (authorities)->{
@@ -88,7 +89,6 @@ public class SecurityConfig {
                     Collection<String> roles = (Collection<String>) realmAccessClaim.get(this.ROLES_CLAIM);
                     grantedAuthoritySet.addAll(this.buildAuthoritiesFromClaimRoles(roles));
                 }
-                // nếu không phải OIDC
             }else{
                 OAuth2UserAuthority oAuth2UserAuthority = (OAuth2UserAuthority)authority;
                 Map<String ,Object> userAttributes = oAuth2UserAuthority.getAttributes();
