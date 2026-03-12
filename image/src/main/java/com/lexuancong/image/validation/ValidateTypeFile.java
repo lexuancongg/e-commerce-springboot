@@ -1,4 +1,4 @@
-package com.lexuancong.media.validation;
+package com.lexuancong.image.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

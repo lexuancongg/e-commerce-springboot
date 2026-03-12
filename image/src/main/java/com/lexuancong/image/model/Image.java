@@ -1,4 +1,4 @@
-package com.lexuancong.media.model;
+package com.lexuancong.image.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,7 +17,6 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String description ;
 
     private String fileName;
 

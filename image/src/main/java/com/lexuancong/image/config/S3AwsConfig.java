@@ -1,5 +1,6 @@
-package com.lexuancong.media.config;
+package com.lexuancong.image.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,23 +9,16 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 @Configuration
-public class AwsS3Config {
-    @Value("${aws.accessKeyId}")
-    private String accessKeyId;
-
-    @Value("${aws.secretKey}")
-    private String secretKey;
-
-    @Value("${aws.region}")
-    private String region;
-
+@RequiredArgsConstructor
+public class S3AwsConfig {
+    private final S3AwsProperties s3AwsProperties;
 
     @Bean
     public S3Client s3Client() {
         return S3Client.builder()
-                .region(Region.of(region))
+                .region(Region.of(s3AwsProperties.getRegion()))
                 .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create(accessKeyId, secretKey)
+                        AwsBasicCredentials.create(s3AwsProperties.getAccessKeyId(), s3AwsProperties.getSecretKey())
                 ))
                 .build();
     }

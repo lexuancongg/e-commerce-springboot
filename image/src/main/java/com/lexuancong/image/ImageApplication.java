@@ -1,13 +1,13 @@
-package com.lexuancong.media;
+package com.lexuancong.image;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class MediaApplication {
+public class ImageApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(MediaApplication.class, args);
+        SpringApplication.run(ImageApplication.class, args);
     }
 
 }

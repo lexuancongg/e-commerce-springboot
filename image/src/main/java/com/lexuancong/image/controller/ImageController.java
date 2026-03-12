@@ -1,10 +1,10 @@
-package com.lexuancong.media.controller;
+package com.lexuancong.image.controller;
 
-import com.lexuancong.media.model.Image;
-import com.lexuancong.media.service.imageService;
-import com.lexuancong.media.dto.ImageDetailGetResponse;
-import com.lexuancong.media.dto.ImageCreateRequest;
-import com.lexuancong.media.dto.ImageGetResponse;
+import com.lexuancong.image.model.Image;
+import com.lexuancong.image.service.imageService;
+import com.lexuancong.image.dto.ImageDetailResponse;
+import com.lexuancong.image.dto.ImageCreateRequest;
+import com.lexuancong.image.dto.ImageResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -21,9 +21,9 @@ public class ImageController {
     // gởi lên bằng submit form
     @PostMapping(value = "/management/images", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     // ModelAttribute : ánh xạ data từ form vào obj như requestBody
-    public ResponseEntity<ImageGetResponse> create(@ModelAttribute @Valid ImageCreateRequest imageCreateRequest){
+    public ResponseEntity<ImageResponse> create(@ModelAttribute @Valid ImageCreateRequest imageCreateRequest){
         Image imageSaved = this.imageService.create(imageCreateRequest);
-        return ResponseEntity.ok(ImageGetResponse.fromImage(imageSaved));
+        return ResponseEntity.ok(ImageResponse.fromImage(imageSaved));
 
     }
 
@@ -35,7 +35,7 @@ public class ImageController {
     }
 
     @GetMapping("/customer/images/{id}")
-    public ResponseEntity<ImageDetailGetResponse> get(@PathVariable Long id){
+    public ResponseEntity<ImageDetailResponse> get(@PathVariable Long id){
         // chúng ta chỉ mới bt  id => cần file name để lấy trong filesystem
         return ResponseEntity.ok(this.imageService.getImageById(id));
     }

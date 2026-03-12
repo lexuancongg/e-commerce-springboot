@@ -1,11 +1,14 @@
-package com.lexuancong.media.config;
+package com.lexuancong.image.config;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+
 @Getter
 @Configuration
-public class FilesystemConfig {
+public class FilesystemProperties {
+
     @Value("${filesystem.directory}")
     private String directory;
+
 }

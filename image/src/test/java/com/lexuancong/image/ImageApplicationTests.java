@@ -1,10 +1,10 @@
-package com.lexuancong.media;
+package com.lexuancong.image;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class MediaApplicationTests {
+class ImageApplicationTests {
 
     @Test
     void contextLoads() {

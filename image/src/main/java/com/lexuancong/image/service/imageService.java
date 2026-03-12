@@ -1,10 +1,10 @@
-package com.lexuancong.media.service;
+package com.lexuancong.image.service;
 
-import com.lexuancong.media.config.FilesystemConfig;
-import com.lexuancong.media.model.Image;
-import com.lexuancong.media.repository.ImageRepository;
-import com.lexuancong.media.dto.ImageDetailGetResponse;
-import com.lexuancong.media.dto.ImageCreateRequest;
+import com.lexuancong.image.config.FilesystemProperties;
+import com.lexuancong.image.model.Image;
+import com.lexuancong.image.repository.ImageRepository;
+import com.lexuancong.image.dto.ImageDetailResponse;
+import com.lexuancong.image.dto.ImageCreateRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -17,10 +17,10 @@ import java.nio.file.Paths;
 @Service
 public class imageService {
     private final ImageRepository imageRepository;
-    private final FilesystemConfig filesystemConfig;
-    public imageService(ImageRepository imageRepository, FilesystemConfig filesystemConfig) {
+    private final FilesystemProperties filesystemProperties;
+    public imageService(ImageRepository imageRepository, FilesystemProperties filesystemProperties) {
         this.imageRepository = imageRepository;
-        this.filesystemConfig = filesystemConfig;
+        this.filesystemProperties = filesystemProperties;
     }
 
     public Image create(ImageCreateRequest imageCreateRequest)  {
@@ -38,7 +38,7 @@ public class imageService {
     }
 
     public String saveFileInFilesystem(String fileName, byte[] contentFile){
-        File directory = new File(filesystemConfig.getDirectory());
+        File directory = new File(filesystemProperties.getDirectory());
         this.checkIsExitedDirectory(directory);
         this.validateFileName(fileName);
         Path filePath = this.buildFilePath(fileName);
@@ -53,7 +53,7 @@ public class imageService {
     }
 
     private Path buildFilePath(String fileName) {
-        Path path = Paths.get(filesystemConfig.getDirectory(), fileName).toAbsolutePath().normalize();
+        Path path = Paths.get(filesystemProperties.getDirectory(), fileName).toAbsolutePath().normalize();
         return path;
     }
 
@@ -75,7 +75,6 @@ public class imageService {
     public void delete(Long id) {
         Image image = imageRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Image not found"));
-        // xóa file trong systemt trước
         Path pathFile = this.buildFilePath(image.getFileName());
         try {
             Files.deleteIfExists(pathFile);
@@ -88,20 +87,14 @@ public class imageService {
     }
 
 
-    public ImageDetailGetResponse getImageById(Long id){
+    public ImageDetailResponse getImageById(Long id){
         // dựa vào file path ddeer lays trong file sytemt
         Image image = imageRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Image not found"));
         Path path = Paths.get(image.getFilePath());
         this.checkIsExitedPath(path);
-        InputStream fileContent = null;
-        try {
-            fileContent = Files.newInputStream(path);
-            return new ImageDetailGetResponse(image.getId() ,image.getDescription() ,
-                    image.getFileName(),image.getImageType(),fileContent);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+            return new ImageDetailResponse(image.getId() ,
+                    image.getFileName(),"");
 
     }
 
