@@ -1,10 +1,10 @@
 package com.lexuancong.feedback.controller;
 
 import com.lexuancong.feedback.service.FeedbackService;
-import com.lexuancong.feedback.dto.feedback.FeedbackPagingGetResponse;
 import com.lexuancong.feedback.dto.feedback.FeedbackCreateRequest;
-import com.lexuancong.feedback.dto.feedback.FeedbackGetResponse;
+import com.lexuancong.feedback.dto.feedback.FeedbackResponse;
 import com.lexuancong.share.constants.Constants;
+import com.lexuancong.share.dto.paging.PagingResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +16,7 @@ public class FeedbackController {
 
     // đã check
     @PostMapping("/customer/feedbacks")
-    public ResponseEntity<FeedbackGetResponse> createFeedback(@RequestBody FeedbackCreateRequest feedBackCreateRequest) {
+    public ResponseEntity<FeedbackResponse> createFeedback(@RequestBody FeedbackCreateRequest feedBackCreateRequest) {
         return ResponseEntity.ok(this.feedbackService.createFeedback(feedBackCreateRequest));
     }
 
@@ -35,12 +35,14 @@ public class FeedbackController {
 
     // đã check
     @GetMapping("/customer/feedbacks/{productId}")
-    public ResponseEntity<FeedbackPagingGetResponse> getRatingByProductId(
+    public ResponseEntity<PagingResponse<FeedbackResponse>> getRatingByProductId(
             @PathVariable(value = "productId") Long productId,
             @RequestParam(value ="pageIndex", defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER , required = false) int pageIndex,
             @RequestParam(value = "pageSize", defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE , required = false) int pageSize
             ) {
-        return ResponseEntity.ok(this.feedbackService.getRatingByProductId(productId,pageIndex,pageSize));
+        return ResponseEntity.ok(
+                this.feedbackService.getRatingByProductId(productId,pageIndex,pageSize)
+        );
 
     }
 

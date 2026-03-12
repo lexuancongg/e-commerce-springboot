@@ -23,6 +23,6 @@ public class Feedback extends AuditEntity{
     private String lastName;
 
     private String firstName;
-//    private String customerId;
+    private String customerId;
 
 }

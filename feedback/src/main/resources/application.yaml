@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: feedback
+
+server:
+  port: 8005

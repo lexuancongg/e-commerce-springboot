@@ -1,7 +1,7 @@
 package com.lexuancong.feedback.service.internal;
 
-import com.lexuancong.feedback.config.ServiceUrlConfig;
-import com.lexuancong.feedback.dto.order.CheckUserHasBoughtProductCompletedVm;
+import com.lexuancong.feedback.config.ServiceUrlsProperties;
+import com.lexuancong.feedback.dto.order.UserHasBoughtProductCompletedResponse;
 import com.lexuancong.share.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,13 +12,13 @@ import java.net.URI;
 
 @Service
 @RequiredArgsConstructor
-public class OrderService {
-    private final ServiceUrlConfig serviceUrlConfig;
+public class OrderClient {
+    private final ServiceUrlsProperties serviceUrlsProperties;
     private final RestClient restClient;
-    public CheckUserHasBoughtProductCompletedVm checkUserHasBoughtProductCompleted(Long productId){
+    public UserHasBoughtProductCompletedResponse checkUserHasBoughtProductCompleted(Long productId){
         final String jwt = AuthenticationUtils.extractJwt();
         URI url = UriComponentsBuilder
-                .fromHttpUrl(this.serviceUrlConfig.order())
+                .fromHttpUrl(this.serviceUrlsProperties.order())
                 .path("/customer/order/completed")
                 .queryParam("productId", productId)
                 .build().toUri();
@@ -26,7 +26,7 @@ public class OrderService {
                 .uri(url)
                 .headers(httpHeaders -> httpHeaders.setBearerAuth(jwt))
                 .retrieve()
-                .body(CheckUserHasBoughtProductCompletedVm.class);
+                .body(UserHasBoughtProductCompletedResponse.class);
 
 
     }

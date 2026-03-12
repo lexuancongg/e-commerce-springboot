@@ -3,12 +3,12 @@ package com.lexuancong.feedback.service;
 import com.lexuancong.feedback.constants.Constants;
 import com.lexuancong.feedback.model.Feedback;
 import com.lexuancong.feedback.repostitory.FeedbackRepository;
-import com.lexuancong.feedback.service.internal.CustomerService;
-import com.lexuancong.feedback.service.internal.OrderService;
-import com.lexuancong.feedback.dto.customer.CustomerGetResponse;
-import com.lexuancong.feedback.dto.feedback.FeedbackPagingGetResponse;
+import com.lexuancong.feedback.service.internal.CustomerClient;
+import com.lexuancong.feedback.service.internal.OrderClient;
+import com.lexuancong.feedback.dto.customer.CustomerResponse;
 import com.lexuancong.feedback.dto.feedback.FeedbackCreateRequest;
-import com.lexuancong.feedback.dto.feedback.FeedbackGetResponse;
+import com.lexuancong.feedback.dto.feedback.FeedbackResponse;
+import com.lexuancong.share.dto.paging.PagingResponse;
 import com.lexuancong.share.exception.AccessDeniedException;
 import com.lexuancong.share.exception.IllegalStateException;
 import com.lexuancong.share.exception.NotFoundException;
@@ -28,31 +28,32 @@ import java.util.List;
 @Transactional
 public class FeedbackService {
     private final FeedbackRepository feedbackRepository;
-    private final CustomerService customerService;
-    private final OrderService orderService;
-    public FeedbackGetResponse createFeedback(FeedbackCreateRequest feedBackCreateRequest){
+    private final CustomerClient customerClient;
+    private final OrderClient orderClient;
+    public FeedbackResponse createFeedback(FeedbackCreateRequest feedBackCreateRequest){
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
-        boolean exitedRating = this.feedbackRepository.existsByCreatedByAndProductId(customerId, feedBackCreateRequest.productId());
-        if(exitedRating){
+        Long productId = feedBackCreateRequest.productId();
+        boolean ratingExits = this.feedbackRepository.existsByProductIdAndCustomerId(productId,customerId);
+        if(ratingExits){
             throw new IllegalStateException(Constants.ErrorKey.FEEDBACK_EXITED);
         }
         // check xem người dùng đã mua sản  phẩm này chưa
-        if(!this.checkUserHasBoughtProductCompleted(feedBackCreateRequest.productId())){
+        if(!this.checkUserHasBoughtProductCompleted(productId)){
             throw new AccessDeniedException(Constants.ErrorKey.ACCESS_DENIED);
         }
 
-        CustomerGetResponse customerGetResponse = this.customerService.getCustomerInfo();
-        if(customerGetResponse == null){
+        CustomerResponse customerResponse = this.customerClient.getCustomerInfo();
+        if(customerResponse == null){
             throw new NotFoundException(Constants.ErrorKey.CUSTOMER_NOT_FOUND,customerId);
         }
         Feedback feedback = new Feedback();
         feedback.setProductId(feedBackCreateRequest.productId());
         feedback.setContent(feedBackCreateRequest.content());
         feedback.setStar(feedBackCreateRequest.star());
-        feedback.setLastName(customerGetResponse.lastName());
-        feedback.setFirstName(customerGetResponse.firstName());
-        Feedback savedFeedback = this.feedbackRepository.save(feedback);
-        return FeedbackGetResponse.fromFeedback(savedFeedback);
+        feedback.setLastName(customerResponse.lastName());
+        feedback.setFirstName(customerResponse.firstName());
+        Feedback feedbackSaved = this.feedbackRepository.save(feedback);
+        return FeedbackResponse.fromFeedback(feedbackSaved);
     }
 
     public void deleteFeedback(Long feedbackId){
@@ -68,33 +69,35 @@ public class FeedbackService {
 
     }
 
-        public FeedbackPagingGetResponse getRatingByProductId(Long productId , int pageIndex, int pageSize){
+        public PagingResponse<FeedbackResponse> getRatingByProductId(Long productId , int pageIndex, int pageSize){
             Pageable pageable = PageRequest.of(pageIndex, pageSize , Sort.by("createdAt").descending());
             Page<Feedback> ratingPage = this.feedbackRepository.findAllByProductId(productId, pageable);
             List<Feedback> feedbacks = ratingPage.getContent();
-            List<FeedbackGetResponse> feedbackGetResponses = feedbacks.stream()
-                    .map(FeedbackGetResponse::fromFeedback)
+            List<FeedbackResponse> feedbackPayload = feedbacks.stream()
+                    .map(FeedbackResponse::fromFeedback)
                     .toList();
-            return new FeedbackPagingGetResponse(
-                    feedbackGetResponses, pageIndex,pageSize,
-                    (int) ratingPage.getTotalElements(),
-                    ratingPage.getTotalPages(),
-                    ratingPage.isLast());
+            return PagingResponse.<FeedbackResponse>builder()
+                    .pageSize(pageSize)
+                    .last(ratingPage.isLast())
+                    .pageIndex(pageIndex)
+                    .totalElements(ratingPage.getTotalElements())
+                    .totalPages(ratingPage.getTotalPages())
+                    .payload(feedbackPayload)
+                    .build();
 
         }
 
     private boolean checkUserHasBoughtProductCompleted(Long productId){
-        return  this.orderService.checkUserHasBoughtProductCompleted(productId)
+        return  this.orderClient.checkUserHasBoughtProductCompleted(productId)
                 .hasPurchased();
     }
 
     public Double getAverageStar(Long productId){
         List<Feedback> feedbacks = this.feedbackRepository.findAllByProductId(productId);
-        Double averageStar = feedbacks.stream()
+        return feedbacks.stream()
                 .mapToDouble(Feedback::getStar)
                 .average()
                 .orElse(0.0);
-        return  averageStar;
 
 
     }
