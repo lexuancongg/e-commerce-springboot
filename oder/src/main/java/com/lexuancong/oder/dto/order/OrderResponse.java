@@ -7,51 +7,49 @@ import com.lexuancong.oder.model.enum_status.DeliveryMethod;
 import com.lexuancong.oder.model.enum_status.DeliveryStatus;
 import com.lexuancong.oder.model.enum_status.OrderStatus;
 import com.lexuancong.oder.model.enum_status.PaymentMethod;
-import com.lexuancong.oder.dto.orderitem.OrderItemGetResponse;
-import com.lexuancong.oder.dto.shippingaddress.ShippingAddressGetResponse;
+import com.lexuancong.oder.dto.orderitem.OrderItemResponse;
+import com.lexuancong.oder.dto.shippingaddress.ShippingAddressResponse;
 
 import java.math.BigDecimal;
 import java.util.*;
 
-public record OrderGetResponse(
+public record OrderResponse(
         Long id,
         String email,
-        ShippingAddressGetResponse shippingAddressGetResponse,
+        ShippingAddressResponse shippingAddress,
         String note,
         int numberItem,
         BigDecimal totalPrice,
         OrderStatus oderStatus,
         DeliveryStatus deliveryStatus,
-        List<OrderItemGetResponse> orderItemGetResponses,
+        List<OrderItemResponse> orderItems,
         DeliveryMethod deliveryMethod,
         Long checkoutId,
         PaymentMethod paymentMethod
 ) {
-    public static OrderGetResponse from(Order orderSaved, List<OrderItem> orderItemSet) {
+    public static OrderResponse from(Order orderSaved, List<OrderItem> items) {
         ShippingAddress shippingAddress = orderSaved.getShippingAddress();
-        ShippingAddressGetResponse shippingAddressGetResponse = ShippingAddressGetResponse.fromShippingAddress(shippingAddress);
+        ShippingAddressResponse shippingAddressResponse =
+                ShippingAddressResponse.fromShippingAddress(shippingAddress);
 
-        // tránh lỗi NullPointerException
-        List<OrderItemGetResponse> orderItemGetResponses = Optional.ofNullable(orderItemSet)
-                // map xử lý optional
-                .map(setOrderItem -> {
-                    // map duyệt qua từng ptu
-                    return orderItemSet.stream().map(OrderItemGetResponse::fromOrderItem)
+        List<OrderItemResponse> orderItems = Optional.ofNullable(items)
+                .map(item -> {
+                    return items.stream().map(OrderItemResponse::fromOrderItem)
                             .toList();
                 })
                 .orElse(new ArrayList<>());
 
 
-        return new OrderGetResponse(
+        return new OrderResponse(
                 orderSaved.getId(),
                 orderSaved.getEmail(),
-                shippingAddressGetResponse,
+                shippingAddressResponse,
                 orderSaved.getNote(),
                 orderSaved.getNumberItem(),
                 orderSaved.getTotalPrice(),
                 orderSaved.getOderStatus(),
                 orderSaved.getDeliveryStatus(),
-                orderItemGetResponses,
+                orderItems,
                 orderSaved.getDeliveryMethod(),
                 orderSaved.getCheckoutId(),
                 orderSaved.getPaymentMethod()

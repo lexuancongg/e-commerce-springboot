@@ -2,7 +2,7 @@ package com.lexuancong.oder.dto.product;
 
 import java.math.BigDecimal;
 
-public record ProductCheckoutPreviewGetResponse(
+public record ProductInfoResponse(
         Long id,
         String name,
         BigDecimal price

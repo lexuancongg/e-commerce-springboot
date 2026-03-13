@@ -4,11 +4,11 @@ import com.lexuancong.oder.constants.Constants;
 import com.lexuancong.oder.model.Checkout;
 import com.lexuancong.oder.model.CheckoutItem;
 import com.lexuancong.oder.repository.CheckoutRepository;
-import com.lexuancong.oder.service.internal.ProductService;
+import com.lexuancong.oder.service.internal.ProductClient;
 import com.lexuancong.oder.dto.checkout.CheckoutCreateRequest;
-import com.lexuancong.oder.dto.checkout.CheckoutGetResponse;
+import com.lexuancong.oder.dto.checkout.CheckoutResponse;
 import com.lexuancong.oder.dto.checkoutitem.CheckoutItemCreateRequest;
-import com.lexuancong.oder.dto.product.ProductCheckoutPreviewGetResponse;
+import com.lexuancong.oder.dto.product.ProductInfoResponse;
 import com.lexuancong.share.exception.AccessDeniedException;
 import com.lexuancong.share.exception.NotFoundException;
 import com.lexuancong.share.utils.AuthenticationUtils;
@@ -26,23 +26,26 @@ import java.util.stream.Collectors;
 @Service
 public class CheckoutService {
     private final CheckoutRepository checkoutRepository;
-    private final ProductService productService;
+    private final ProductClient productClient;
 
-    public CheckoutGetResponse createCheckout(CheckoutCreateRequest checkoutCreateRequest){
+    public CheckoutResponse createCheckout(CheckoutCreateRequest checkoutCreateRequest){
         Checkout checkout = checkoutCreateRequest.toCheckout();
         String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
+
         checkout.setCustomerId(customerId);
         List<CheckoutItem> checkoutItems = this.buildCheckoutItems(checkoutCreateRequest,checkout);
+
         checkout.setCheckoutItems(checkoutItems);
+
         BigDecimal total = checkoutItems.parallelStream()
                 .reduce(BigDecimal.ZERO,
                         (acc, item) -> acc.add(item.getPrice()),
-                        BigDecimal::add); // gộp kết quả từ nhiều thread
+                        BigDecimal::add);
         checkout.setTotalPrice(total);
 
         checkout = this.checkoutRepository.save(checkout);
-        CheckoutGetResponse checkoutGetResponse = CheckoutGetResponse.fromCheckout(checkout);
-        return checkoutGetResponse;
+        CheckoutResponse checkoutResponse = CheckoutResponse.fromCheckout(checkout);
+        return checkoutResponse;
     }
 
 
@@ -52,18 +55,19 @@ public class CheckoutService {
                 .map(CheckoutItemCreateRequest::productId)
                 .collect(Collectors.toSet());
 
-        List<ProductCheckoutPreviewGetResponse> productCheckoutPreviewGetResponses =
-                this.productService.getProductInfoPreviewByIds(productIdsCheckoutItems);
-        if(productCheckoutPreviewGetResponses.isEmpty()){
+        List<ProductInfoResponse> productInfos =
+                this.productClient.getProductInfoByIds(productIdsCheckoutItems);
+        if(productInfos.isEmpty()){
             throw  new NotFoundException(Constants.ErrorKey.PRODUCT_NOT_FOUND);
         }
-        Map<Long, ProductCheckoutPreviewGetResponse> productCheckoutPreviewVmMap = productCheckoutPreviewGetResponses.stream()
-                .collect(Collectors.toMap(ProductCheckoutPreviewGetResponse::id,Function.identity()));
+
+        Map<Long, ProductInfoResponse> mapProductInfo = productInfos.stream()
+                .collect(Collectors.toMap(ProductInfoResponse::id,Function.identity()));
 
 
         List<CheckoutItem> checkoutItems = checkoutItemCreateRequests.stream()
                 .map(checkoutItemCreateRequest -> {
-                    ProductCheckoutPreviewGetResponse productInfo = productCheckoutPreviewVmMap.get(checkoutItemCreateRequest.productId());
+                    ProductInfoResponse productInfo = mapProductInfo.get(checkoutItemCreateRequest.productId());
                     if(productInfo == null){
                         throw  new NotFoundException(Constants.ErrorKey.PRODUCT_NOT_FOUND);
                     }
@@ -75,11 +79,11 @@ public class CheckoutService {
 
 
 
-    public CheckoutGetResponse getCheckoutById(Long id){
+    public CheckoutResponse getCheckoutById(Long id){
         Checkout checkout = this.checkoutRepository.findById(id)
                 .orElseThrow(()-> new NotFoundException(Constants.ErrorKey.CHECKOUT_NOT_FOUND));
         this.validateOwnCurrentUser(checkout);
-        return CheckoutGetResponse.fromCheckout(checkout);
+        return CheckoutResponse.fromCheckout(checkout);
 
     }
 
@@ -89,7 +93,8 @@ public class CheckoutService {
         }
     }
     private boolean checkOwnCurrentUser(Checkout checkout){
-        return !checkout.getCustomerId().equals(AuthenticationUtils.extractCustomerIdFromJwt());
+        String customerIdCurrent = AuthenticationUtils.extractCustomerIdFromJwt();
+        return !checkout.getCustomerId().equals(customerIdCurrent);
 
     }
 }

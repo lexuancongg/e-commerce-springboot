@@ -1,10 +1,10 @@
 package com.lexuancong.oder.service.internal;
 
-import com.lexuancong.oder.config.ServiceUrlConfig;
+import com.lexuancong.oder.config.ServiceUrlsProperties;
 import com.lexuancong.oder.model.OrderItem;
-import com.lexuancong.oder.dto.product.ProductCheckoutPreviewGetResponse;
+import com.lexuancong.oder.dto.product.ProductInfoResponse;
 import com.lexuancong.oder.dto.product.ProductSubtractQuantity;
-import com.lexuancong.oder.dto.product.ProductVariantPreviewGetResponse;
+import com.lexuancong.oder.dto.product.ProductVariantInfoResponse;
 import com.lexuancong.share.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
@@ -18,17 +18,17 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ProductService {
-    private final ServiceUrlConfig serviceUrlConfig;
+public class ProductClient {
+    private final ServiceUrlsProperties serviceUrlsProperties;
     private final RestClient restClient;
 
-    public List<ProductVariantPreviewGetResponse> getProductVariantByProductParentId(Long productId) {
+    public List<ProductVariantInfoResponse> getProductVariantByProductParentId(Long productId) {
         return null;
     }
 
-    public List<ProductCheckoutPreviewGetResponse>  getProductInfoPreviewByIds(Collection<Long> productIds) {
+    public List<ProductInfoResponse> getProductInfoByIds(Collection<Long> productIds) {
         String jwt = AuthenticationUtils.extractJwt();
-        URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlConfig.product())
+        URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlsProperties.product())
                 .path("/internal-order/products")
                 .queryParam("ids",productIds)
                 .buildAndExpand()
@@ -38,7 +38,7 @@ public class ProductService {
                 .uri(url)
                 .headers(httpHeaders -> httpHeaders.setBearerAuth(jwt))
                 .retrieve()
-                .toEntity(new ParameterizedTypeReference<List<ProductCheckoutPreviewGetResponse>>() {
+                .toEntity(new ParameterizedTypeReference<List<ProductInfoResponse>>() {
                 })
                 .getBody();
 
@@ -49,7 +49,7 @@ public class ProductService {
         List<ProductSubtractQuantity> productSubtractQuantities = orderItems.stream()
                 .map(ProductSubtractQuantity::fromOrderItem)
                 .toList();
-        URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlConfig.product())
+        URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlsProperties.product())
                 .path("/internal-order/products/subtract-quantity")
                 .buildAndExpand()
                 .toUri();

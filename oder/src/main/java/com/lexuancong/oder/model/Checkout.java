@@ -20,16 +20,14 @@ public class Checkout extends AuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    // sau này gởi toong báo về email
     private String email;
     private  String note;
-
 
     @Builder.Default
     private BigDecimal totalPrice = BigDecimal.ZERO;
 
-
     private String customerId;
+
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private CheckoutStatus checkoutStatus;

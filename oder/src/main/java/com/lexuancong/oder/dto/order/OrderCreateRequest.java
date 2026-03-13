@@ -18,14 +18,14 @@ public record OrderCreateRequest(
         String note,
         int numberItem,
         @NotNull BigDecimal totalPrice,
-        @NotNull List<OrderItemCreateRequest> orderItemCreateRequests,
-        @NotNull ShippingAddressCreateRequest shippingAddressCreateRequest,
+        @NotNull List<OrderItemCreateRequest> items,
+        @NotNull ShippingAddressCreateRequest shippingAddress,
         @NotNull PaymentMethod paymentMethod
 
 
         ) {
     public Order toOrder(){
-        ShippingAddress shippingAddress = this.shippingAddressCreateRequest.toShippingAddress();
+        ShippingAddress shippingAddress = this.shippingAddress.toShippingAddress();
         return Order.builder()
                 .email(email)
                 .note(note)

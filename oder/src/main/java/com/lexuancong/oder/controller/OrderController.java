@@ -4,6 +4,7 @@ import com.lexuancong.oder.constants.Constants;
 import com.lexuancong.oder.model.enum_status.OrderStatus;
 import com.lexuancong.oder.service.OderService;
 import com.lexuancong.oder.dto.order.*;
+import com.lexuancong.share.dto.paging.PagingResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,14 +22,14 @@ public class OrderController {
     }
 
     @PostMapping("/customer/orders")
-    public ResponseEntity<OrderGetResponse> createOrder(@RequestBody @Valid OrderCreateRequest orderCreateRequest) {
+    public ResponseEntity<OrderResponse> createOrder(@RequestBody @Valid OrderCreateRequest orderCreateRequest) {
         return  ResponseEntity.ok(orderService.createOrder(orderCreateRequest));
 
     }
 
     // có thể tận dụng api này cho check ở feedback nhưng mà không tối ưu về performance vì load ht
     @GetMapping("/customer/orders/my-orders")
-    public ResponseEntity<List<OrderGetResponse>> getMyOrders(
+    public ResponseEntity<List<OrderResponse>> getMyOrders(
             @RequestParam(required = false)OrderStatus orderStatus
             ) {
         return ResponseEntity.ok(this.orderService.getMyOrders(orderStatus));
@@ -36,16 +37,15 @@ public class OrderController {
     }
 
 
-    // api đc gọi bởi feedback check xem đã mua sp này chưa => đã check
     @GetMapping({"/internal-feedback/orders/completed"})
-    public ResponseEntity<CheckUserHasBoughtProductCompleted> checkUserHasBoughtProductCompleted(
+    public ResponseEntity<UserPurchasedProductResponse> checkUserHasBoughtProductCompleted(
             @RequestParam Long productId
     ){
         return ResponseEntity.ok(this.orderService.checkUserHasBoughtProductCompleted(productId));
     }
 
     @GetMapping("management/orders")
-    ResponseEntity<OrderPagingGetResponse> getOrders(
+    ResponseEntity<PagingResponse<OrderPreviewResponse>> getOrders(
             @RequestParam(value = "pageIndex" ,required = false, defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER) int pageIndex,
             @RequestParam(value = "pageSize", required = false, defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE) int pageSize
     ){
@@ -56,7 +56,7 @@ public class OrderController {
 
 
     @GetMapping("/management/orders/{id}")
-    public ResponseEntity<OrderGetResponse> getOrderById(@PathVariable Long id){
+    public ResponseEntity<OrderResponse> getOrderById(@PathVariable Long id){
         return ResponseEntity.ok(this.orderService.getOrderById(id));
     }
 

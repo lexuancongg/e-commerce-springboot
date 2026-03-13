@@ -1,6 +1,6 @@
 package com.lexuancong.oder.dto.product;
 
-public record ProductVariantPreviewGetResponse(
+public record ProductVariantInfoResponse(
         Long id ,
         String name,
         String slug

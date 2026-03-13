@@ -5,15 +5,15 @@ import com.lexuancong.oder.model.ShippingAddress;
 import com.lexuancong.oder.model.enum_status.DeliveryMethod;
 import com.lexuancong.oder.model.enum_status.OrderStatus;
 import com.lexuancong.oder.model.enum_status.PaymentStatus;
-import com.lexuancong.oder.dto.shippingaddress.ShippingAddressGetResponse;
+import com.lexuancong.oder.dto.shippingaddress.ShippingAddressResponse;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
-public record OrderPreviewGetResponse(
+public record OrderPreviewResponse(
         Long id,
         String email,
-        ShippingAddressGetResponse shippingAddressGetResponse,
+        ShippingAddressResponse shippingAddress,
         BigDecimal totalPrice,
         OrderStatus orderStatus,
         DeliveryMethod deliveryMethod,
@@ -22,13 +22,13 @@ public record OrderPreviewGetResponse(
 
 
 ) {
-    public static OrderPreviewGetResponse fromOrder(Order order) {
+    public static OrderPreviewResponse fromOrder(Order order) {
         ShippingAddress shippingAddress = order.getShippingAddress();
-        ShippingAddressGetResponse shippingAddressGetResponse = ShippingAddressGetResponse.fromShippingAddress(shippingAddress);
-        return new OrderPreviewGetResponse(
+        ShippingAddressResponse shippingAddressResponse = ShippingAddressResponse.fromShippingAddress(shippingAddress);
+        return new OrderPreviewResponse(
                 order.getId(),
                 order.getEmail(),
-                shippingAddressGetResponse,
+                shippingAddressResponse,
                 order.getTotalPrice(),
                 order.getOderStatus(),
                 order.getDeliveryMethod(),

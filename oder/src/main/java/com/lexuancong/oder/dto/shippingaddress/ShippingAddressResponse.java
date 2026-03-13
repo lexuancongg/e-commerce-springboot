@@ -2,7 +2,7 @@ package com.lexuancong.oder.dto.shippingaddress;
 
 import com.lexuancong.oder.model.ShippingAddress;
 
-public record ShippingAddressGetResponse(
+public record ShippingAddressResponse(
         Long id,
         String customerName,
         String phoneNumber,
@@ -20,8 +20,8 @@ public record ShippingAddressGetResponse(
 
     
     
-    public static ShippingAddressGetResponse fromShippingAddress(ShippingAddress shippingAddress) {
-        return new ShippingAddressGetResponse(
+    public static ShippingAddressResponse fromShippingAddress(ShippingAddress shippingAddress) {
+        return new ShippingAddressResponse(
                 shippingAddress.getId(),
                 shippingAddress.getCustomerName(),
                 shippingAddress.getPhoneNumber(),
