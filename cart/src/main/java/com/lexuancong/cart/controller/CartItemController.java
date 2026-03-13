@@ -44,10 +44,6 @@ public class CartItemController {
     }
 
 
-    @PostMapping("/internal-order/cart-items/remove")
-    public ResponseEntity<List<CartItemResponse>> removeCartItems(@RequestBody @Valid List<CartItemDeleteRequest> cartItemDeleteRequests){
-        return ResponseEntity.ok(this.cartItemService.updateCartItemAfterOrder(cartItemDeleteRequests));
 
-    }
 
 }

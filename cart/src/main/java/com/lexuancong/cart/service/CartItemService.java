@@ -147,53 +147,5 @@ public class CartItemService {
 
 
 
-    public List<CartItemResponse> updateCartItemAfterOrder(List<CartItemDeleteRequest> cartItemDeleteRequests){
-        this.validateDuplicatedProductIdInCartItemDelete(cartItemDeleteRequests);
 
-        List<Long> productIds = cartItemDeleteRequests.stream()
-                .map(CartItemDeleteRequest::productId)
-                .toList();
-
-        String customerId = AuthenticationUtils.extractCustomerIdFromJwt();
-
-        List<CartItem> cartItems = this.cartItemRepository.findByCustomerIdAndProductIdIn(customerId,productIds);
-
-        Map<Long,CartItem> mapCartItemByProductId = cartItems.stream()
-                .collect(Collectors.toMap(CartItem::getProductId, Function.identity()));
-        List<CartItem> cartItemsToDelete = new ArrayList<>();
-        List<CartItem> cartItemsToUpdateQuantity = new ArrayList<>();
-        for (CartItemDeleteRequest cartItemDeleteRequest : cartItemDeleteRequests){
-            Optional<CartItem> optionalCartItem=
-                    Optional.ofNullable(mapCartItemByProductId.get(cartItemDeleteRequest.productId()));
-
-            optionalCartItem.ifPresent(cartItem -> {
-                if(cartItem.getQuantity() <= cartItemDeleteRequest.quantity()){
-                    cartItemsToDelete.add(cartItem);
-                }else{
-                    cartItem.setQuantity(cartItem.getQuantity() - cartItemDeleteRequest.quantity());
-                    cartItemsToUpdateQuantity.add(cartItem);
-                }
-            });
-        }
-
-        this.cartItemRepository.deleteAll(cartItemsToDelete);
-        this.cartItemRepository.saveAll(cartItemsToUpdateQuantity);
-        return cartItemsToUpdateQuantity.stream()
-                .map(CartItemResponse::fromCartItem)
-                .toList();
-
-    }
-
-
-
-    private void  validateDuplicatedProductIdInCartItemDelete(List<CartItemDeleteRequest> requests){
-        Map<Long,Integer> map = new HashMap<>();
-        for (CartItemDeleteRequest req : requests){
-            Integer quantityProduct =  map.putIfAbsent(req.productId(),req.quantity());
-
-            if(!Objects.isNull(quantityProduct) && !quantityProduct.equals(req.quantity())){
-                throw  new BadRequestException(Constants.ErrorKey.DUPLICATED_CART_ITEMS_TO_DELETE);
-            }
-        }
-    }
 }

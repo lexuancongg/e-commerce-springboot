@@ -2,7 +2,7 @@ package com.lexuancong.oder.dto.orderitem;
 
 import com.lexuancong.oder.model.Order;
 import com.lexuancong.oder.model.OrderItem;
-import com.lexuancong.oder.dto.inventory.InventorySubtract;
+import com.lexuancong.oder.dto.inventory.ProductSubtractQuantity;
 
 import java.math.BigDecimal;
 
@@ -24,7 +24,7 @@ public record OrderItemCreateRequest(
     }
 
 
-    public InventorySubtract toInventorySubtract(){
-        return new InventorySubtract(this.productId(), this.quantity);
+    public ProductSubtractQuantity toProductSubtract(){
+        return new ProductSubtractQuantity(this.productId(), this.quantity);
     }
 }

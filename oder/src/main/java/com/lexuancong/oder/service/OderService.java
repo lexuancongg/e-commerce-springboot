@@ -1,5 +1,6 @@
 package com.lexuancong.oder.service;
 
+import com.lexuancong.oder.kafka.message.OrderCreatedMessage;
 import com.lexuancong.oder.model.Order;
 import com.lexuancong.oder.model.OrderItem;
 import com.lexuancong.oder.model.enum_status.OrderStatus;
@@ -10,17 +11,20 @@ import com.lexuancong.oder.service.internal.InventoryService;
 import com.lexuancong.oder.service.internal.ProductClient;
 import com.lexuancong.oder.specification.OrderSpecification;
 import com.lexuancong.oder.constants.Constants;
-import com.lexuancong.oder.dto.inventory.InventorySubtract;
+import com.lexuancong.oder.dto.inventory.ProductSubtractQuantity;
 import com.lexuancong.oder.dto.order.*;
 import com.lexuancong.oder.dto.product.ProductVariantInfoResponse;
 import com.lexuancong.share.dto.paging.PagingResponse;
 import com.lexuancong.share.exception.NotFoundException;
+import com.lexuancong.share.kafka.KafkaEventPublisher;
+import com.lexuancong.share.kafka.KafkaTopics;
 import com.lexuancong.share.utils.AuthenticationUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -28,21 +32,21 @@ import java.util.List;
 
 @Service
 public class OderService {
+    private final KafkaEventPublisher kafkaEventPublisher;
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-    private final CartClient cartClient;
     private final ProductClient productClient;
     private final InventoryService inventoryService;
-    public OderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository, CartClient cartClient, ProductClient productClient, InventoryService inventoryService) {
+    public OderService(KafkaEventPublisher kafkaEventPublisher, OrderRepository orderRepository, OrderItemRepository orderItemRepository, CartClient cartClient, ProductClient productClient, InventoryService inventoryService) {
+        this.kafkaEventPublisher = kafkaEventPublisher;
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
-        this.cartClient = cartClient;
         this.productClient = productClient;
         this.inventoryService = inventoryService;
     }
 
     public OrderResponse createOrder(OrderCreateRequest orderCreateRequest){
-        List<InventorySubtract> inventorySubtracts = new ArrayList<>();
+        List<ProductSubtractQuantity> productSubtractQuantities = new ArrayList<>();
 
         Order order = orderCreateRequest.toOrder();
         String userId = AuthenticationUtils.extractCustomerIdFromJwt();
@@ -52,21 +56,28 @@ public class OderService {
 
         List<OrderItem> orderItems = orderCreateRequest.items().stream()
                 .map(orderItemCreateRequest -> {
-                    inventorySubtracts.add(orderItemCreateRequest.toInventorySubtract());
+                    productSubtractQuantities.add(orderItemCreateRequest.toProductSubtract());
                     return  orderItemCreateRequest.toOrderItem(order);
                 })
                 .toList();
 
         this.orderItemRepository.saveAll(orderItems);
 
-        // dùng kafka để nhanh hơn
-        this.cartClient.deleteCartItems(orderItems);
+
+        OrderCreatedMessage message = OrderCreatedMessage.builder()
+                .customerId(userId)
+                .productSubtract(productSubtractQuantities)
+                .build();
+
+        kafkaEventPublisher.publish(KafkaTopics.ORDER_CREATED, message);
 
         this.productClient.updateQuantityProductAfterOrder(orderItems);
-        this.inventoryService.subtractQuantityProduct(inventorySubtracts);
+        this.inventoryService.subtractQuantityProduct(productSubtractQuantities);
         return  OrderResponse.from(order,orderItems);
 
     }
+
+
 
 
 

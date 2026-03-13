@@ -1,13 +1,13 @@
 package com.lexuancong.oder.service.internal;
 
-import com.lexuancong.oder.dto.inventory.InventorySubtract;
+import com.lexuancong.oder.dto.inventory.ProductSubtractQuantity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class InventoryService {
-    public void subtractQuantityProduct(List<InventorySubtract> inventorySubtracts) {
+    public void subtractQuantityProduct(List<ProductSubtractQuantity> productSubtractQuantities) {
 
     }
 }

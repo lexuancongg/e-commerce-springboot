@@ -26,8 +26,10 @@ public abstract class  AbstractKafkaListenerConfig <K,V>{
 
 
     public abstract ConcurrentKafkaListenerContainerFactory<K,V> listenerContainerFactory();
+
+
     public  ConcurrentKafkaListenerContainerFactory<K,V> kafkaListenerContainerFactory(){
-        ConcurrentKafkaListenerContainerFactory factory = new ConcurrentKafkaListenerContainerFactory();
+        ConcurrentKafkaListenerContainerFactory<K,V> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(this.typeConsumerFactory(keyType, valueType));
         return factory;
     }

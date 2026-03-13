@@ -2,6 +2,9 @@ spring:
   application:
     name: cart
 
+  kafka:
+    bootstrap-servers: "localhost:9092"
+
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/cart
