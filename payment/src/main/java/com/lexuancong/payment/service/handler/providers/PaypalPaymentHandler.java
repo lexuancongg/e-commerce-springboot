@@ -19,12 +19,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class PaypalPaymentHandler extends AbstractPaymentProviderSupport implements ProviderPaymentHandler{
     private final PaypalService paypalService;
-    private final PaymentRepository paymentRepository;
 
-    public PaypalPaymentHandler(final PaymentProviderRepository paymentProviderRepository, PaypalService paypalService, PaymentRepository paymentRepository) {
+    public PaypalPaymentHandler(final PaymentProviderRepository paymentProviderRepository, PaymentRepository paymentRepository, PaypalService paypalService) {
         super(paymentProviderRepository);
         this.paypalService = paypalService;
-        this.paymentRepository = paymentRepository;
     }
     @Override
     public String getNameProvider() {
@@ -54,11 +52,7 @@ public class PaypalPaymentHandler extends AbstractPaymentProviderSupport impleme
                 .paymentId(capturePaymentRequest.paymentId())
                 .build();
         PaypalCaptureResponse captureResponse = this.paypalService.capturePayment(captureRequest);
-        Payment payment =  paymentRepository.findById(captureResponse.paymentId())
-                .orElseThrow(() -> new RuntimeException("Payment not found"));
-        payment.setPaymentStatus(PaymentStatus.valueOf(captureResponse.status()));
-        paymentRepository.save(payment);
-        
+
 
         return   CapturePaymentResponse.builder()
                 .paymentId(captureResponse.paymentId())

@@ -1,11 +1,14 @@
 package com.lexuancong.payment.service;
 
 import com.lexuancong.payment.dto.*;
+import com.lexuancong.payment.kafka.message.PaymentResultMessage;
 import com.lexuancong.payment.model.Payment;
 import com.lexuancong.payment.model.enumeration.PaymentMethod;
 import com.lexuancong.payment.model.enumeration.PaymentStatus;
 import com.lexuancong.payment.repository.PaymentRepository;
 import com.lexuancong.payment.service.handler.providers.ProviderPaymentHandler;
+import com.lexuancong.share.kafka.KafkaEventPublisher;
+import com.lexuancong.share.kafka.KafkaTopics;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +18,7 @@ import java.util.Map;
 
 @Service
 public class PaymentService {
+    private final KafkaEventPublisher kafkaEventPublisher;
     private final Map<String, ProviderPaymentHandler> providers = new HashMap<>();
 
     private final List<ProviderPaymentHandler> providerPaymentHandlers;
@@ -29,7 +33,8 @@ public class PaymentService {
         }
     }
 
-    public PaymentService(List<ProviderPaymentHandler> providerPaymentHandlers, PaymentRepository paymentRepository) {
+    public PaymentService(KafkaEventPublisher kafkaEventPublisher, List<ProviderPaymentHandler> providerPaymentHandlers, PaymentRepository paymentRepository) {
+        this.kafkaEventPublisher = kafkaEventPublisher;
         this.providerPaymentHandlers = providerPaymentHandlers;
         this.paymentRepository = paymentRepository;
     }
@@ -74,6 +79,19 @@ public class PaymentService {
         ProviderPaymentHandler providerPaymentHandler = this.getProviderPaymentHandler(capturePaymentRequest.paymentMethod());
         CapturePaymentResponse capturePaymentResponse =
                 providerPaymentHandler.capturePayment(capturePaymentRequest);
+        Payment payment =  paymentRepository.findById(capturePaymentResponse.paymentId())
+                .orElseThrow(() -> new RuntimeException("Payment not found"));
+        payment.setPaymentStatus(capturePaymentResponse.status());
+        paymentRepository.save(payment);
+
+        // kafka bắn tới order để update
+        PaymentResultMessage paymentResultMessage = PaymentResultMessage.builder()
+                .status(capturePaymentResponse.status())
+                .paymentId(capturePaymentResponse.paymentId())
+                .orderId(capturePaymentRequest.orderId())
+                .build();
+        kafkaEventPublisher.publish(KafkaTopics.PAYMENT_RESULT, paymentResultMessage);
+
         return capturePaymentResponse;
     }
 }
