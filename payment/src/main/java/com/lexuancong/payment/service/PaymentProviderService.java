@@ -2,7 +2,7 @@ package com.lexuancong.payment.service;
 
 import com.lexuancong.payment.model.PaymentProvider;
 import com.lexuancong.payment.repository.PaymentProviderRepository;
-import com.lexuancong.payment.dto.PaymentProviderGetResponse;
+import com.lexuancong.payment.dto.PaymentProviderResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +14,10 @@ public class PaymentProviderService {
     private final PaymentProviderRepository paymentProviderRepository;
 
 
-    public List<PaymentProviderGetResponse> getPaymentProviders(){
+    public List<PaymentProviderResponse> getPaymentProviders(){
         List<PaymentProvider> paymentProviders = paymentProviderRepository.findByEnabledIsTrue();
         return paymentProviders.stream()
-                .map(PaymentProviderGetResponse::fromPaymentProvider)
+                .map(PaymentProviderResponse::fromPaymentProvider)
                 .toList();
 
     }

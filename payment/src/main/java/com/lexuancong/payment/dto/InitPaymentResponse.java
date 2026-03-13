@@ -1,6 +1,8 @@
 package com.lexuancong.payment.dto;
 
 public record InitPaymentResponse(
-        String status, String paymentId, String redirectUrl
+        String status,
+        Long paymentId,
+        String redirectUrl
 ) {
 }

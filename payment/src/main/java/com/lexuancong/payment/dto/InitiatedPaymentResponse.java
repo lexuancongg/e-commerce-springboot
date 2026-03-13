@@ -1,17 +1,18 @@
-package com.lexuancong.payment.model;
+package com.lexuancong.payment.dto;
 
 import lombok.Builder;
 
 import java.time.LocalDateTime;
 @Builder
-public record InitiatedPaymentVm(
-        String redirectUrl,  String transactionId,
-         String orderId,
+public record InitiatedPaymentResponse(
+        String redirectUrl,
+        String transactionId,
+         Long orderId,
          LocalDateTime expiredTime,
          String qrCode,
          String status,
          String provider,
          String signature,
-        String paymentId
+        Long paymentId
 ) {
 }

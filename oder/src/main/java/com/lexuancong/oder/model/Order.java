@@ -49,7 +49,6 @@ public class Order extends AuditEntity{
     private PaymentMethod PaymentMethod;
 
 
-    private Long paymentId;
 
     private Long checkoutId;
 

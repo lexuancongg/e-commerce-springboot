@@ -1,5 +1,7 @@
 package com.lexuancong.paypalpayment.service;
 
+import com.lexuancong.paypalpayment.dto.PaypalCaptureRequest;
+import com.lexuancong.paypalpayment.dto.PaypalCaptureResponse;
 import com.lexuancong.paypalpayment.dto.PaypalCreatePaymentRequest;
 import com.lexuancong.paypalpayment.dto.PaypalCreatePaymentResponse;
 import com.lexuancong.share.exception.NotFoundException;
@@ -21,83 +23,78 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PaypalService {
     private final PayPalHttpClient payPalHttpClient;
+    // cách dùng cũ => tham khảo sau
     private final PaypalServerSdkClient paypalServerSdkClient;
     @Value("${}")
     private  String returnUrl;
     @Value("${}")
     private  String cancelUrl;
 
-    private final String brandName = "lexuancong";
+    private final String brand = "lexuancong";
 
-    private final BigDecimal maxPay = new BigDecimal(100);
+    public PaypalCreatePaymentResponse createPayment(PaypalCreatePaymentRequest request) {
+        PurchaseUnitRequest purchaseUnitRequest = new PurchaseUnitRequest()
+                .amountWithBreakdown(
+                        new AmountWithBreakdown()
+                                .currencyCode("USD")
+                                .value(request.totalPrice().toString())
+                );
 
-    public PaypalCreatePaymentResponse createPayment(PaypalCreatePaymentRequest paypalCreatePaymentRequest) {
-        BigDecimal totalPrice = paypalCreatePaymentRequest.totalPrice();
-        // chia transaction ra nếu viwotj quá maxPay
-        List<BigDecimal> transactions = new ArrayList<>();
-        while (totalPrice.compareTo(BigDecimal.ZERO) > 0) {
-            if(totalPrice.compareTo(maxPay) > 0) {
-                totalPrice = totalPrice.subtract(maxPay);
-                transactions.add(maxPay);
-                continue;
-            }
-            transactions.add(totalPrice);
-            totalPrice = BigDecimal.ZERO;
+        OrderRequest orderRequest = new OrderRequest();
+        orderRequest.checkoutPaymentIntent("CAPTURE");
+        orderRequest.purchaseUnits(List.of(purchaseUnitRequest));
+        ApplicationContext applicationContext = new ApplicationContext()
+                .returnUrl(this.returnUrl)
+                .cancelUrl(this.cancelUrl)
+                .brandName(this.brand)
+                .landingPage("BILLING")
+                .userAction("PAY_NOW")
+                .shippingPreference("NO_SHIPPING");
 
+        orderRequest.applicationContext(applicationContext);
+
+        OrdersCreateRequest ordersCreateRequest = (OrdersCreateRequest) new OrdersCreateRequest()
+                .header("prefer", "return=representation")
+                .requestBody(orderRequest);
+
+        try {
+            HttpResponse<Order> response = this.payPalHttpClient.execute(ordersCreateRequest);
+            Order order = response.result();
+
+            String redirectUrl = order.links().stream()
+                    .filter(link -> "approve".equals(link.rel()))
+                    .findFirst()
+                    .orElseThrow(() -> new NotFoundException("Approve URL not found"))
+                    .href();
+
+            return new PaypalCreatePaymentResponse(HttpStatus.OK.name(), request.orderId(), redirectUrl);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return new PaypalCreatePaymentResponse(HttpStatus.INTERNAL_SERVER_ERROR.name(), request.orderId(), null);
         }
-
-        List<String> redirectUrls = new ArrayList<>();
-
-        for (BigDecimal amount : transactions) {
-            PurchaseUnitRequest purchaseUnitRequest = new PurchaseUnitRequest()
-                    .amountWithBreakdown(
-                            new AmountWithBreakdown()
-                                    .currencyCode("USD")
-                                    .value(amount.toString())
-                    );
-            // đại diện cho data body trong req
-            OrderRequest orderRequest = new OrderRequest();
-            orderRequest.checkoutPaymentIntent("CAPTURE");
-            orderRequest.purchaseUnits(List.of(purchaseUnitRequest));
-            // câu hiình giao diện khi thanh toán treen paypal
-            ApplicationContext applicationContext = new ApplicationContext()
-                    .returnUrl(this.returnUrl)
-                    .cancelUrl(this.cancelUrl)
-                    .brandName(this.brandName)
-                    .landingPage("BILLING")
-                    .userAction("PAY_NOW")
-                    .shippingPreference("NO_SHIPPING");
-
-            orderRequest.applicationContext(applicationContext);
-            OrdersCreateRequest request = (OrdersCreateRequest) new OrdersCreateRequest()
-                    .header("perfer","return=representation")
-                    .requestBody(orderRequest);
-            try {
-                HttpResponse<Order> orderHttpResponse = this.payPalHttpClient.execute(request);
-                Order order = orderHttpResponse.result();
-                String redirectUrl  = order.links().stream()
-                        .filter(link -> "approve".equals(link))
-                        .findFirst()
-                        .orElseThrow(()-> new NotFoundException(""))
-                        .href();
-
-                redirectUrls.add(redirectUrl);
-                return new PaypalCreatePaymentResponse(HttpStatus.OK.name(),paypalCreatePaymentRequest.orderId(),redirectUrl);
-
-            }catch (IOException exception){
-                exception.printStackTrace();
-                return new PaypalCreatePaymentResponse(HttpStatus.INTERNAL_SERVER_ERROR.name(),paypalCreatePaymentRequest.orderId(),null);
-            }
+    }
 
 
+    public PaypalCaptureResponse capturePayment(PaypalCaptureRequest request) {
+        OrdersCaptureRequest ordersCaptureRequest = new OrdersCaptureRequest(request.token());
+        try {
+            HttpResponse<Order> httpResponse = payPalHttpClient.execute(ordersCaptureRequest);
+            Order order = httpResponse.result();
 
+            boolean isSuccess = "COMPLETED".equals(order.status());
 
+            return PaypalCaptureResponse.builder()
+                    .paymentId(request.paymentId())
+                    .status(isSuccess ? "COMPLETED" : "FAILED")
+                    .build();
+
+        } catch (IOException e) {
+            return PaypalCaptureResponse.builder()
+                    .paymentId(request.paymentId())
+                    .status("FAILED")
+                    .build();
         }
-        return new PaypalCreatePaymentResponse(
-                HttpStatus.OK.name(),
-                paypalCreatePaymentRequest.orderId(),
-                String.join(",", redirectUrls)
-        );
 
     }
 

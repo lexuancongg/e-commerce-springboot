@@ -4,5 +4,5 @@ import lombok.Builder;
 
 import java.math.BigDecimal;
 @Builder
-public record PaypalCreatePaymentRequest(BigDecimal totalPrice,String orderId) {
+public record PaypalCreatePaymentRequest(BigDecimal totalPrice,Long orderId) {
 }
