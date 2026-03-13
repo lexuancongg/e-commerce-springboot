@@ -1,7 +1,7 @@
 package com.lexuancong.inventory.service.Internal;
 
-import com.lexuancong.inventory.config.ServiceUrlConfig;
-import com.lexuancong.inventory.dto.product.ProductInfoGetResponse;
+import com.lexuancong.inventory.config.ServiceUrlsProperties;
+import com.lexuancong.inventory.dto.product.ProductInfoResponse;
 import com.lexuancong.share.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
@@ -18,13 +18,13 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ProductService {
+public class ProductClient {
     private final RestClient restClient;
-    private final ServiceUrlConfig serviceUrlConfig;
+    private final ServiceUrlsProperties serviceUrlsProperties;
 
-    public ProductInfoGetResponse getProductById(Long productId){
+    public ProductInfoResponse getProductById(Long productId){
         String jwt  = AuthenticationUtils.extractJwt();
-        URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlConfig.product())
+        URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlsProperties.product())
                 .path("/internal/products/"+ productId)
                 .build()
                 .toUri();
@@ -32,10 +32,10 @@ public class ProductService {
                 .uri(url)
                 .headers(httpHeaders -> httpHeaders.setBearerAuth(jwt))
                 .retrieve()
-                .body(ProductInfoGetResponse.class);
+                .body(ProductInfoResponse.class);
     }
 
-    public List<ProductInfoGetResponse> filterProductInProductIdsByNameOrSku(List<Long> productIds, String name, String sku){
+    public List<ProductInfoResponse> filterProductInProductIdsByNameOrSku(List<Long> productIds, String name, String sku){
         String jwt  = AuthenticationUtils.extractJwt();
         if(productIds.isEmpty()){
             return Collections.emptyList();
@@ -44,7 +44,7 @@ public class ProductService {
         queryParams.add("name",name);
         queryParams.add("sku",sku);
         queryParams.add("productIds",productIds.stream().map(Object::toString).collect(Collectors.joining(",")));
-        URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlConfig.product())
+        URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlsProperties.product())
                 .path("/internal/products/warehouse")
                 .queryParams(queryParams)
                 .build()
@@ -53,7 +53,7 @@ public class ProductService {
                 .uri(url)
                 .headers(httpHeaders -> httpHeaders.setBearerAuth(jwt))
                 .retrieve()
-                .toEntity(new ParameterizedTypeReference<List<ProductInfoGetResponse>>() {
+                .toEntity(new ParameterizedTypeReference<List<ProductInfoResponse>>() {
                 })
                 .getBody();
     }

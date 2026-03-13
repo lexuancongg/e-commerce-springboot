@@ -19,8 +19,6 @@ public class Stock extends AuditEntity{
     private Long productId;
 
     private int quantity;
-
-    // số lượng đang pending để xử lý cho đơn hàng
     private int lockedQuantity;
 
     @ManyToOne

@@ -23,4 +23,5 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
     List<Stock> findByWarehouseIdAndProductIds(@Param("warehouseId") Long warehouseId,
                                                @Param("productIds") Collection<Long> productIds);
 
+    boolean existsByWarehouse_Id(Long warehouseId);
 }

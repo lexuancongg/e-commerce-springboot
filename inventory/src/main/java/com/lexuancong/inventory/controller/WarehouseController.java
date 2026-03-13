@@ -2,9 +2,10 @@ package com.lexuancong.inventory.controller;
 
 import com.lexuancong.inventory.service.WarehouseService;
 import com.lexuancong.inventory.dto.warehouse.WarehouseCreateRequest;
-import com.lexuancong.inventory.dto.warehouse.WarehouseGetResponse;
+import com.lexuancong.inventory.dto.warehouse.WarehouseResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -20,16 +21,12 @@ public class WarehouseController {
 
     // checked
     @PostMapping("/management/warehouses")
-    public ResponseEntity<WarehouseGetResponse> createWarehouse(
+    public ResponseEntity<WarehouseResponse> createWarehouse(
             @RequestBody @Valid WarehouseCreateRequest warehouseCreateRequest,
             UriComponentsBuilder uriComponentsBuilder
     ) {
-        WarehouseGetResponse warehouseGetResponse = this.warehouseService.createWarehouse(warehouseCreateRequest);
-        return ResponseEntity.created(
-                uriComponentsBuilder.replacePath("/warehouses/{id}")
-                        .buildAndExpand(warehouseGetResponse.id())
-                        .toUri()
-        ).body(warehouseGetResponse);
+        WarehouseResponse warehouseResponse = this.warehouseService.createWarehouse(warehouseCreateRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(warehouseResponse);
 
     }
 
@@ -59,7 +56,7 @@ public class WarehouseController {
 
     // checked
     @GetMapping("/management/warehouses")
-    public ResponseEntity<List<WarehouseGetResponse>> getWarehouses() {
+    public ResponseEntity<List<WarehouseResponse>> getWarehouses() {
         return ResponseEntity.ok(this.warehouseService.getWarehouses());
 
     }

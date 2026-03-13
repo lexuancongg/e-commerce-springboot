@@ -6,6 +6,6 @@ public class Constants {
         public static final String STOCK_ALREADY_EXIST = "STOCK_ALREADY_EXIST";
         public static final String WAREHOUSE_NOT_FOUND = "WAREHOUSE_NOT_FOUND";
         public static final String NAME_ALREADY_EXIST = "NAME_ALREADY_EXIST";
-
+        public static final String WAREHOUSE_IS_IN_USE = "WAREHOUSE_IS_IN_USE";
     }
 }

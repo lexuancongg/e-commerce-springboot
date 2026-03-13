@@ -2,14 +2,16 @@ package com.lexuancong.inventory.service;
 
 import com.lexuancong.inventory.constants.Constants;
 import com.lexuancong.inventory.model.Warehouse;
+import com.lexuancong.inventory.repository.StockRepository;
 import com.lexuancong.inventory.repository.WarehouseRepository;
-import com.lexuancong.inventory.service.Internal.AddressService;
+import com.lexuancong.inventory.service.Internal.AddressClient;
 import com.lexuancong.inventory.dto.address.AddressCreateRequest;
-import com.lexuancong.inventory.dto.address.AddressGetResponse;
+import com.lexuancong.inventory.dto.address.AddressResponse;
 import com.lexuancong.inventory.dto.warehouse.WarehouseCreateRequest;
-import com.lexuancong.inventory.dto.warehouse.WarehouseGetResponse;
+import com.lexuancong.inventory.dto.warehouse.WarehouseResponse;
 import com.lexuancong.share.exception.DuplicatedException;
 import com.lexuancong.share.exception.NotFoundException;
+import com.lexuancong.share.exception.ResourceInUseException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,22 +21,25 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WarehouseService {
     private final WarehouseRepository warehouseRepository;
-    private final AddressService   addressService;
+    private final AddressClient addressClient;
+    private final StockRepository stockRepository;
 
     public List<Long> getProductIdsInWarehouse(Long warehouseId) {
         return this.warehouseRepository.getProductIdsInWarehouse(warehouseId);
 
     }
 
-    public WarehouseGetResponse createWarehouse(WarehouseCreateRequest warehouseCreateRequest) {
-        this.validateExitedName(warehouseCreateRequest.name(),null);
+    public WarehouseResponse createWarehouse(WarehouseCreateRequest warehouseCreateRequest) {
+        String wareHouseName = warehouseCreateRequest.name();
+        this.validateExitedName(wareHouseName,null);
         AddressCreateRequest addressCreateRequest = this.buildAddressPostVm(warehouseCreateRequest);
-        AddressGetResponse addressSaved = this.addressService.createAddress(addressCreateRequest);
+        AddressResponse address =
+                this.addressClient.createAddress(addressCreateRequest);
 
         Warehouse warehouse = new Warehouse();
-        warehouse.setName(warehouseCreateRequest.name());
-        warehouse.setAddressId(addressSaved.id());
-        return WarehouseGetResponse.fromWarehouse(this.warehouseRepository.save(warehouse));
+        warehouse.setName(wareHouseName);
+        warehouse.setAddressId(address.id());
+        return WarehouseResponse.fromWarehouse(this.warehouseRepository.save(warehouse));
 
 
     }
@@ -70,7 +75,7 @@ public class WarehouseService {
         this.validateExitedName(warehouseCreateRequest.name(),id);
         warehouse.setName(warehouseCreateRequest.name());
         AddressCreateRequest addressCreateRequest = this.buildAddressPostVm(warehouseCreateRequest);
-        this.addressService.updateAddress(warehouse.getAddressId(), addressCreateRequest);
+        this.addressClient.updateAddress(warehouse.getAddressId(), addressCreateRequest);
         this.warehouseRepository.save(warehouse);
 
     }
@@ -78,13 +83,16 @@ public class WarehouseService {
     public void  deleteWarehouse(Long id){
         Warehouse warehouse = this.warehouseRepository.findById(id)
                 .orElseThrow(()-> new NotFoundException(Constants.ErrorKey.WAREHOUSE_NOT_FOUND,id));
+        if(stockRepository.existsByWarehouse_Id(warehouse.getId())){
+            throw  new ResourceInUseException(Constants.ErrorKey.WAREHOUSE_IS_IN_USE);
+        }
         this.warehouseRepository.delete(warehouse);
-        this.addressService.deleteAddress(warehouse.getAddressId());
+        this.addressClient.deleteAddress(warehouse.getAddressId());
     }
 
-    public List<WarehouseGetResponse> getWarehouses() {
+    public List<WarehouseResponse> getWarehouses() {
         List<Warehouse> warehouses = this.warehouseRepository.findAll();
-        return warehouses.stream().map(WarehouseGetResponse::fromWarehouse).toList();
+        return warehouses.stream().map(WarehouseResponse::fromWarehouse).toList();
 
     }
 }

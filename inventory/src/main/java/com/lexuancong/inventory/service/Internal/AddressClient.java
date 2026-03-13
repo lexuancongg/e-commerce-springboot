@@ -1,8 +1,8 @@
 package com.lexuancong.inventory.service.Internal;
 
-import com.lexuancong.inventory.config.ServiceUrlConfig;
+import com.lexuancong.inventory.config.ServiceUrlsProperties;
 import com.lexuancong.inventory.dto.address.AddressCreateRequest;
-import com.lexuancong.inventory.dto.address.AddressGetResponse;
+import com.lexuancong.inventory.dto.address.AddressResponse;
 import com.lexuancong.share.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,14 +13,14 @@ import java.net.URI;
 
 @Service
 @RequiredArgsConstructor
-public class AddressService {
+public class AddressClient {
     private final RestClient restClient;
-    private final ServiceUrlConfig serviceUrlConfig;
+    private final ServiceUrlsProperties serviceUrlsProperties;
 
 
-    public AddressGetResponse createAddress(AddressCreateRequest addressCreateRequest){
+    public AddressResponse createAddress(AddressCreateRequest addressCreateRequest){
         String jwt = AuthenticationUtils.extractJwt();
-        URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlConfig.address())
+        URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlsProperties.address())
                 .path("/internal-inventory/addresses")
                 .buildAndExpand()
                 .toUri();
@@ -30,14 +30,14 @@ public class AddressService {
                 .headers(httpHeaders -> httpHeaders.setBearerAuth(jwt))
                 .body(addressCreateRequest)
                 .retrieve()
-                .body(AddressGetResponse.class);
+                .body(AddressResponse.class);
 
 
     }
 
     public void updateAddress(Long id, AddressCreateRequest addressCreateRequest){
         String jwt = AuthenticationUtils.extractJwt();
-        URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlConfig.address())
+        URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlsProperties.address())
                 .path("/internal/addresses/{id}")
                 .buildAndExpand(id)
                 .toUri();
@@ -51,7 +51,7 @@ public class AddressService {
 
     public void deleteAddress(Long id){
         String jwt = AuthenticationUtils.extractJwt();
-        URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlConfig.address())
+        URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlsProperties.address())
                 .path("/internal/addresses/{id}")
                 .buildAndExpand(id)
                 .toUri();

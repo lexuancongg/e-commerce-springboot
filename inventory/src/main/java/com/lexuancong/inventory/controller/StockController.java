@@ -1,7 +1,7 @@
 package com.lexuancong.inventory.controller;
 
 import com.lexuancong.inventory.service.StockService;
-import com.lexuancong.inventory.dto.stock.StockGetResponse;
+import com.lexuancong.inventory.dto.stock.StockDetailResponse;
 import com.lexuancong.inventory.dto.stock.StockCreateRequest;
 import com.lexuancong.inventory.dto.stock.StockPutQuantityRequest;
 import jakarta.validation.Valid;
@@ -19,7 +19,6 @@ public class StockController {
     private final StockService stockService;
 
 
-    // checked
     @PostMapping
     public ResponseEntity<Void> addProductIntoWarehouse(@RequestBody @NotEmpty @Valid List<StockCreateRequest> stockCreateRequestList) {
         this.stockService.addProductIntoWarehouse(stockCreateRequestList);
@@ -40,7 +39,7 @@ public class StockController {
     // lấy danh sách để show => checked
 
     @GetMapping
-    public ResponseEntity<List<StockGetResponse>> getStockByWarehouseIdAndProductSkuAndProductName(
+    public ResponseEntity<List<StockDetailResponse>> getStockByWarehouseIdAndProductSkuAndProductName(
             @RequestParam(name = "warehouseId") Long warehouseId,
             @RequestParam(required = false) String productName,
             @RequestParam(required = false) String productSku

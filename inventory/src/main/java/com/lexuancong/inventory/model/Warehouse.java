@@ -3,7 +3,6 @@ package com.lexuancong.inventory.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-// entity kho chứa hàng
 @Entity
 @Table(name = "warehouse")
 @Getter
