@@ -10,8 +10,6 @@ public record CategoryCreateRequest(
        String description,
        Long parentId,
        Long imageId,
-       String metaKeywords,
-       String metaDescription,
        Short displayIndex,
        boolean isPublic
 ) {
@@ -21,8 +19,6 @@ public record CategoryCreateRequest(
                 .slug(slug)
                 .description(description)
                 .displayIndex(displayIndex)
-                .metaKeywords(metaKeywords)
-                .metaDescription(metaDescription)
                 .imageId(imageId)
                 .isPublic(isPublic)
                 .build();

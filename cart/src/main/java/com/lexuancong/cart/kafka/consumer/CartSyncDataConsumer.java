@@ -7,6 +7,7 @@ import com.lexuancong.cart.kafka.message.OrderCreatedMessage;
 import com.lexuancong.cart.model.CartItem;
 import com.lexuancong.cart.repository.CartItemRepository;
 import com.lexuancong.share.exception.BadRequestException;
+import com.lexuancong.share.kafka.KafkaTopics;
 import com.lexuancong.share.utils.AuthenticationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -21,8 +22,8 @@ public class CartSyncDataConsumer {
     private final CartItemRepository cartItemRepository;
 
     @KafkaListener(
-            topics ="order-created",
-            containerFactory = "CartKafkaListenerContainerFactory"
+            topics = KafkaTopics.ORDER_CREATED,
+            containerFactory = "orderCreatedListenerFactory"
     )
     public List<CartItemResponse> updateCartItemAfterOrder(OrderCreatedMessage orderCreatedMessage) {
         List<ProductSubtractQuantity> productSubtractQuantities =orderCreatedMessage.productSubtract();

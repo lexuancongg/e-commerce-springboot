@@ -4,8 +4,8 @@ import com.lexuancong.product.constant.Constants;
 import com.lexuancong.product.model.*;
 import com.lexuancong.product.model.attribute.ProductAttributeGroup;
 import com.lexuancong.product.repository.*;
-import com.lexuancong.product.service.internal.ImageService;
-import com.lexuancong.product.dto.image.ImagePreviewGetResponse;
+import com.lexuancong.product.service.internal.ImageClient;
+import com.lexuancong.product.dto.image.ImagePreviewResponse;
 import com.lexuancong.product.dto.product.*;
 import com.lexuancong.product.dto.product.databinding.BaseProductPropertiesRequire;
 import com.lexuancong.product.dto.product.producforwarehouse.ProductInfoGetResponse;
@@ -41,7 +41,7 @@ public class ProductService {
     private final ProductOptionRepository productOptionRepository;
     private final ProductOptionValueRepository productOptionValueRepository;
     private final SpecificProductVariantRepository specificProductVariantRepository;
-    private final ImageService imageService;
+    private final ImageClient imageClient;
 
     public ProductSummaryGetResponse createProduct(ProductCreateRequest productCreateRequest) {
 
@@ -611,7 +611,7 @@ public class ProductService {
         List<Product> productsContent = productPage.getContent();
         List<ProductPreviewGetResponse> productPreviewPayload = productsContent.stream()
                 .map(product -> {
-                    String avatarUrl = this.imageService.getImageById(product.getAvatarImageId()).url();
+                    String avatarUrl = this.imageClient.getImageById(product.getAvatarImageId()).url();
                     return new ProductPreviewGetResponse(product.getId(), product.getName(), product.getSlug(), product.getPrice(), avatarUrl);
                 }).toList();
 
@@ -629,12 +629,12 @@ public class ProductService {
     public ProductDetailGetResponse getProductDetailBySlug(String slug) {
         Product product = this.productRepository.findBySlugAndPublicIsTrue(slug)
                 .orElseThrow(() -> new NotFoundException(Constants.ErrorKey.PRODUCT_NOT_FOUND, slug));
-        String avatarUrl = this.imageService.getImageById(product.getAvatarImageId())
+        String avatarUrl = this.imageClient.getImageById(product.getAvatarImageId())
                 .url();
         List<Long> imageIds = product.getProductImages().stream().map(ProductImage::getImageId)
                 .toList();
-        List<String> productImageUrls = this.imageService.getImageByIds(imageIds)
-                .stream().map(ImagePreviewGetResponse::url)
+        List<String> productImageUrls = this.imageClient.getImageByIds(imageIds)
+                .stream().map(ImagePreviewResponse::url)
                 .toList();
 
         List<ProductAttributeValue> productAttributeValues = product.getProductAttributeValues();
@@ -719,7 +719,7 @@ public class ProductService {
 
         List<ProductPreviewGetResponse> productPreviewGetResponses = productContents.stream()
                 .map(product -> {
-                    String avatarUrl = this.imageService.getImageById(product.getAvatarImageId()).url();
+                    String avatarUrl = this.imageClient.getImageById(product.getAvatarImageId()).url();
                     return new ProductPreviewGetResponse(
                             product.getId(), product.getName(), product.getSlug(), product.getPrice(), avatarUrl
                     );
@@ -745,7 +745,7 @@ public class ProductService {
                 .map(product -> {
                     return new ProductPreviewGetResponse(
                             product.getId(), product.getName(), product.getSlug(), product.getPrice(),
-                            imageService.getImageById(product.getAvatarImageId()).url()
+                            imageClient.getImageById(product.getAvatarImageId()).url()
                     );
                 })
                 .toList();
@@ -755,12 +755,12 @@ public class ProductService {
     public List<ProductPreviewGetResponse> getProductsByIds(List<Long> ids) {
         List<Product> products = this.productRepository.findAllByIdIn(ids);
         return products.stream().map(product -> {
-            String avatarUrl = this.imageService.getImageById(product.getAvatarImageId()).url();
+            String avatarUrl = this.imageClient.getImageById(product.getAvatarImageId()).url();
             // nếu avataurl = null mà không có parent nữa thì trả về null luôn
             if (StringUtils.isEmpty(avatarUrl) && Objects.nonNull(product.getParent())) {
                 Optional<Product> parentProduct = this.productRepository.findById(product.getParent().getId());
                 avatarUrl = parentProduct.map(item ->
-                                this.imageService.getImageById(item.getAvatarImageId()).url())
+                                this.imageClient.getImageById(item.getAvatarImageId()).url())
                         .orElse("");
 
             }
@@ -785,7 +785,7 @@ public class ProductService {
         List<Product> products = productPage.getContent();
         List<ProductPreviewGetResponse> contentPayload = products.stream()
                 .map(product -> {
-                    String avatarUrl = this.imageService.getImageById(product.getAvatarImageId()).url();
+                    String avatarUrl = this.imageClient.getImageById(product.getAvatarImageId()).url();
                     return new ProductPreviewGetResponse(
                             product.getId(),
                             product.getName(),
@@ -829,10 +829,10 @@ public class ProductService {
                                 );
                         String avatarUrl = null;
                         if (variant.getAvatarImageId() != null) {
-                            avatarUrl = this.imageService.getImageById(variant.getAvatarImageId()).url();
+                            avatarUrl = this.imageClient.getImageById(variant.getAvatarImageId()).url();
                         }
                         List<Long> imageIds = variant.getProductImages().stream().map(ProductImage::getId).toList();
-                        List<ImagePreviewGetResponse> productImages = this.imageService.getImageByIds(imageIds);
+                        List<ImagePreviewResponse> productImages = this.imageClient.getImageByIds(imageIds);
                         return new ProductVariantGetResponse(
                                 variant.getId(),
                                 variant.getName(),

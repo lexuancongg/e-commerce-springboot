@@ -3,67 +3,81 @@ package com.lexuancong.product.service;
 import com.lexuancong.product.constant.Constants;
 import com.lexuancong.product.model.Category;
 import com.lexuancong.product.repository.CategoryRepository;
-import com.lexuancong.product.service.internal.ImageService;
+import com.lexuancong.product.service.internal.ImageClient;
 import com.lexuancong.product.dto.category.CategoryCreateRequest;
-import com.lexuancong.product.dto.category.CategoryGetResponse;
-import com.lexuancong.product.dto.image.ImagePreviewGetResponse;
+import com.lexuancong.product.dto.category.CategoryResponse;
+import com.lexuancong.product.dto.image.ImagePreviewResponse;
 import com.lexuancong.share.exception.BadRequestException;
 import com.lexuancong.share.exception.DuplicatedException;
 import com.lexuancong.share.exception.NotFoundException;
+import com.lexuancong.share.exception.ResourceInUseException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryService {
     private final CategoryRepository categoryRepository;
-    private final ImageService imageService;
+    private final ImageClient imageClient;
 
-    public CategoryService(CategoryRepository categoryRepository, ImageService imageService) {
+    public CategoryService(CategoryRepository categoryRepository, ImageClient imageClient) {
         this.categoryRepository = categoryRepository;
-        this.imageService = imageService;
+        this.imageClient = imageClient;
     }
 
-    public List<CategoryGetResponse> getCategories(String categoryName) {
-        List<CategoryGetResponse> categoryGetResponses = new ArrayList<>();
+    public List<CategoryResponse> getCategories(String categoryName) {
+        List<CategoryResponse> categoryResponses = new ArrayList<>();
         List<Category> categories = categoryRepository.findByNameContainingIgnoreCase(categoryName);
-        categories.forEach(category -> {
-            ImagePreviewGetResponse image = null;
-            if (category.getImageId() != null) {
-                image = new ImagePreviewGetResponse(category.getImageId(), imageService.getImageById(category.getImageId()).url());
-            }
-            CategoryGetResponse categoryGetResponse = CategoryGetResponse.builder()
+        List<Long> imageCategoryIds = categories.stream()
+                        .map(Category::getImageId)
+                                .filter(Objects::nonNull)
+                                        .toList();
+        List<ImagePreviewResponse> images = imageClient.getImageByIds(imageCategoryIds);
+        Map<Long,String> mapImage = images.stream()
+                .collect(Collectors.toMap(
+                        image -> image.id(),
+                        ImagePreviewResponse::url
+                ));
+        for (Category category : categories) {
+            String url = mapImage.getOrDefault(category.getImageId(),"");
+            CategoryResponse cate = CategoryResponse.builder()
                     .id(category.getId())
                     .name(category.getName())
+                    .avatarUrl(url)
                     .slug(category.getSlug())
-                    .avatarUrl(image != null ? image.url() : "")
                     .build();
-            categoryGetResponses.add(categoryGetResponse);
-        });
-        return categoryGetResponses;
+            categoryResponses.add(cate);
+        }
+        return categoryResponses;
 
     }
 
-    public CategoryGetResponse createCategory(CategoryCreateRequest categoryCreateRequest) {
+
+    public CategoryResponse createCategory(CategoryCreateRequest categoryCreateRequest) {
         this.validateDuplicateName(categoryCreateRequest.name(), null);
+        Long parentId = categoryCreateRequest.parentId();
+
         Category category = categoryCreateRequest.toCategory();
-        if (categoryCreateRequest.parentId() != null) {
+        if (parentId != null) {
             Category parent = categoryRepository.findById(categoryCreateRequest.parentId())
                     .orElseThrow(() -> new BadRequestException(Constants.ErrorKey.PARENT_CATEGORY_NOT_FOUND, categoryCreateRequest.parentId()));
             category.setParent(parent);
         }
-        return CategoryGetResponse.fromCategory(categoryRepository.saveAndFlush(category));
+        return CategoryResponse.fromCategory(categoryRepository.save(category));
 
     }
 
     private void validateDuplicateName(String name, Long id) {
-        if (this.checkIsExistName(name, id)) {
+        if (this.checkExistName(name, id)) {
             throw new DuplicatedException(Constants.ErrorKey.NAME_ALREADY_EXITED, name);
         }
     }
 
-    private boolean checkIsExistName(String name, Long id) {
+    private boolean checkExistName(String name, Long id) {
         return categoryRepository.findByNameAndIdNot(name, id) != null;
     }
 
@@ -84,6 +98,7 @@ public class CategoryService {
 
         category.setPublic(categoryCreateRequest.isPublic());
         category.setImageId(categoryCreateRequest.imageId());
+
         if (categoryCreateRequest.parentId() != null) {
             Category parent = categoryRepository.findById(categoryCreateRequest.parentId())
                     .orElseThrow(() -> new NotFoundException(Constants.ErrorKey.PARENT_CATEGORY_NOT_FOUND, categoryCreateRequest.parentId()));
@@ -113,10 +128,10 @@ public class CategoryService {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(Constants.ErrorKey.CATEGORY_NOT_FOUND, id));
         if(!category.getChild().isEmpty()){
-            throw new BadRequestException(Constants.ErrorKey.CATEGORY_CONTAIN_CHILDREN);
+            throw new ResourceInUseException(Constants.ErrorKey.CATEGORY_CONTAIN_CHILDREN);
         }
         if(!category.getProductCategories().isEmpty()){
-            throw new BadRequestException(Constants.ErrorKey.CATEGORY_CONTAIN_PRODUCTS);
+            throw new ResourceInUseException(Constants.ErrorKey.CATEGORY_CONTAIN_PRODUCTS);
         }
 
         categoryRepository.deleteById(id);

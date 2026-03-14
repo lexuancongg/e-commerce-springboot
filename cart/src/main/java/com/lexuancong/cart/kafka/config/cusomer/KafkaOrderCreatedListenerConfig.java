@@ -9,13 +9,13 @@ import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 @EnableKafka
 @Configuration
-public class KafkaCartListenerConfig extends AbstractKafkaListenerConfig<String, OrderCreatedMessage> {
-    public KafkaCartListenerConfig(KafkaProperties kafkaProperties) {
+public class KafkaOrderCreatedListenerConfig extends AbstractKafkaListenerConfig<String, OrderCreatedMessage> {
+    public KafkaOrderCreatedListenerConfig(KafkaProperties kafkaProperties) {
         super(String.class, OrderCreatedMessage.class, kafkaProperties);
     }
 
 
-    @Bean(name = "CartKafkaListenerContainerFactory")
+    @Bean(name = "orderCreatedListenerFactory")
     @Override
     public ConcurrentKafkaListenerContainerFactory<String,OrderCreatedMessage> listenerContainerFactory() {
         return super.kafkaListenerContainerFactory();

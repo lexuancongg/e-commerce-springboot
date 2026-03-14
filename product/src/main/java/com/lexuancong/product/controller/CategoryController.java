@@ -2,7 +2,7 @@ package com.lexuancong.product.controller;
 
 import com.lexuancong.product.service.CategoryService;
 import com.lexuancong.product.dto.category.CategoryCreateRequest;
-import com.lexuancong.product.dto.category.CategoryGetResponse;
+import com.lexuancong.product.dto.category.CategoryResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,29 +18,26 @@ public class CategoryController {
     }
 
 
-    // CHECKED
     @GetMapping({"/management/categories","/customer/categories"})
-    public ResponseEntity<List<CategoryGetResponse>> getCategories(
+    public ResponseEntity<List<CategoryResponse>> getCategories(
             @RequestParam(required = false , defaultValue = "") String categoryName
     ) {
-        List<CategoryGetResponse> categoryGetResponses = categoryService.getCategories(categoryName);
-        return new ResponseEntity<>(categoryGetResponses, HttpStatus.OK);
+        List<CategoryResponse> categories = categoryService.getCategories(categoryName);
+        return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 
-    // đã check
     @PostMapping("/management/categories")
-    public ResponseEntity<CategoryGetResponse> createCategory(
+    public ResponseEntity<CategoryResponse> createCategory(
             @RequestBody @Valid CategoryCreateRequest categoryCreateRequest,
             UriComponentsBuilder uriComponentsBuilder
             ){
-        CategoryGetResponse categorySaved = categoryService.createCategory(categoryCreateRequest);
+        CategoryResponse categorySaved = categoryService.createCategory(categoryCreateRequest);
         return ResponseEntity.created(uriComponentsBuilder.replacePath("/categories/{id}")
                 .buildAndExpand(categorySaved.id())
                 .toUri()
         ).body(categorySaved);
     }
 
-    // đã check
     @PutMapping("/management/categories/{id}")
     public ResponseEntity<Void> updateCategory(@PathVariable Long id,
                                                @RequestBody @Valid CategoryCreateRequest categoryCreateRequest
@@ -50,7 +47,6 @@ public class CategoryController {
     }
 
 
-    // đã check
     @DeleteMapping("/management/categories/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);

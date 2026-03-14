@@ -1,6 +1,6 @@
 package com.lexuancong.product.dto.product.variants;
 
-import com.lexuancong.product.dto.image.ImagePreviewGetResponse;
+import com.lexuancong.product.dto.image.ImagePreviewResponse;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -13,7 +13,7 @@ public record ProductVariantGetResponse(
         String sku,
         BigDecimal price,
         String avatarUrl,
-        List<ImagePreviewGetResponse>  productImages,
+        List<ImagePreviewResponse>  productImages,
         Map<Long,String> optionValues
 
 ) {

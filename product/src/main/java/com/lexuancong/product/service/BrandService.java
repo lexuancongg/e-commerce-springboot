@@ -4,10 +4,11 @@ import com.lexuancong.product.constant.Constants;
 import com.lexuancong.product.model.Brand;
 import com.lexuancong.product.repository.BrandRepository;
 import com.lexuancong.product.dto.brand.BrandCreateRequest;
-import com.lexuancong.product.dto.brand.BrandGetResponse;
+import com.lexuancong.product.dto.brand.BrandResponse;
 import com.lexuancong.share.exception.BadRequestException;
 import com.lexuancong.share.exception.DuplicatedException;
 import com.lexuancong.share.exception.NotFoundException;
+import com.lexuancong.share.exception.ResourceInUseException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,16 +20,16 @@ public class BrandService {
         this.brandRepository = brandRepository;
     }
 
-    public List<BrandGetResponse> getBrands(String brandName){
+    public List<BrandResponse> getBrands(String brandName){
         return brandRepository.findByNameContainingIgnoreCase(brandName)
                 .stream()
-                .map(BrandGetResponse::fromBrand)
+                .map(BrandResponse::fromBrand)
                 .toList();
     }
 
-    public BrandGetResponse createBrand(BrandCreateRequest brandCreateRequest) {
+    public BrandResponse createBrand(BrandCreateRequest brandCreateRequest) {
         this.validateDuplicateName(brandCreateRequest.name(),null);
-        return BrandGetResponse.fromBrand(brandRepository.save(brandCreateRequest.toBrand()));
+        return BrandResponse.fromBrand(brandRepository.save(brandCreateRequest.toBrand()));
     }
     private void validateDuplicateName(String brandName,Long id) {
         if(this.checkIsExitsName(brandName,id)){
@@ -37,13 +38,12 @@ public class BrandService {
 
     }
     private boolean checkIsExitsName(String  brandName,Long id) {
-        return brandRepository.findExistedName(brandName, id)!=null;
+        return brandRepository.checkExistName(brandName, id)!=null;
     }
 
     public void updateBrand(Long id, BrandCreateRequest brandCreateRequest){
         this.validateDuplicateName(brandCreateRequest.name(),id);
         Brand brand = brandRepository.findById(id)
-                // throw exception
                 .orElseThrow(()->new NotFoundException(Constants.ErrorKey.BRAND_NOT_FOUND,id));
         brand.setName(brandCreateRequest.name());
         brand.setSlug(brandCreateRequest.slug());
@@ -54,10 +54,9 @@ public class BrandService {
 
     public void deleteBrand(Long id){
         Brand brand = brandRepository.findById(id)
-                // throw exception
                 .orElseThrow(()->new NotFoundException(Constants.ErrorKey.BRAND_NOT_FOUND,id));
         if(!brand.getProducts().isEmpty()){
-            throw new BadRequestException(Constants.ErrorKey.BRAND_HAS_PRODUCTS,brand.getName());
+            throw new ResourceInUseException(Constants.ErrorKey.BRAND_HAS_PRODUCTS,brand.getName());
         }
         brandRepository.deleteById(id);
     }

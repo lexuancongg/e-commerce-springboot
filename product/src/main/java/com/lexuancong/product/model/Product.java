@@ -22,39 +22,25 @@ public class Product extends AuditEntity{
     private String name;
     private String description;
     private String shortDescription;
-    // thông số kỹ thuật
-    private String specifications;
-    // mã quản lý kho
     private String sku;
-    // slug để hiển thị trên url
     private String slug;
-
     private BigDecimal price;
-    // cs biến thể hay không
     private boolean hasOptions;
-    // cho phép oder hay không
     private boolean isOrderEnable;
-    // hiển thị hay không
     private boolean isPublic;
     private boolean isFeature;
-    // xác định cho các biến thể , chỉ có sp chính hiển thị đôc lập trên web
     private boolean isShownSeparately;
-    // xacs định có theo dõi số lượng tồn không để kiểm tra trong quá trình đặt hàng
     private boolean isInventoryTracked;
-    // số luownjng tồn kho
+
     private Long inventoryQuantity;
 
-
-    // hình id hình ảnh đại diện
     private Long avatarImageId;
 
-    // thuoojc tính để xác định phí vận chuyển cho sau này
     private Double length;
     private Double width;
     private Double height;
     private Double weight;
 
-    // các thuộc tính khác
 
     @ManyToOne
     @JoinColumn(name = "brand_id")

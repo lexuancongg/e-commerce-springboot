@@ -13,7 +13,7 @@ public interface BrandRepository extends JpaRepository<Brand, Long> {
             "from  Brand  brand" +
             " where brand.name =?1 and (?2 is null or ?2 != brand.id) ")
 //     cs thể dùng findByNameAndIdNot
-    Brand findExistedName(String name,Long id);
+    Brand checkExistName(String name, Long id);
 
 
 }

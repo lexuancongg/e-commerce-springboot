@@ -1,7 +1,7 @@
 package com.lexuancong.product.service.internal;
 
-import com.lexuancong.product.config.ServiceUrlConfig;
-import com.lexuancong.product.dto.image.ImagePreviewGetResponse;
+import com.lexuancong.product.config.ServiceUrlsProperties;
+import com.lexuancong.product.dto.image.ImagePreviewResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -14,37 +14,37 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ImageService {
+public class ImageClient {
     private final RestClient restClient;
-    private final ServiceUrlConfig serviceUrlConfig;
-    public ImagePreviewGetResponse getImageById (Long id){
+    private final ServiceUrlsProperties serviceUrlsProperties;
+    public ImagePreviewResponse getImageById (Long id){
         if(id== null){
-            return  new ImagePreviewGetResponse(null,"");
+            return  new ImagePreviewResponse(null,"");
         }
-        URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlConfig.image())
+        URI url = UriComponentsBuilder.fromHttpUrl(this.serviceUrlsProperties.image())
                 .path("/images/{id}").buildAndExpand(id)
                 .toUri();
         return this.restClient.get()
                 .uri(url)
                 .retrieve()
-                .body(ImagePreviewGetResponse.class);
+                .body(ImagePreviewResponse.class);
 
 
 
     }
 
-    public List<ImagePreviewGetResponse> getImageByIds (List<Long> ids){
+    public List<ImagePreviewResponse> getImageByIds (List<Long> ids){
         if(ids.isEmpty()){
             return Collections.emptyList();
         }
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(this.serviceUrlConfig.image())
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(this.serviceUrlsProperties.image())
                 .path("/images")
                 .queryParam("ids", ids);
         URI uri = builder.build().toUri();
         return  this.restClient.get()
                 .uri(uri)
                 .retrieve()
-                .body(new ParameterizedTypeReference<List<ImagePreviewGetResponse>>(){});
+                .body(new ParameterizedTypeReference<List<ImagePreviewResponse>>(){});
 
     }
 }

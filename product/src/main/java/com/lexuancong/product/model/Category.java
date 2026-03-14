@@ -27,10 +27,6 @@ public class Category extends AuditEntity {
 
     private Short displayIndex;
 
-    private String metaKeywords;
-
-    private String metaDescription;
-
     @ManyToOne()
     @JoinColumn(name = "parent_id")
     private Category parent;
