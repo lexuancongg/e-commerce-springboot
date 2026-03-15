@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-public record ProductVariantGetResponse(
+public record ProductVariantResponse(
         Long id,
         String name,
         String slug,

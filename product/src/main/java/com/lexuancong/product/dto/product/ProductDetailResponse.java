@@ -1,19 +1,18 @@
 package com.lexuancong.product.dto.product;
 
-import com.lexuancong.product.dto.productattribute.AttributeGroupValueGetResponse;
+import com.lexuancong.product.dto.productattribute.AttributeGroupValueResponse;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-public record ProductDetailGetResponse(
+public record ProductDetailResponse(
         Long id,
         String name,
         String brandName,
         List<String> categories,
-        List<AttributeGroupValueGetResponse> attributeGroupValues,
+        List<AttributeGroupValueResponse> attributeGroupValues,
         String shortDescription,
         String description,
-        String specifications,
         BigDecimal price,
         boolean hasOptions,
         String avatarUrl,

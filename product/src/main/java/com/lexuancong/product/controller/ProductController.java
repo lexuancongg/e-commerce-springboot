@@ -4,7 +4,8 @@ import com.lexuancong.product.service.ProductService;
 import com.lexuancong.product.constant.Constants;
 import com.lexuancong.product.dto.product.*;
 import com.lexuancong.product.dto.product.producforwarehouse.ProductInfoGetResponse;
-import com.lexuancong.product.dto.product.variants.ProductVariantGetResponse;
+import com.lexuancong.product.dto.product.variants.ProductVariantResponse;
+import com.lexuancong.share.dto.paging.PagingResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,9 +37,8 @@ public class ProductController {
 
     }
 
-    // ds nổi bật => CHECKED
     @GetMapping("/customer/products/featured")
-    public ResponseEntity<ProductPreviewPagingGetResponse> getFeaturedProductsPaging(
+    public ResponseEntity<PagingResponse<ProductPreviewResponse>> getFeaturedProductsPaging(
             @RequestParam(value = "pageIndex", defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER) int pageIndex,
             @RequestParam(value = "pageSize",defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE) int pageSize
     ) {
@@ -46,14 +46,12 @@ public class ProductController {
     }
 
 
-    // xem chi tiết sp => đã check
     @GetMapping("/customer/products/{slug}")
-    public ResponseEntity<ProductDetailGetResponse> getProductDetail(@PathVariable("slug") String slug) {
+    public ResponseEntity<ProductDetailResponse> getProductDetail(@PathVariable("slug") String slug) {
         return ResponseEntity.ok(this.productService.getProductDetailBySlug(slug));
 
     }
 
-    // xóa sp => đã check
     @DeleteMapping("/management/products/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable("id") Long id) {
         this.productService.deleteProduct(id);
@@ -65,28 +63,20 @@ public class ProductController {
 
 
 
-    // lấy ra ds sp trong category dựa vào slug => đã check
     @GetMapping({"/customer/category/{categorySlug}/products"})
-    public ResponseEntity<ProductPagingGetResponse> getProductsFromCategoryPaging(
+    public ResponseEntity<PagingResponse<ProductPreviewResponse>> getProductsByCategoryPaging(
             @RequestParam(value = "pageIndex",defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER,required = false) int pageIndex,
             @RequestParam(value = "pageSize",defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE,required = false) int pageSize,
             @PathVariable String categorySlug
     ){
-        return ResponseEntity.ok(this.productService.getProductsByCategorySlug(pageIndex,pageSize,categorySlug));
+        return ResponseEntity.ok(
+                this.productService.getProductsByCategorySlug(pageIndex,pageSize,categorySlug));
     }
 
 
-    //  lấy ngaaux nhiên sp làm slide => đã check
-    @GetMapping({"/customer/products/featured/slide"})
-    public ResponseEntity<List<ProductPreviewGetResponse>> getProductFeaturedMakeSlide(){
-        List<ProductPreviewGetResponse> productPreviewGetResponses =  productService.getProductFeaturedMakeSlide();
-        return new ResponseEntity<>(productPreviewGetResponses, HttpStatus.OK);
-    }
 
-
-    // đã check
     @GetMapping({"/customer/products","/internal-order/products"})
-    public ResponseEntity<List<ProductPreviewGetResponse>> getProductsByIds (
+    public ResponseEntity<List<ProductPreviewResponse>> getProductsByIds (
             @RequestParam("productIds") List<Long> productIds
     ){
         return ResponseEntity.ok(this.productService.getProductsByIds(productIds));
@@ -95,33 +85,31 @@ public class ProductController {
 
 
 
-    @GetMapping("/customer/products")
-    public ResponseEntity<ProductPagingGetResponse> getProductByMultiParams(
-            @RequestParam(value = "pageIndex" ,required = false , defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE) int pageIndex,
-            @RequestParam(value = "pageSize", defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
-            @RequestParam(value = "productName", defaultValue = "", required = false) String productName,
-            @RequestParam(value = "categorySlug", defaultValue = "", required = false) String categorySlug,
-            @RequestParam(value = "startPrice", defaultValue = "", required = false) Double startPrice,
-            @RequestParam(value = "endPrice", defaultValue = "", required = false) Double endPrice
-    ){
-        return ResponseEntity.ok(
-                this.productService.getProductByMultiParams(pageIndex,pageSize,productName,categorySlug,startPrice,endPrice)
-                );
-
-    }
-
-
+//    @GetMapping("/customer/products")
+//    public ResponseEntity<ProductPagingGetResponse> getProductByMultiParams(
+//            @RequestParam(value = "pageIndex" ,required = false , defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE) int pageIndex,
+//            @RequestParam(value = "pageSize", defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+//            @RequestParam(value = "productName", defaultValue = "", required = false) String productName,
+//            @RequestParam(value = "categorySlug", defaultValue = "", required = false) String categorySlug,
+//            @RequestParam(value = "startPrice", defaultValue = "", required = false) Double startPrice,
+//            @RequestParam(value = "endPrice", defaultValue = "", required = false) Double endPrice
+//    ){
+//        return ResponseEntity.ok(
+//                this.productService.getProductByMultiParams(pageIndex,pageSize,productName,categorySlug,startPrice,endPrice)
+//                );
+//
+//    }
 
 
-    // lay ds bien the => đã check
+
+
     @GetMapping("/customer/product-variations/{parentId}")
-    public ResponseEntity<List<ProductVariantGetResponse>> getProductVariationsByParentId(@PathVariable Long parentId) {
+    public ResponseEntity<List<ProductVariantResponse>> getProductVariationsByParentId(@PathVariable Long parentId) {
         return new ResponseEntity<>(this.productService.getProductVariationsByParentId(parentId),HttpStatus.OK);
     }
 
 
 
-    // checked
     @GetMapping("/internal-inventory/products/warehouse")
     public ResponseEntity<List<ProductInfoGetResponse>> filterProductInProductIdsByNameOrSku(
             @RequestParam(name = "name" , required = false) String name,
