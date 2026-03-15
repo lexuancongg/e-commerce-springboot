@@ -4,9 +4,9 @@ import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.lexuancong.search.constant.ProductField;
 import com.lexuancong.search.model.Product;
-import com.lexuancong.search.dto.ProductPagingGetResponse;
-import com.lexuancong.search.dto.ProductPreviewGetResponse;
+import com.lexuancong.search.dto.ProductPreviewResponse;
 import com.lexuancong.search.dto.ProductQueryParams;
+import com.lexuancong.share.dto.paging.PagingResponse;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
@@ -25,7 +25,7 @@ public class SearchProductService {
         this.elasticsearchOperations = elasticsearchOperations;
     }
 
-    public ProductPagingGetResponse findProductsByCriteria(ProductQueryParams productQueryParams) {
+    public PagingResponse<ProductPreviewResponse> findProductsByCriteria(ProductQueryParams productQueryParams) {
         NativeQueryBuilder nativeQueryBuilder = NativeQuery.builder()
                 // theem cacs điều kiện vào truy vaans
                 .withQuery(queryBuilder -> queryBuilder
@@ -70,20 +70,18 @@ public class SearchProductService {
         SearchHits<Product> searchHitsProduct = this.elasticsearchOperations.search(query, Product.class);
         // chuyển đổi ds kết quả thành  phân trang page
         SearchPage<Product> searchPageProduct = SearchHitSupport.searchPageFor(searchHitsProduct, nativeQueryBuilder.getPageable());
-        List<ProductPreviewGetResponse> productPreviewGetResponses = searchHitsProduct.stream()
+        List<ProductPreviewResponse> payload = searchHitsProduct.stream()
                 .map(productSearchHit -> {
                     Product product = productSearchHit.getContent();
-                    return ProductPreviewGetResponse.fromModel(product);
+                    return ProductPreviewResponse.fromProduct(product);
                 })
                 .toList();
-        return new ProductPagingGetResponse(
-                productPreviewGetResponses,
-                searchPageProduct.getNumber(),
-                searchPageProduct.getSize(),
-                (int) searchPageProduct.getTotalElements(),
-                searchPageProduct.getTotalPages(),
-                searchPageProduct.isLast()
-        );
+        return PagingResponse.<ProductPreviewResponse> builder()
+                .last(searchPageProduct.isLast())
+                .payload(payload)
+                .totalPages(searchPageProduct.getTotalPages())
+                .totalElements(searchPageProduct.getTotalElements())
+                .build();
     }
 
     private void applyTermsFilter(String fieldValues, String fieldName, BoolQuery.Builder boolQueryBuilder) {

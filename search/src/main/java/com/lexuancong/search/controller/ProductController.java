@@ -1,9 +1,10 @@
 package com.lexuancong.search.controller;
 
+import com.lexuancong.search.dto.ProductPreviewResponse;
 import com.lexuancong.search.service.SearchProductService;
-import com.lexuancong.search.dto.ProductPagingGetResponse;
 import com.lexuancong.search.dto.ProductQueryParams;
 import com.lexuancong.share.constants.Constants;
+import com.lexuancong.share.dto.paging.PagingResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -17,7 +18,7 @@ public class ProductController {
         this.searchProductService = searchProductService;
     }
     @GetMapping("/customer/search")
-    public ResponseEntity<ProductPagingGetResponse> searchProduct(
+    public ResponseEntity<PagingResponse<ProductPreviewResponse>> searchProduct(
             @RequestParam(name = "keyword", defaultValue = "") String keyword,
             @RequestParam(name = "pageIndex", defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER) int pageIndex,
             @RequestParam(name = "pageSize" , defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE) int pageSize,
