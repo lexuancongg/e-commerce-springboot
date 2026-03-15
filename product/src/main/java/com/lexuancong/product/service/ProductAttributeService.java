@@ -5,11 +5,12 @@ import com.lexuancong.product.model.attribute.ProductAttribute;
 import com.lexuancong.product.model.attribute.ProductAttributeGroup;
 import com.lexuancong.product.repository.ProductAttributeGroupRepository;
 import com.lexuancong.product.repository.ProductAttributeRepository;
-import com.lexuancong.product.dto.attribute.ProductAttributePagingGetResponse;
 import com.lexuancong.product.dto.attribute.ProductAttributeCreateRequest;
-import com.lexuancong.product.dto.attribute.ProductAttributeGetResponse;
+import com.lexuancong.product.dto.attribute.ProductAttributeResponse;
+import com.lexuancong.share.dto.paging.PagingResponse;
 import com.lexuancong.share.exception.BadRequestException;
 import com.lexuancong.share.exception.NotFoundException;
+import com.lexuancong.share.exception.ResourceInUseException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,32 +28,33 @@ public class ProductAttributeService {
         this.productAttributeRepository = productAttributeRepository;
     }
 
-    public List<ProductAttributeGetResponse> getProductAttributes() {
+    public List<ProductAttributeResponse> getProductAttributes() {
         return this.productAttributeRepository.findAll().stream()
-                .map(ProductAttributeGetResponse::fromProductAttribute)
+                .map(ProductAttributeResponse::fromProductAttribute)
                 .toList();
     }
 
-    public ProductAttributePagingGetResponse getProductAttributePaging(int pageIndex, int pageSize) {
+    public PagingResponse<ProductAttributeResponse> getProductAttributePaging(int pageIndex, int pageSize) {
         Pageable pageable = PageRequest.of(pageIndex, pageSize);
         Page<ProductAttribute> productAttributePage = this.productAttributeRepository.findAll(pageable);
         List<ProductAttribute> productAttributes = productAttributePage.getContent();
-        List<ProductAttributeGetResponse> productAttributeGetResponses = productAttributes.stream()
-                .map(ProductAttributeGetResponse::fromProductAttribute)
+        List<ProductAttributeResponse> payload = productAttributes.stream()
+                .map(ProductAttributeResponse::fromProductAttribute)
                 .toList();
-        return new ProductAttributePagingGetResponse(
-                productAttributeGetResponses,
-                pageIndex,
-                pageSize,
-                (int) productAttributePage.getTotalElements(),
-                productAttributePage.getTotalPages(),
-                productAttributePage.isLast()
-        );
+        return PagingResponse.<ProductAttributeResponse> builder()
+                .pageIndex(pageIndex)
+                .pageSize(pageSize)
+                .last(productAttributePage.isLast())
+                .totalPages(productAttributePage.getTotalPages())
+                .totalElements(productAttributePage.getTotalElements())
+                .payload(payload)
+                .build();
 
     }
 
     public ProductAttribute createProductAttribute(ProductAttributeCreateRequest productAttributeCreateRequest) {
-        this.validateExistedName(productAttributeCreateRequest.name(), null);
+
+        this.validateDuplicateName(productAttributeCreateRequest.name(), null);
 
         ProductAttribute productAttribute = new ProductAttribute();
         productAttribute.setName(productAttributeCreateRequest.name());
@@ -65,18 +67,18 @@ public class ProductAttributeService {
             ProductAttributeGroup productAttributeGroup = this.productAttributeGroupRepository
                     .findById(productAttributeGroupId)
                     .orElseThrow(() -> new NotFoundException(Constants.ErrorKey.PRODUCT_ATTRIBUTE_GROUP_NOT_FOUND,productAttributeGroupId));
-            productAttribute.setProductAttributeGroup(productAttributeGroup);
+            productAttribute.setGroup(productAttributeGroup);
         }
     }
 
 
-    private void validateExistedName(String name, Long id) {
-        if (checkExistedName(name, id)) {
+    private void validateDuplicateName(String name, Long id) {
+        if (checkExistName(name, id)) {
             throw new BadRequestException(Constants.ErrorKey.NAME_ALREADY_EXITED,name);
         }
     }
 
-    private boolean checkExistedName(String name, Long id) {
+    private boolean checkExistName(String name, Long id) {
         return this.productAttributeRepository.findByNameAndIdNot(name, id) != null;
     }
 
@@ -84,7 +86,7 @@ public class ProductAttributeService {
         ProductAttribute productAttribute = this.productAttributeRepository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException(Constants.ErrorKey.PRODUCT_ATTRIBUTE_NOT_FOUND,id));
-        this.validateExistedName(productAttributeCreateRequest.name(), id);
+        this.validateDuplicateName(productAttributeCreateRequest.name(), id);
         productAttribute.setName(productAttributeCreateRequest.name());
         this.setProductAttributeGroup(productAttribute, productAttributeCreateRequest.productAttributeGroupId());
         this.productAttributeRepository.save(productAttribute);
@@ -98,7 +100,7 @@ public class ProductAttributeService {
 
 
         if (!productAttribute.getProductAttributeValues().isEmpty()) {
-            throw new BadRequestException(Constants.ErrorKey.PRODUCT_ATTRIBUTE_CONSTANT_PRODUCT,id);
+            throw new ResourceInUseException(Constants.ErrorKey.PRODUCT_ATTRIBUTE_CONSTANT_PRODUCT,id);
         }
         this.productAttributeRepository.deleteById(id);
     }

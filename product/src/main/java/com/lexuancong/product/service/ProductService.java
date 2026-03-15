@@ -642,7 +642,7 @@ public class ProductService {
         if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(productAttributeValues)) {
             List<ProductAttributeGroup> productAttributeGroups = productAttributeValues.stream()
                     .map(productAttributeValue ->
-                            productAttributeValue.getProductAttribute().getProductAttributeGroup())
+                            productAttributeValue.getProductAttribute().getGroup())
                     .filter(Objects::nonNull)
                     // loại bỏ ptu trùng lặp dựa trên equal
                     .distinct()
@@ -651,7 +651,7 @@ public class ProductService {
             productAttributeGroups.forEach(productAttributeGroup -> {
                 List<AttributeValueGetResponse> attributeValueGetResponses = new ArrayList<>();
                 productAttributeValues.forEach(productAttributeValue -> {
-                    if (productAttributeValue.getProductAttribute().getProductAttributeGroup().getId().equals(productAttributeGroup.getId())) {
+                    if (productAttributeValue.getProductAttribute().getGroup().getId().equals(productAttributeGroup.getId())) {
                         String attributeName = productAttributeValue.getProductAttribute().getName();
                         String value = productAttributeValue.getValue();
                         AttributeValueGetResponse attributeValueGetResponse = new AttributeValueGetResponse(attributeName, value);

@@ -3,9 +3,9 @@ package com.lexuancong.product.controller;
 import com.lexuancong.product.model.attribute.ProductAttribute;
 import com.lexuancong.product.service.ProductAttributeService;
 import com.lexuancong.product.constant.Constants;
-import com.lexuancong.product.dto.attribute.ProductAttributePagingGetResponse;
 import com.lexuancong.product.dto.attribute.ProductAttributeCreateRequest;
-import com.lexuancong.product.dto.attribute.ProductAttributeGetResponse;
+import com.lexuancong.product.dto.attribute.ProductAttributeResponse;
+import com.lexuancong.share.dto.paging.PagingResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,15 +20,15 @@ public class ProductAttributeController {
     private final ProductAttributeService productAttributeService;
 
 
-    // đã check
     @GetMapping({"/management/product-attributes","customer/product-attributes"})
-    public ResponseEntity<List<ProductAttributeGetResponse>> getProductAttributes() {
-        return ResponseEntity.ok(this.productAttributeService.getProductAttributes());
+    public ResponseEntity<List<ProductAttributeResponse>> getProductAttributes() {
+        return ResponseEntity.ok(
+                this.productAttributeService.getProductAttributes()
+        );
     }
 
-    // phân trang theo thuộc tính
     @GetMapping({"/management/product-attribute/paging"})
-    public ResponseEntity<ProductAttributePagingGetResponse> getProductAttributePaging(
+    public ResponseEntity<PagingResponse<ProductAttributeResponse>> getProductAttributePaging(
             @RequestParam(name ="pageIndex" ,defaultValue = Constants.PagingConstants.DEFAULT_PAGE_NUMBER,required = false)
             final int pageIndex,
             @RequestParam(name = "pageSize" ,defaultValue = Constants.PagingConstants.DEFAULT_PAGE_SIZE,required = false)
@@ -37,20 +37,18 @@ public class ProductAttributeController {
         return ResponseEntity.ok(this.productAttributeService.getProductAttributePaging(pageIndex, pageSize));
     }
 
-    // đã check
 
     @PostMapping("/management/product-attributes")
-    public ResponseEntity<ProductAttributeGetResponse> createProductAttribute(@RequestBody @Valid ProductAttributeCreateRequest productAttributeCreateRequest,
-                                                                              UriComponentsBuilder uriComponentsBuilder ) {
+    public ResponseEntity<ProductAttributeResponse> createProductAttribute(@RequestBody @Valid ProductAttributeCreateRequest productAttributeCreateRequest,
+                                                                           UriComponentsBuilder uriComponentsBuilder ) {
         ProductAttribute productAttribute = this.productAttributeService.createProductAttribute(productAttributeCreateRequest);
-        ProductAttributeGetResponse productAttributeGetResponse = ProductAttributeGetResponse.fromProductAttribute(productAttribute);
+        ProductAttributeResponse productAttributeResponse = ProductAttributeResponse.fromProductAttribute(productAttribute);
         return ResponseEntity.created(uriComponentsBuilder.replacePath("/product-attributes/{id}")
                         .buildAndExpand(productAttribute.getId()).toUri())
-                .body(productAttributeGetResponse);
+                .body(productAttributeResponse);
     }
 
 
-    // đã check
     @PutMapping({"/management/product-attributes/{id}"})
     public ResponseEntity<Void> updateProductAttribute(@PathVariable Long id,
                                                        @Valid @RequestBody ProductAttributeCreateRequest productAttributeCreateRequest) {
@@ -59,7 +57,6 @@ public class ProductAttributeController {
     }
 
 
-    // đã check
 
     @DeleteMapping({"/management/product-attributes/{id}"})
     public ResponseEntity<Void> deleteProductAttribute(@PathVariable Long id) {

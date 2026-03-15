@@ -19,7 +19,7 @@ public class ProductAttributeGroup extends AuditEntity {
     private Long id;
     private String name;
 
-    @OneToMany(mappedBy = "productAttributeGroup")
+    @OneToMany(mappedBy = "group")
     private List<ProductAttribute> productAttributes = new ArrayList<>();
 
 

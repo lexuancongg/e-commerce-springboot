@@ -24,7 +24,7 @@ public class ProductAttribute extends AuditEntity {
 
     @ManyToOne
     @JoinColumn(name = "product_attribute_group_id" )
-    private ProductAttributeGroup productAttributeGroup;
+    private ProductAttributeGroup group;
 
 
     // mục đích để sau này khi xóa attribute thì có thể get ra xem có chứa gtri chưa , nếu có thì k thể xóa
