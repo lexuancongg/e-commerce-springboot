@@ -3,7 +3,7 @@ package com.lexuancong.product.dto.product.databinding;
 import java.util.List;
 
 // không sử dụng interface trư tiếp mà dùng T extent giúp mở rộng cho sau này lỡ có một vài sp có thuộc tính đặc biệt ,
-public interface ProductPropertiesRequire<T extends ProductVariationPropertiesRequire> extends BaseProductPropertiesRequire {
+public interface ProductParentPropertiesRequire<T extends ProductVariationPropertiesRequire> extends BaseProductPropertiesRequire {
     // T ở đây là các biến thể con kèm theo như màu sắc...
     List<T> variations();
     boolean isPublic();

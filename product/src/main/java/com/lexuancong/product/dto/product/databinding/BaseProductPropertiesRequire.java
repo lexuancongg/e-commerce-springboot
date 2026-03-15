@@ -15,7 +15,6 @@ public interface BaseProductPropertiesRequire {
     BigDecimal price();
     Long avatarImageId();
 
-    List<Long> imageIds();
 
 
 

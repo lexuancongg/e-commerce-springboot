@@ -5,8 +5,8 @@ import com.lexuancong.product.model.Product;
 import com.lexuancong.product.model.SpecificProductVariant;
 import com.lexuancong.product.repository.ProductRepository;
 import com.lexuancong.product.repository.SpecificProductVariantRepository;
-import com.lexuancong.product.dto.productoptionvalue.ProductOptionValueGetResponse;
-import com.lexuancong.product.dto.specificproductvariant.SpecificProductVariantGetResponse;
+import com.lexuancong.product.dto.productoptionvalue.ProductOptionValueResponse;
+import com.lexuancong.product.dto.specificproductvariant.SpecificProductVariantResponse;
 import com.lexuancong.share.exception.BadRequestException;
 import com.lexuancong.share.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -21,20 +21,20 @@ public class SpecificProductVariantService {
     private final ProductRepository productRepository;
 
 
-    public List<SpecificProductVariantGetResponse> getSpecificProductVariantsByProductId(Long productId) {
+    public List<SpecificProductVariantResponse> getSpecificProductVariantsByProductId(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(()-> new NotFoundException(Constants.ErrorKey.PRODUCT_NOT_FOUND,productId));
 
         return this.specificProductVariantRepository
                 .findAllByProduct_Parent(product)
                 .stream()
-                .map(SpecificProductVariantGetResponse::fromSpecificProductVariant)
+                .map(SpecificProductVariantResponse::fromSpecificProductVariant)
                 .toList();
     }
 
 
 
-    public List<ProductOptionValueGetResponse> getProductOptionValuesOfSpecificProductVariants(List<Long> productIds){
+    public List<ProductOptionValueResponse> getProductOptionValuesOfSpecificProductVariants(List<Long> productIds){
         List<Product> products = productRepository.findAllById(productIds);
         if(products.size() != productIds.size()){
             throw  new BadRequestException(Constants.ErrorKey.PRODUCT_NOT_FOUND);
@@ -42,7 +42,7 @@ public class SpecificProductVariantService {
         List<SpecificProductVariant> specificProductVariants = specificProductVariantRepository.findAllByProductIn(products);
         return specificProductVariants.stream()
                 .map(specificProductVariant -> {
-                    return new ProductOptionValueGetResponse(
+                    return new ProductOptionValueResponse(
                             specificProductVariant.getProduct().getId(),
                             specificProductVariant.getId(),
                             specificProductVariant.getProduct().getName(),

@@ -19,18 +19,18 @@ public class ProductController {
         this.productService = productService;
     }
 
-    // create => đã check
     @PostMapping({"/management/products"})
-    public ResponseEntity<ProductSummaryGetResponse> createProduct(@Valid @RequestBody ProductCreateRequest productCreateRequest) {
-        ProductSummaryGetResponse productSummaryGetResponse = this.productService.createProduct(productCreateRequest);
-        return new ResponseEntity<>(productSummaryGetResponse, HttpStatus.CREATED);
+    public ResponseEntity<ProductSummaryResponse> createProduct(@Valid @RequestBody ProductParentCreateRequest productCreateRequest) {
+        ProductSummaryResponse productSummaryResponse = this.productService.createProduct(productCreateRequest);
+        return new ResponseEntity<>(productSummaryResponse, HttpStatus.CREATED);
 
     }
 
-    // update // đã check
+
+
     @PutMapping(path = "/management/products/{id}")
     public ResponseEntity<Void> updateProduct(@PathVariable("id") Long id,
-                                              @Valid @RequestBody ProductCreateRequest productCreateRequest) {
+                                              @Valid @RequestBody ProductParentCreateRequest productCreateRequest) {
         this.productService.updateProduct(id, productCreateRequest);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 

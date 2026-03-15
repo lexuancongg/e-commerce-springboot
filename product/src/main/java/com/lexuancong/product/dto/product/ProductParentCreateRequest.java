@@ -3,7 +3,7 @@ package com.lexuancong.product.dto.product;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.lexuancong.product.model.Product;
-import com.lexuancong.product.dto.product.databinding.ProductPropertiesRequire;
+import com.lexuancong.product.dto.product.databinding.ProductParentPropertiesRequire;
 import com.lexuancong.product.dto.productoptionvalue.ProductOptionValueCreateRequest;
 import com.lexuancong.product.dto.product.variants.ProductVariationCreateRequest;
 import jakarta.validation.constraints.DecimalMin;
@@ -16,24 +16,21 @@ import java.util.List;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 // dùng để tùy chỉnh quá trình Serialization
 @JsonSerialize
-public record ProductCreateRequest(
+public record ProductParentCreateRequest(
         @NotBlank String name,
         @NotBlank String slug,
         Long brandId,
         List<Long> categoryIds,
         String shortDescription,
         String description,
-        String specification,
         String sku,
-        String gtin,
-//        @ValidateProductPrice Double price,
         @DecimalMin(value = "0.0", inclusive = false, message = "Price phải lớn hơn 0")
         BigDecimal price,
         boolean isPublic,
         boolean isFeature,
         boolean isOrderEnable,
-        List<Long> imageIds,
         Long avatarImageId,
+        List<Long> imageIds,
         Double length,
         Double width,
         Double height,
@@ -42,7 +39,7 @@ public record ProductCreateRequest(
         Boolean isShownSeparately,
         List<ProductVariationCreateRequest> variations,
         List<ProductOptionValueCreateRequest> productOptionValues
-)  implements ProductPropertiesRequire<ProductVariationCreateRequest> {
+)  implements ProductParentPropertiesRequire<ProductVariationCreateRequest> {
 
 
 
@@ -55,8 +52,6 @@ public record ProductCreateRequest(
         product.setDescription(description);
         product.setSku(slug);
         product.setShortDescription(shortDescription);
-        product.setSpecifications(specification);
-        product.setGtin(gtin);
         product.setPrice(price);
         product.setPublic(isPublic);
         product.setFeature(isFeature);

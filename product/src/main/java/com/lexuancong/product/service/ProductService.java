@@ -29,6 +29,7 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -43,56 +44,60 @@ public class ProductService {
     private final SpecificProductVariantRepository specificProductVariantRepository;
     private final ImageClient imageClient;
 
-    public ProductSummaryGetResponse createProduct(ProductCreateRequest productCreateRequest) {
+    public ProductSummaryResponse createProduct(ProductParentCreateRequest productCreateRequest) {
 
         this.validateProduct(productCreateRequest, null);
         Product product = productCreateRequest.toModel();
 
         this.setBrandForProduct(product, productCreateRequest.brandId());
 
-        Product parentProductSaved = this.productRepository.save(product);
+        Product parentProduct = this.productRepository.save(product);
 
-        this.syncProductCategories(parentProductSaved, productCreateRequest.categoryIds());
-        this.syncProductImages(parentProductSaved, productCreateRequest.imageIds());
+
+        this.syncProductCategories(parentProduct, productCreateRequest.categoryIds());
+
+        this.syncProductImages(parentProduct, productCreateRequest.imageIds());
 
 
         if (CollectionUtils.isEmpty(productCreateRequest.variations()) || CollectionUtils.isEmpty(productCreateRequest.productOptionValues())) {
-            return ProductSummaryGetResponse.fromModel(product);
+            return ProductSummaryResponse.fromProduct(product);
         }
 
         // xử lý các biến thể
-        List<Product> variationSaved = this.createVariationsFromVm(productCreateRequest.variations(), parentProductSaved);
+        List<Product> variants = this.createVariants(productCreateRequest.variations(), parentProduct);
 
 
         List<ProductOption> productOptions = this.getProductOption(productCreateRequest.productOptionValues());
 
         Map<Long, ProductOption> mapOptionById = productOptions.stream()
                 .collect(Collectors.toMap(ProductOption::getId, Function.identity()));
+
         List<ProductOptionValue> productOptionValues =
-                this.createProductOptionValue(productCreateRequest, parentProductSaved, mapOptionById);
-        this.createProductOptionCombination(variationSaved, productOptionValues, productCreateRequest.variations(), mapOptionById);
-        return ProductSummaryGetResponse.fromModel(parentProductSaved);
+                this.createProductOptionValue(productCreateRequest, parentProduct, mapOptionById);
+
+        this.createSpecificVariant(variants, productOptionValues, productCreateRequest.variations(), mapOptionById);
+        return ProductSummaryResponse.fromProduct(parentProduct);
     }
 
     // cần có product và ProductOption
-    private void createProductOptionCombination(List<Product> variationsSaved,
-                                                List<ProductOptionValue> productOptionValues,
-                                                List<ProductVariationCreateRequest> variationVms,
-                                                Map<Long, ProductOption> mapOptionById) {
+    private void createSpecificVariant(List<Product> variationsSaved,
+                                       List<ProductOptionValue> productOptionValues,
+                                       List<ProductVariationCreateRequest> variantCreates,
+                                       Map<Long, ProductOption> mapOptionById) {
         List<SpecificProductVariant> specificProductVariants = new ArrayList<>();
         // variationSave rồi nhưng chưa bt nó ứng với productOption Id nào và value gì => dua vao variationVm
         // variantSaved và variantVm có cùng slug => dựa vào slug để lấy
         Map<String, Product> mapProductBySlug = variationsSaved.stream()
                 .collect(Collectors.toMap(Product::getSlug, Function.identity()));
-        for (ProductVariationCreateRequest variationVm : variationVms) {
-            String slugVariant = variationVm.slug().toLowerCase();
+
+        for (ProductVariationCreateRequest variantCreate : variantCreates) {
+            String slugVariant = variantCreate.slug().toLowerCase();
             Product variantSaved = mapProductBySlug.get(slugVariant);
             if (variantSaved == null) {
-                // chứng tỏ lưu lần trước bị lỗi
                 throw new RuntimeException();
             }
             // lặp qua từng option
-            variationVm.valueOfOptionByOptionId().forEach((optionId, optionValue) -> {
+            variantCreate.valueOfOptionByOptionId().forEach((optionId, optionValue) -> {
                 ProductOption productOption = mapOptionById.get(optionId);
                 // check xem giá trị của từng option có nằm trong productOptionValues khong
                 boolean isExitOptionValue = productOptionValues.stream()
@@ -115,15 +120,15 @@ public class ProductService {
     }
 
 
-    private List<ProductOptionValue> createProductOptionValue(ProductCreateRequest productCreateRequest,
-                                                              Product mainProduct, Map<Long, ProductOption> productOptionMapById) {
+    private List<ProductOptionValue> createProductOptionValue(ProductParentCreateRequest productCreateRequest,
+                                                              Product productParent, Map<Long, ProductOption> mapProductOption) {
         List<ProductOptionValue> productOptionValues = new ArrayList<>();
         productCreateRequest.productOptionValues().forEach(optionValue -> {
-            ProductOption productOption = productOptionMapById.get(optionValue.productOptionId());
+            ProductOption productOption = mapProductOption.get(optionValue.productOptionId());
             optionValue.values().forEach(value -> {
                 ProductOptionValue productOptionValue = ProductOptionValue.builder()
                         .productOption(productOption)
-                        .product(mainProduct)
+                        .product(productParent)
                         .value(value)
                         .build();
                 productOptionValues.add(productOptionValue);
@@ -134,168 +139,153 @@ public class ProductService {
         return productOptionValues;
     }
 
-    private List<ProductOption> getProductOption(List<ProductOptionValueCreateRequest> productOptionValueVms) {
-        List<Long> optionIds = productOptionValueVms.stream()
+    private List<ProductOption> getProductOption(List<ProductOptionValueCreateRequest> productOptionValueRequest) {
+        List<Long> optionIds = productOptionValueRequest.stream()
                 .map(ProductOptionValueCreateRequest::productOptionId)
                 .toList();
-        if (CollectionUtils.isEmpty(optionIds)) return Collections.emptyList();
-        List<ProductOption> productOptions = this.productOptionRepository.findAllById(optionIds);
-        return productOptions;
+        if (CollectionUtils.isEmpty(optionIds)) {
+            return Collections.emptyList();
+        }
+        return this.productOptionRepository.findAllById(optionIds);
 
     }
 
 
-    private List<Product> createVariationsFromVm(List<ProductVariationCreateRequest> variationPostVmList,
-                                                 Product mainProduct) {
+    private List<Product> createVariants(List<ProductVariationCreateRequest> variantCreateRequests,
+                                         Product productParent) {
 
-        // đầu tiên sử lý hình ảnh
-        List<ProductImage> allProductImages = new ArrayList<>();
-        List<Product> variations = variationPostVmList.stream()
-                .map(variationVm -> {
-                    Product productVariation = this.buildProductVariationFormVm(variationVm, mainProduct, new Product());
-                    // quay lại lưu hình ảnh như sản phẩm chính
-                    List<ProductImage> variationImages =
-                            this.updateProductImagesForSave(productVariation, variationVm.imageIds());
-
-                    allProductImages.addAll(variationImages);
-
-                    return productVariation;
-
-                })
+        List<Product> variants = variantCreateRequests.stream()
+                .map(req -> buildVariant(req, productParent, new Product()))
                 .toList();
 
-//        allProductImages cùng tham chiếu tới các product trong list product variations
-        List<Product> variationsSaved = this.productRepository.saveAll(variations);
+        this.productRepository.saveAll(variants);
 
-        // lưu cho bảng productImage
-        this.productImageRepository.saveAll(allProductImages);
-        return variationsSaved;
+        List<ProductImage> allImages = IntStream.range(0, variants.size())
+                .boxed()
+                .filter(i -> org.apache.commons.collections4.CollectionUtils.isNotEmpty(variantCreateRequests.get(i).imageIds()))
+                .flatMap(i -> variantCreateRequests.get(i).imageIds().stream()
+                        .map(imageId -> ProductImage.builder()
+                                .imageId(imageId)
+                                .product(variants.get(i))
+                                .build()))
+                .toList();
+        if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(allImages)) {
+            this.productImageRepository.saveAll(allImages);
+        }
 
+        return variants;
 
     }
+
 
 
     private void syncProductImages(Product product, List<Long> imageIds) {
-        List<ProductImage> productImageNew = this.updateProductImagesForSave(product, imageIds);
-        this.productImageRepository.saveAll(productImageNew);
-    }
-
-    // cũng dần cho cả create cả update
-    private List<ProductImage> updateProductImagesForSave(Product product, List<Long> imageIds) {
-        List<ProductImage> productImages = new ArrayList<>();
-
         if (CollectionUtils.isEmpty(imageIds)) {
-            // xóa các cái cũ đi
             this.productImageRepository.deleteByProductId(product.getId());
 
         }
-        // trường hợp product chưa có category => chỉ cần thêm vào để lưu vào
         else if (product.getProductImages().isEmpty()) {
-            productImages.addAll(
-                    imageIds.stream().map(imageId ->
-                            ProductImage.builder().imageId(imageId).product(product).build()
-                    ).toList()
-            );
+            List<ProductImage> productImages = imageIds.stream().map(imageId ->
+                    ProductImage.builder().imageId(imageId).product(product).build()
+            ).toList();
+            this.productImageRepository.saveAll(productImages);
 
-            // nếu đã có trc , => xóa cái cũ, thêm cái mới
         } else {
-            List<Long> imageIdsOfProductInDb = product.getProductImages().stream()
+            List<Long> imageIdsOld = product.getProductImages().stream()
                     .map(ProductImage::getImageId)
                     .sorted()
                     .toList();
-            if (!org.apache.commons.collections4.CollectionUtils.isEqualCollection(imageIds, imageIdsOfProductInDb)) {
-                List<Long> newImageIds = imageIds.stream()
-                        .filter(imageId -> !imageIdsOfProductInDb.contains(imageId))
+            if (!org.apache.commons.collections4.CollectionUtils.isEqualCollection(imageIds, imageIdsOld)) {
+                List<Long> imageIdsNew = imageIds.stream()
+                        .filter(imageId -> !imageIdsOld.contains(imageId))
                         .toList();
-                List<Long> imageIdsToDelete = imageIdsOfProductInDb.stream()
+                List<Long> imageIdsToDelete = imageIdsOld.stream()
                         .filter(imageId -> !imageIds.contains(imageId))
                         .toList();
                 if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(imageIdsToDelete)) {
                     this.productImageRepository.deleteByImageIdInAndProductId(imageIdsToDelete, product.getId());
 
                 }
-                if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(newImageIds)) {
-                    productImages.addAll(
-                            newImageIds.stream()
+                if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(imageIdsNew)) {
+                    List<ProductImage> productImages =
+                            imageIdsNew.stream()
                                     .map(newImageId -> ProductImage.builder().imageId(newImageId).product(product).build())
-                                    .toList()
-                    );
+                                    .toList();
+                    this.productImageRepository.saveAll(productImages);
                 }
             }
 
         }
-        return productImages;
-
     }
 
 
-    private void syncProductCategories(Product product, List<Long> categoryIdsVm) {
-        List<ProductCategory> productCategoryList = this.buildProductCategories(product, categoryIdsVm);
-        List<ProductCategory> productCategories = new ArrayList<>();
 
-        if (productCategoryList.isEmpty()) {
-            if (categoryIdsVm.isEmpty()) {
+
+    private void syncProductCategories(Product product, List<Long> categoryIds) {
+        List<ProductCategory> productCategories = this.buildProductCategories(product, categoryIds);
+
+        Map<Long, ProductCategory> mapProductCategory = productCategories.stream()
+                .collect(Collectors.toMap(
+                        productCategory -> productCategory.getCategory().getId(),
+                        Function.identity()
+
+                ));
+
+
+        if (productCategories.isEmpty()) {
+            if (categoryIds.isEmpty()) {
                 this.productCategoryRepository.deleteByProductId(product.getId());
             }
         } else {
-            List<Long> categoryIdsOfProductInDb = product.getProductCategories().stream()
+            List<Long> categoryIdsOld = product.getProductCategories().stream()
                     .map(productCategory -> productCategory.getCategory().getId())
                     .toList();
-            List<Long> categoryIdsToDelete = categoryIdsOfProductInDb.stream()
-                    .filter(categoryId -> !categoryIdsVm.contains(categoryId))
+            List<Long> categoryIdsToDelete = categoryIdsOld.stream()
+                    .filter(categoryId -> !categoryIds.contains(categoryId))
                     .toList();
-            List<Long> newCategoryIds = categoryIdsVm.stream()
-                    .filter(categoryId -> !categoryIdsOfProductInDb.contains(categoryId))
+            List<Long> categoIdsNew = categoryIds.stream()
+                    .filter(categoryId -> !categoryIdsOld.contains(categoryId))
                     .toList();
 
             if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(categoryIdsToDelete)) {
                 this.productCategoryRepository.deleteByCategoryIdInAndProductId(categoryIdsToDelete, product.getId());
             }
-            if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(newCategoryIds)) {
-                productCategories.addAll(
-                        newCategoryIds.stream().map(categoryId -> ProductCategory
-                                .builder()
-                                .category(productCategoryList.stream()
-                                        .filter(productCategory -> productCategory.getCategory().getId().equals(categoryId))
-                                        .findFirst()
-                                        .get()
-                                        .getCategory()
-                                )
-                                .product(product)
-                                .build()
-                        ).toList()
-                );
+            if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(categoIdsNew)) {
+                List<ProductCategory> productCategoriesNew =  categoIdsNew.stream()
+                        .map(
+                                mapProductCategory::get
+                        ).toList();
+                this.productCategoryRepository.saveAll(productCategoriesNew);
+
             }
         }
-        this.productCategoryRepository.saveAll(productCategories);
 
 
     }
 
 
     // cho  cả update và create dùng chung
-    private List<ProductCategory> buildProductCategories(Product product, List<Long> categoryIdsVm) {
-        if (CollectionUtils.isEmpty(categoryIdsVm)) {
+    private List<ProductCategory> buildProductCategories(Product product, List<Long> categoryIds) {
+        if (CollectionUtils.isEmpty(categoryIds)) {
             return Collections.emptyList();
         }
         List<ProductCategory> productCategoryList = new ArrayList<>();
 
         // product có thể là cái mới save , có thể là cái lấy trong db ra nếu update
-        List<Long> categoryIds = product.getProductCategories().stream()
+        List<Long> categoryIdsInDb = product.getProductCategories().stream()
                 .map(productCategory -> productCategory.getCategory().getId())
                 .sorted()
                 .toList();
         // nếu có thay đổi thì mới thực hiện
-        if (!org.apache.commons.collections4.CollectionUtils.isEqualCollection(categoryIds, categoryIdsVm)) {
-            List<Category> categories = categoryRepository.findAllById(categoryIdsVm);
+        if (!org.apache.commons.collections4.CollectionUtils.isEqualCollection(categoryIdsInDb, categoryIds)) {
+            List<Category> categories = categoryRepository.findAllById(categoryIds);
             if (categories.isEmpty()) {
-                throw new BadRequestException(Constants.ErrorKey.CATEGORY_NOT_FOUND, categoryIdsVm);
-            } else if (categoryIdsVm.size() > categories.size()) {
+                throw new BadRequestException(Constants.ErrorKey.CATEGORY_NOT_FOUND, categoryIds);
+            } else if (categoryIds.size() > categories.size()) {
                 List<Long> categoryIdsValid = categories.stream().map(Category::getId).toList();
-                categoryIdsVm.removeAll(categoryIdsValid);
-                throw new BadRequestException(Constants.ErrorKey.CATEGORY_NOT_FOUND, categoryIdsVm);
+                categoryIds.removeAll(categoryIdsValid);
+                throw new BadRequestException(Constants.ErrorKey.CATEGORY_NOT_FOUND, categoryIds);
             } else {
-                //  hợp lệ
                 for (Category category : categories) {
                     productCategoryList.add(ProductCategory.builder()
                             .product(product)
@@ -319,71 +309,61 @@ public class ProductService {
     }
 
 
-    //  cả update và create và update đều validate => gộp chung hàm
-    private void validateProduct(ProductCreateRequest productVmToSave, Product existingProduct) {
-        this.validateLengthMustGreaterThanWidth(productVmToSave);
-        this.validateUniqueProductProperties(productVmToSave, existingProduct);
-        this.validateDuplicateProductPropertiesBetweenVariations(productVmToSave);
+    private void validateProduct(ProductParentCreateRequest productCreateRequest, Product productExist) {
+        this.validateLengthMustGreaterThanWidth(productCreateRequest);
+        this.validateUniqueProductProperties(productCreateRequest, productExist);
+        this.validateDuplicateProductPropertiesBetweenVariations(productCreateRequest);
 
-
-        // valid datete thuộc tính của varian cos bị trùng lặp trong db không
-        List<Long> variationIds = productVmToSave.variations().stream()
+        List<Long> variationIds = productCreateRequest.variations().stream()
                 .map(ProductVariationCreateRequest::id)
                 .filter(Objects::nonNull)
                 .toList();
 
-        // variant tuong ung trong db vs tung id
-        Map<Long, Product> mapVariationsSaved = this.productRepository.findAllById(variationIds)
+        Map<Long, Product> mapVariant = this.productRepository.findAllById(variationIds)
                 .stream()
                 .collect(Collectors.toMap(Product::getId, Function.identity(), (product1, product2) -> new Product()));
 
-        for (ProductVariationCreateRequest variation : productVmToSave.variations()) {
-            Product variantExitedInDb = mapVariationsSaved.get(variation.id());
-            this.validateUniqueProductProperties(variation, variantExitedInDb);
+        for (ProductVariationCreateRequest variation : productCreateRequest.variations()) {
+            Product variantInDb = mapVariant.get(variation.id());
+            this.validateUniqueProductProperties(variation, variantInDb);
         }
 
     }
 
 
-    // check xem chieeuf dài và chiều rộng đươc nhập hhowpjp lệ không => tính toán tiền vận chuyển sau nay
-    private void validateLengthMustGreaterThanWidth(ProductCreateRequest productVmToSave) {
+    private void validateLengthMustGreaterThanWidth(ProductParentCreateRequest productVmToSave) {
         if (productVmToSave.length() < productVmToSave.width()) {
             throw new BadRequestException(Constants.ErrorKey.LENGTH_MUST_EXCEED_WIDTH);
         }
     }
 
-    // check xem các thuộc tinhs của sp có bị trùng lặp trong db không
-    private void validateUniqueProductProperties(BaseProductPropertiesRequire baseProductProperties, Product existingProduct) {
+    private void validateUniqueProductProperties(BaseProductPropertiesRequire baseProductProperties, Product productExist) {
         this.ensurePropertyNotExists(baseProductProperties.slug().toLowerCase(), this.productRepository::findBySlug,
-                existingProduct, Constants.ErrorKey.SLUG_ALREADY_EXISTED);
+                productExist, Constants.ErrorKey.SLUG_ALREADY_EXISTED);
 
         this.ensurePropertyNotExists(baseProductProperties.sku(), this.productRepository::findBySku,
-                existingProduct, Constants.ErrorKey.SKU_ALREADY_EXISTED);
+                productExist, Constants.ErrorKey.SKU_ALREADY_EXISTED);
 
     }
 
 
-    private void ensurePropertyNotExists(String propertyValue, Function<String, Optional<Product>> finder, Product existingProduct, String errorKey) {
+    private void ensurePropertyNotExists(String propertyValue, Function<String, Optional<Product>> finder, Product productExist, String errorKey) {
         finder.apply(propertyValue).ifPresent(product -> {
-            if (existingProduct == null || !product.getId().equals(existingProduct.getId())) {
+            if (productExist == null || !product.getId().equals(productExist.getId())) {
                 throw new DuplicatedException(errorKey);
             }
         });
     }
 
 
-    // chưa check trùng lặp các thuộc tính con trong db => làm sau
-    private void validateDuplicateProductPropertiesBetweenVariations(ProductCreateRequest productVmToSave) {
-        // check trùng lặp slug , sku, gtins cho các biến thể con
-        Set<String> setSkus = new HashSet<>(Collections.singletonList(productVmToSave.sku()));
-        Set<String> setGtins = new HashSet<>(Collections.singletonList(productVmToSave.gtin()));
-        Set<String> setSlugs = new HashSet<>(Collections.singletonList(productVmToSave.slug()));
-        for (ProductVariationCreateRequest variation : productVmToSave.variations()) {
+    private void validateDuplicateProductPropertiesBetweenVariations(ProductParentCreateRequest productCreateRequest) {
+        Set<String> setSkus = new HashSet<>(Collections.singletonList(productCreateRequest.sku()));
+        Set<String> setSlugs = new HashSet<>(Collections.singletonList(productCreateRequest.slug()));
+        for (ProductVariationCreateRequest variation : productCreateRequest.variations()) {
             if (!setSkus.add(variation.sku().toLowerCase())) {
                 throw new DuplicatedException(Constants.ErrorKey.SKU_ALREADY_EXISTED);
             }
             if (!setSlugs.add(variation.slug().toLowerCase())) {
-                // throw exception
                 throw new DuplicatedException(Constants.ErrorKey.SLUG_ALREADY_EXISTED);
             }
 
@@ -391,7 +371,7 @@ public class ProductService {
     }
 
 
-    public void updateProduct(Long id, ProductCreateRequest productCreateRequest) {
+    public void updateProduct(Long id, ProductParentCreateRequest productCreateRequest) {
         Product product = this.productRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(Constants.ErrorKey.PRODUCT_NOT_FOUND, id));
 
@@ -435,10 +415,10 @@ public class ProductService {
             return;
         }
         //create variation và create combination cho variation mới => variationVm này đã qua được isvalid
-        List<Product> variationSaved = this.createVariationsFromVm(variationVmsNew, product);
+        List<Product> variationSaved = this.createVariants(variationVmsNew, product);
         // create  combination
 
-        this.createProductOptionCombination(variationSaved, productOptionValues, variationVmsNew, productOptionMapById);
+        this.createSpecificVariant(variationSaved, productOptionValues, variationVmsNew, productOptionMapById);
 
 
     }
@@ -450,12 +430,12 @@ public class ProductService {
                                                 Map<Long, ProductOption> productOptionMapById) {
         List<Long> variationIds = variationChill.stream().map(Product::getId).toList();
         this.specificProductVariantRepository.deleteAllByProductIdIn(variationIds);
-        this.createProductOptionCombination(variantUpdated, productOptionValues, variationVms, productOptionMapById);
+        this.createSpecificVariant(variantUpdated, productOptionValues, variationVms, productOptionMapById);
 
     }
 
     private List<ProductOptionValue> updateProductOptionValue(Product product, Map<Long, ProductOption> productOptionMapById,
-                                                              ProductCreateRequest productCreateRequest) {
+                                                              ProductParentCreateRequest productCreateRequest) {
         this.productOptionValueRepository.deleteAllByProductId(product.getId());
         return this.createProductOptionValue(productCreateRequest, product, productOptionMapById);
 
@@ -491,17 +471,17 @@ public class ProductService {
 //    }
 
 
-    private Product buildProductVariationFormVm(ProductVariationCreateRequest productVariationCreateRequest,
-                                                Product mainProduct, Product variationInit) {
-        variationInit.setName(productVariationCreateRequest.name());
-        variationInit.setAvatarImageId(productVariationCreateRequest.avatarImageId());
-        variationInit.setSlug(productVariationCreateRequest.slug());
-        variationInit.setSku(productVariationCreateRequest.sku());
-        variationInit.setPrice(productVariationCreateRequest.price());
-        variationInit.setPublic(mainProduct.isPublic());
+    private Product buildVariant(ProductVariationCreateRequest variationCreateRequest,
+                                 Product productParent, Product variationInit) {
+        variationInit.setName(variationCreateRequest.name());
+        variationInit.setAvatarImageId(variationCreateRequest.avatarImageId());
+        variationInit.setSlug(variationCreateRequest.slug());
+        variationInit.setSku(variationCreateRequest.sku());
+        variationInit.setPrice(variationCreateRequest.price());
+        variationInit.setPublic(productParent.isPublic());
         // khi create
         if (variationInit.getId() == null) {
-            variationInit.setParent(mainProduct);
+            variationInit.setParent(productParent);
         }
         return variationInit;
 
@@ -510,11 +490,11 @@ public class ProductService {
 
 
     private void perFormUpdateValueForVariation(Product mainProduct, ProductVariationCreateRequest variationPutVm, Product variationInit) {
-        this.buildProductVariationFormVm(variationPutVm, mainProduct, variationInit);
+        this.buildVariant(variationPutVm, mainProduct, variationInit);
 
     }
 
-    private void updateVariationInDb(ProductCreateRequest productCreateRequest, List<Product> variationInDbs, Product mainProduct) {
+    private void updateVariationInDb(ProductParentCreateRequest productCreateRequest, List<Product> variationInDbs, Product mainProduct) {
         Map<Long, Product> mapVariationSaved = variationInDbs.stream()
                 .collect(Collectors.toMap(Product::getId, Function.identity()));
         productCreateRequest.variations().forEach(variationVm -> {
@@ -556,7 +536,7 @@ public class ProductService {
 //    }
 
 
-    private void updatePropertiesProductFromVm(Product product, ProductCreateRequest productCreateRequest) {
+    private void updatePropertiesProductFromVm(Product product, ProductParentCreateRequest productCreateRequest) {
         product.setName(productCreateRequest.name());
         product.setSlug(productCreateRequest.slug());
         product.setAvatarImageId(productCreateRequest.avatarImageId());
