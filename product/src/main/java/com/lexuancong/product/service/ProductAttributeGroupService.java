@@ -4,7 +4,7 @@ import com.lexuancong.product.constant.Constants;
 import com.lexuancong.product.model.attribute.ProductAttributeGroup;
 import com.lexuancong.product.repository.ProductAttributeGroupRepository;
 import com.lexuancong.product.dto.attributegroup.ProductAttributeGroupCreateRequest;
-import com.lexuancong.product.dto.attributegroup.ProductAttributeGroupGetResponse;
+import com.lexuancong.product.dto.attributegroup.ProductAttributeGroupResponse;
 import com.lexuancong.share.exception.BadRequestException;
 import com.lexuancong.share.exception.NotFoundException;
 import org.springframework.stereotype.Service;
@@ -20,37 +20,39 @@ public class ProductAttributeGroupService {
     }
 
 
-    public List<ProductAttributeGroupGetResponse> getProductAttributeGroups(){
+    public List<ProductAttributeGroupResponse> getProductAttributeGroups(){
         return this.productAttributeGroupRepository.findAll()
                 .stream()
-                .map(ProductAttributeGroupGetResponse::fromProductAttributeGroup)
+                .map(ProductAttributeGroupResponse::fromProductAttributeGroup)
                 .toList();
     }
 
 
-    public ProductAttributeGroupGetResponse createProductAttributeGroup(ProductAttributeGroupCreateRequest productAttributeGroupCreateRequest){
+    public ProductAttributeGroupResponse createProductAttributeGroup(ProductAttributeGroupCreateRequest productAttributeGroupCreateRequest){
         ProductAttributeGroup productAttributeGroup = productAttributeGroupCreateRequest.toProductAttributeGroup();
 
-        this.validateExistedName(null, productAttributeGroupCreateRequest.name());
+        this.validateDuplicateName(null, productAttributeGroupCreateRequest.name());
         this.productAttributeGroupRepository.save(productAttributeGroup);
-        return ProductAttributeGroupGetResponse.fromProductAttributeGroup(productAttributeGroup);
+        return ProductAttributeGroupResponse.fromProductAttributeGroup(productAttributeGroup);
 
     }
-    public void validateExistedName(Long id,String name){
-        if(this.checkExistedName(id,name)){
+    public void validateDuplicateName(Long id, String name){
+        if(this.checkExitsName(id,name)){
              throw new BadRequestException(Constants.ErrorKey.NAME_ALREADY_EXITED,name);
         }
     }
-    public boolean checkExistedName(Long id,String name){
+    public boolean checkExitsName(Long id, String name){
         return this.productAttributeGroupRepository.findExistedName(id,name)!=null;
     }
 
 
     public void updateProductAttributeGroup(Long id, ProductAttributeGroupCreateRequest productAttributeGroupCreateRequest){
+        String attributeGroupName = productAttributeGroupCreateRequest.name();
         ProductAttributeGroup productAttributeGroup = this.productAttributeGroupRepository
                 .findById(id)
                 .orElseThrow(()->new NotFoundException(Constants.ErrorKey.PRODUCT_ATTRIBUTE_GROUP_NOT_FOUND,id));
-        productAttributeGroup.setName(productAttributeGroupCreateRequest.name());
+        this.validateDuplicateName(id, attributeGroupName);
+        productAttributeGroup.setName(attributeGroupName);
         this.productAttributeGroupRepository.save(productAttributeGroup);
 
 
